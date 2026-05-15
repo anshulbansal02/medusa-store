@@ -24,6 +24,7 @@ Canonical docs:
 - `docs/architecture.md`
 - `docs/storefront-experience.md`
 - `docs/engineering-standards.md`
+- `docs/secrets-and-config.md`
 - `docs/implementation-plan.md`
 - `docs/launch-checklist.md`
 - `docs/cost-model.md`
@@ -37,6 +38,25 @@ Canonical docs:
 - Do not patch Medusa core.
 - Keep custom integrations isolated as Medusa modules/providers/workflows where possible.
 - Keep the setup simple; avoid complex monorepo tooling.
+
+## Setup Rules
+
+- Use Node.js 24 LTS.
+- Use Corepack-managed pnpm pinned in root `packageManager`.
+- Use pnpm `minimumReleaseAge: 4320` with strict mode.
+- Use official CLIs for framework scaffolding.
+- Scaffold the storefront with `create-next-app`.
+- Scaffold the Medusa backend with `create-medusa-app`.
+- Use Biome, `src/`, and `@/*` for the Next.js storefront scaffold.
+- Place the generated Medusa backend at `apps/medusa`.
+- Do not install Medusa's optional Next.js Starter Storefront.
+- Use Docker Compose for local Postgres and Redis only.
+- Run Next.js and Medusa directly with pnpm during local development.
+- Keep app-generated TypeScript configs initially; do not add a root `tsconfig.base.json` until useful.
+- Use simple conventional commit messages; no commit tooling yet.
+- Use feature branches merged to `dev`, then `dev` merged to `main`.
+- Treat `dev` as the default remote branch once the remote exists.
+- Protect both `dev` and `main`.
 
 ## Storefront Rules
 
@@ -66,6 +86,7 @@ Use real product imagery, brand assets, clear typography, strong hierarchy, usef
 
 ## Security Rules
 
+- Follow `docs/secrets-and-config.md`.
 - No secrets in code.
 - No real `.env` files committed.
 - Use `NEXT_PUBLIC_*` only for browser-safe values.

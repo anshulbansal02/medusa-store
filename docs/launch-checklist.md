@@ -13,7 +13,7 @@ This checklist is intentionally lightweight. There is no written test suite for 
 - No obvious console errors on key pages.
 - `.env.example` files are current.
 - Real secrets are not committed.
-- `main` branch is protected.
+- `dev` and `main` branches are protected.
 - `dev` deploys to QA.
 - `main` deploys to production.
 

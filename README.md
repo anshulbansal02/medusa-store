@@ -49,10 +49,10 @@ Start Phase 0 from [Implementation Plan](docs/implementation-plan.md):
 
 ```txt
 Project foundation:
-  repo structure
-  Next.js app
-  Medusa app
-  pnpm scripts
-  env examples
-  basic local README updates
+  Node 24 and pinned pnpm
+  pnpm workspace and security policy
+  official Next.js scaffold
+  official Medusa scaffold
+  Docker Compose for local Postgres/Redis
+  env examples and README updates
 ```
