@@ -16,7 +16,7 @@ Single-brand premium fashion ecommerce storefront.
 
 ## Current Status
 
-Phase 0 foundation is in progress: the repo has a pnpm workspace, a Next.js storefront scaffold, a Medusa backend scaffold, and local Docker services for Postgres/Redis.
+Phase 0 foundation is complete: the repo has a pnpm workspace, a Next.js storefront scaffold, a Medusa backend scaffold, and local Docker services for Postgres/Redis.
 
 The architecture and product decisions have been cleaned into focused docs. The original research note is historical; use the canonical docs below for implementation.
 
@@ -75,7 +75,7 @@ pnpm dev:medusa
 
 ## Next Step
 
-Finish Phase 0 verification, then continue with Phase 1 from [Implementation Plan](docs/implementation-plan.md):
+Continue with Phase 1 from [Implementation Plan](docs/implementation-plan.md):
 
 ```txt
 Design foundation:
