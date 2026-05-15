@@ -46,6 +46,11 @@ Rules:
 
 - Scaffold the storefront with `create-next-app`.
 - Scaffold the Medusa backend with `create-medusa-app`.
+- Use Biome for the storefront scaffold when the Next.js CLI offers a linter choice.
+- Use the `src/` directory option for the storefront scaffold.
+- Use the default Next.js `@/*` import alias for the storefront.
+- Place the generated Medusa backend app at `apps/medusa` in this repo.
+- If `create-medusa-app` generates `apps/backend`, moving it to `apps/medusa` is allowed scaffold cleanup.
 - Use latest stable tooling at setup time.
 - Do not hand-create framework internals that the official CLIs should own.
 - Clean up generated starter files after scaffolding.
@@ -139,14 +144,18 @@ Rules:
 
 ## Linting And Formatting
 
-Use whatever works best with the current Next.js ecosystem.
+Use Biome as the default linting and formatting tool for application code.
 
 Rules:
 
-- Use ESLint for Next.js/React/TypeScript rules where expected.
-- Use one formatter only: Prettier or Biome.
-- Do not let Biome/Prettier/ESLint fight over formatting.
+- Use the official Next.js CLI Biome option for the storefront scaffold.
+- Add ESLint only if a framework integration requires checks that Biome does not cover well.
+- Do not let Biome, Prettier, and ESLint overlap on formatting.
 - Keep scripts simple:
+  - `dev:storefront`
+  - `dev:medusa`
+  - `build:storefront`
+  - `build:medusa`
   - `typecheck`
   - `lint`
   - `format` or `format:check`
@@ -270,8 +279,8 @@ Keep setup simple and agent-friendly.
 - `.env.example` files.
 - Obvious app boundaries.
 - No hidden setup steps.
-- Docker optional only if it simplifies dependencies.
-- Docker Compose only if local Postgres/Redis setup becomes annoying.
+- Use Docker Compose for local Postgres and Redis from day one.
+- Keep Docker Compose scoped to local development; production services are managed by hosted infrastructure.
 
 ## Dependency Updates
 

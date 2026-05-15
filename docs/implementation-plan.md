@@ -96,9 +96,10 @@ Use four buckets:
 Goal: get the repo and local development shape right.
 
 - Repository structure.
-- Next.js app scaffolded with official `create-next-app` CLI.
-- Medusa app scaffolded with official `create-medusa-app` CLI.
+- Next.js app scaffolded with official `create-next-app` CLI using Biome, `src/`, and `@/*`.
+- Medusa app scaffolded with official `create-medusa-app` CLI and placed at `apps/medusa`.
 - pnpm scripts.
+- Docker Compose for local Postgres/Redis from day one.
 - `.env.example` files.
 - Basic README.
 - Initial docs wired.
