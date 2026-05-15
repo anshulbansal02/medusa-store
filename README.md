@@ -1,6 +1,6 @@
 # Fashion Commerce Storefront
 
-Planning repo for a single-brand premium fashion ecommerce storefront.
+Single-brand premium fashion ecommerce storefront.
 
 ## Direction
 
@@ -16,9 +16,39 @@ Planning repo for a single-brand premium fashion ecommerce storefront.
 
 ## Current Status
 
-The project is in planning/design stage. No application code has been scaffolded yet.
+Phase 0 foundation is in progress: the repo has a pnpm workspace, a Next.js storefront scaffold, a Medusa backend scaffold, and local Docker services for Postgres/Redis.
 
 The architecture and product decisions have been cleaned into focused docs. The original research note is historical; use the canonical docs below for implementation.
+
+## Local Setup
+
+Use Node 24 and pinned pnpm:
+
+```sh
+corepack enable
+corepack prepare pnpm@11.1.2 --activate
+pnpm install
+```
+
+Run local services:
+
+```sh
+pnpm services:up
+```
+
+Copy app-local env examples before running apps:
+
+```sh
+cp apps/storefront/.env.example apps/storefront/.env.local
+cp apps/medusa/.env.example apps/medusa/.env
+```
+
+Start apps:
+
+```sh
+pnpm dev:storefront
+pnpm dev:medusa
+```
 
 ## Docs
 
@@ -45,14 +75,12 @@ The architecture and product decisions have been cleaned into focused docs. The 
 
 ## Next Step
 
-Start Phase 0 from [Implementation Plan](docs/implementation-plan.md):
+Finish Phase 0 verification, then continue with Phase 1 from [Implementation Plan](docs/implementation-plan.md):
 
 ```txt
-Project foundation:
-  Node 24 and pinned pnpm
-  pnpm workspace and security policy
-  official Next.js scaffold
-  official Medusa scaffold
-  Docker Compose for local Postgres/Redis
-  env examples and README updates
+Design foundation:
+  visual system
+  Tailwind tokens
+  shadcn-style component structure
+  Base UI primitives
 ```
