@@ -8,6 +8,7 @@ Use official docs first when implementation depends on current platform behavior
 ## Commerce
 
 - Medusa docs: https://docs.medusajs.com/
+- Medusa create-medusa-app CLI: https://docs.medusajs.com/resources/create-medusa-app
 - Medusa Next.js starter: https://docs.medusajs.com/resources/nextjs-starter
 - Medusa deployment: https://docs.medusajs.com/learn/deployment/general
 - Medusa payment module: https://docs.medusajs.com/resources/commerce-modules/payment
@@ -18,6 +19,7 @@ Use official docs first when implementation depends on current platform behavior
 ## Storefront
 
 - Next.js docs: https://nextjs.org/docs
+- Next.js create-next-app CLI: https://nextjs.org/docs/app/api-reference/cli/create-next-app
 - Next.js production checklist: https://nextjs.org/docs/app/guides/production-checklist
 - Next.js metadata and OG images: https://nextjs.org/docs/app/getting-started/metadata-and-og-images
 - Next.js Image component: https://nextjs.org/docs/app/api-reference/components/image

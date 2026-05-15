@@ -96,12 +96,20 @@ Use four buckets:
 Goal: get the repo and local development shape right.
 
 - Repository structure.
-- Next.js app.
-- Medusa app.
+- Next.js app scaffolded with official `create-next-app` CLI.
+- Medusa app scaffolded with official `create-medusa-app` CLI.
 - pnpm scripts.
 - `.env.example` files.
 - Basic README.
 - Initial docs wired.
+
+Rules:
+
+- Use official framework CLIs for initial scaffolding.
+- Do not manually create framework internals.
+- Use latest stable tooling at setup time.
+- Clean up generated files after scaffolding where they conflict with project decisions.
+- Do not install Medusa's optional Next.js Starter Storefront; the customer storefront is custom.
 
 ### Phase 1: Design Foundation
 

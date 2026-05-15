@@ -38,6 +38,19 @@ Rules:
 - Do not create shared packages prematurely.
 - Duplicated config is acceptable if it keeps setup simple.
 
+## Scaffolding
+
+Use official CLIs for framework scaffolding.
+
+Rules:
+
+- Scaffold the storefront with `create-next-app`.
+- Scaffold the Medusa backend with `create-medusa-app`.
+- Use latest stable tooling at setup time.
+- Do not hand-create framework internals that the official CLIs should own.
+- Clean up generated starter files after scaffolding.
+- Skip Medusa's optional Next.js Starter Storefront because this project uses a custom storefront UI.
+
 ## Storefront Structure
 
 ```txt
