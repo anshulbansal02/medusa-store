@@ -37,6 +37,8 @@ Rules:
 - Commit lockfile.
 - Do not create shared packages prematurely.
 - Duplicated config is acceptable if it keeps setup simple.
+- Use simple conventional commit messages, but do not add commit tooling yet.
+- Add `.editorconfig` during setup.
 
 ## Runtime
 
@@ -176,6 +178,8 @@ Rules:
 - Validate external/API data at boundaries where needed.
 - Keep Medusa API helper functions typed.
 - Keep types pragmatic; avoid type gymnastics.
+- Let official app scaffolds generate their own TypeScript configs first.
+- Do not add a root `tsconfig.base.json` until there is real shared compiler config value.
 
 ## Testing
 
@@ -186,6 +190,8 @@ Required checks:
 - Typecheck.
 - Lint/format.
 - Production build.
+- Light CI where it is useful for deployments and build verification.
+- Avoid excessive CI jobs that waste hosted limits.
 - Manual browser testing.
 - Manual mobile/desktop visual review.
 - Manual checkout/payment/email smoke testing.
@@ -292,6 +298,7 @@ Keep setup simple and agent-friendly.
 - Run Next.js and Medusa directly with pnpm on the host during local development.
 - Do not containerize application servers for local development unless there is a clear need later.
 - Keep Docker Compose scoped to local development; production services are managed by hosted infrastructure.
+- Use conventional local ports: storefront `3000`, Medusa `9000`, Postgres `5432`, Redis `6379`.
 
 ## Dependency Updates
 

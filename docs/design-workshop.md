@@ -70,8 +70,11 @@ Use this file for future high-level design discussions. When a decision becomes 
 ## Environment Summary
 
 - Branches:
+  - feature branches are used for development work.
   - `dev` deploys to QA.
-  - `main` deploys to production and must be protected.
+  - feature branches merge into `dev`; `dev` merges into `main` for production release.
+  - `dev` should be the default GitHub branch.
+  - `dev` and `main` deploy to hosted environments and must be protected.
 - Vercel:
   - QA storefront from `dev`.
   - Production storefront from `main`.

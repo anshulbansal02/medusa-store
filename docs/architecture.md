@@ -206,9 +206,13 @@ Do not mount Medusa Admin/API under storefront paths unless there is a specific 
 
 Branches:
 
+- Feature branches are used for development work.
 - `dev` deploys to QA.
 - `main` deploys to production.
-- `main` must be protected; no direct pushes.
+- Feature branches merge into `dev`.
+- `dev` merges into `main` for production release.
+- `dev` should be the default GitHub branch.
+- `dev` and `main` must be protected; no direct pushes.
 
 QA:
 

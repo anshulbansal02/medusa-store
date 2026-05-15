@@ -99,6 +99,8 @@ Goal: get the repo and local development shape right.
 - Node.js 24 LTS recorded in version and engine files.
 - Corepack-managed pnpm pinned in root `packageManager`.
 - pnpm supply-chain policy with 3-day minimum release age.
+- App-generated TypeScript configs; no root `tsconfig.base.json` until it is useful.
+- `.editorconfig`.
 - Next.js app scaffolded with official `create-next-app` CLI using Biome, `src/`, and `@/*`.
 - Medusa app scaffolded with official `create-medusa-app` CLI and placed at `apps/medusa`.
 - pnpm scripts.
@@ -116,6 +118,9 @@ Rules:
 - Use latest stable tooling at setup time.
 - Clean up generated files after scaffolding where they conflict with project decisions.
 - Do not install Medusa's optional Next.js Starter Storefront; the customer storefront is custom.
+- Use simple conventional commit messages.
+- Use feature branches merged to `dev`, then `dev` merged to `main`.
+- Keep `dev` as the default branch once the remote exists.
 
 ### Phase 1: Design Foundation
 
