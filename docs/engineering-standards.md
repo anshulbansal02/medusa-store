@@ -78,6 +78,15 @@ apps/storefront/lib/utils/    small utilities
 apps/storefront/styles/       global styles/tokens
 ```
 
+Preferred component structure:
+
+```txt
+apps/storefront/src/components/ui/       shadcn-style local components using Base UI/native primitives
+apps/storefront/src/components/layout/   header, footer, container, section
+apps/storefront/src/features/            commerce/domain UI and behavior
+apps/storefront/src/lib/utils/           small utilities such as cn()
+```
+
 Rules:
 
 - Keep Medusa access inside `lib/medusa`.
@@ -87,6 +96,30 @@ Rules:
 - Use server rendering for product/collection data where practical.
 - Use typed data contracts at API boundaries.
 - Avoid random API calls inside components.
+- Keep UI components local to the storefront; do not create a shared UI package yet.
+- Do not invent interactive/accessibility primitives.
+- Use Base UI and shadcn-style components/patterns for interactive UI.
+- If shadcn does not provide a component, compose a local component with the same style pattern using Base UI primitives.
+- Compose non-interactive layout/content components from semantic HTML and design-token-backed Tailwind utilities.
+- Use a local `cn()` helper based on `clsx` and `tailwind-merge`.
+
+## Storefront Styling
+
+Use Tailwind CSS v4 utilities backed by design tokens.
+
+Rules:
+
+- Keep CSS in global/token files only.
+- Do not add component-level CSS files.
+- Do not add custom CSS classes unless a CSS feature cannot be expressed cleanly with Tailwind utilities or tokens.
+- Prefer semantic design tokens over one-off literal values.
+- Keep theming configurable in the same spirit as shadcn-style CSS variables.
+- Do not add dark mode tokens for v1.
+- Use proper SVG/icon-library icons; do not use emoji as UI icons or placeholders unless explicitly requested.
+- Use `lucide-react` as the primary UI icon library.
+- Use outline icons that inherit `currentColor`, with consistent stroke width around `1.5` to `1.75`.
+- Do not import the whole icon library namespace or use dynamic icon imports.
+- Use official SVG assets for brand, payment, and social logos instead of UI icon libraries.
 
 ## Preferred Libraries
 

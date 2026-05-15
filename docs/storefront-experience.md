@@ -21,6 +21,7 @@ Design defaults:
 - Elegant serif for selected headings.
 - Clean sans-serif for body/UI.
 - Brand-controlled light theme only.
+- Tailwind CSS v4 design tokens for colors, typography, spacing, radius, and layout.
 - Warm white / soft black base.
 - One or two muted accents from brand colors.
 - Spacious but not empty layouts.
@@ -28,6 +29,9 @@ Design defaults:
 - Thin borders and restrained dividers.
 - Refined product cards.
 - Calm, polished forms and checkout.
+- `lucide-react` outline icons for UI actions, inheriting `currentColor` with consistent refined stroke width.
+- Official SVG assets for brand, payment, and social logos.
+- No emoji icons unless explicitly requested.
 - Subtle hover/image transitions only.
 
 ## Anti-Generic Design Rules
@@ -43,6 +47,7 @@ Avoid:
 - Cards inside cards.
 - Disconnected sections that look generated separately.
 - Fake luxury copy.
+- Emoji placeholders.
 - Vague filler headlines.
 - Over-animated hover effects.
 - Decorative complexity instead of real product content.
@@ -51,6 +56,7 @@ Prefer:
 
 - Real product photography.
 - Brand assets and design references.
+- Semantic design tokens instead of one-off CSS.
 - Strong hierarchy.
 - Useful content.
 - Fewer, better sections.
