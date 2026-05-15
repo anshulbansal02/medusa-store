@@ -1,0 +1,21 @@
+{
+  "name": "fashion-commerce",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": ">=11.1.2 <12"
+  },
+  "scripts": {
+    "dev:storefront": "pnpm --dir apps/storefront dev",
+    "dev:medusa": "pnpm --dir apps/medusa dev",
+    "build:storefront": "pnpm --dir apps/storefront build",
+    "build:medusa": "pnpm --dir apps/medusa build",
+    "lint": "pnpm --dir apps/storefront lint",
+    "typecheck": "pnpm --recursive --if-present typecheck",
+    "format": "pnpm --dir apps/storefront format",
+    "format:check": "pnpm --dir apps/storefront format:check"
+  }
+}
