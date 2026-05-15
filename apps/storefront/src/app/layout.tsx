@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Geist } from "next/font/google";
+import { Geist, Instrument_Serif } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument-serif",
+});
 
 export const metadata: Metadata = {
-  title: "Fashion Commerce",
-  description: "Premium fashion storefront.",
+  title: "The Label | Occasion wear for evenings out",
+  description:
+    "Premium occasion and western wear for dinners, weddings, and after-hours plans.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -16,7 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html
+      lang="en"
+      className={cn("font-sans", geist.variable, instrumentSerif.variable)}
+    >
       <body>{children}</body>
     </html>
   );
