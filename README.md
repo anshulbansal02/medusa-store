@@ -28,6 +28,7 @@ The architecture and product decisions have been cleaned into focused docs. The 
 - [Architecture](docs/architecture.md): system, infrastructure, integrations, environments.
 - [Storefront Experience](docs/storefront-experience.md): UX, design, pages, SEO, accessibility.
 - [Engineering Standards](docs/engineering-standards.md): code organization, tooling, security, performance.
+- [Secrets And Config](docs/secrets-and-config.md): environment variables, secret handling, hosted config, rotation.
 - [Implementation Plan](docs/implementation-plan.md): MVP scope and build phases.
 - [Launch Checklist](docs/launch-checklist.md): manual launch readiness checks.
 - [Cost Model](docs/cost-model.md): cost assumptions and guardrails.

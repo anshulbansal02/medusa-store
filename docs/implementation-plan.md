@@ -105,6 +105,7 @@ Goal: get the repo and local development shape right.
 - Docker Compose for local Postgres/Redis from day one.
 - Apps run directly with pnpm on the host in local development.
 - `.env.example` files.
+- Secrets/config guide linked from docs.
 - Basic README.
 - Initial docs wired.
 

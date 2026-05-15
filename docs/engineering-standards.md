@@ -231,6 +231,7 @@ Security is non-negotiable.
 
 Required:
 
+- Follow [Secrets And Config](secrets-and-config.md) for environment variables, hosted config, and secret rotation.
 - No secrets in code.
 - No real `.env` files committed.
 - `.env.example` documents required variables.

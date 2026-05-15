@@ -8,6 +8,7 @@ This folder contains the canonical planning and implementation context for the f
 - [Architecture](architecture.md): platform, infrastructure, integrations, environments, security boundaries.
 - [Storefront Experience](storefront-experience.md): UX, design direction, page behavior, content standards.
 - [Engineering Standards](engineering-standards.md): code organization, tooling, state, forms, security, accessibility, performance.
+- [Secrets And Config](secrets-and-config.md): environment variable layout, secret handling, rotation, and hosted config rules.
 - [Implementation Plan](implementation-plan.md): MVP boundary, build phases, launch scope.
 - [Launch Checklist](launch-checklist.md): manual readiness checks before production launch.
 - [Cost Model](cost-model.md): recurring cost assumptions and guardrails.
