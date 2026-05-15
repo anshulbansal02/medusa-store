@@ -11,41 +11,13 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
+import { getHomeProducts, type HomeProduct } from "@/lib/medusa/products";
 import { cn } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 const heroImage =
   "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1800&q=82";
-
-const products = [
-  {
-    name: "Noor Draped Midi Dress",
-    price: "Rs. 6,800",
-    note: "Wine",
-    image:
-      "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    name: "Ira Structured Co-ord",
-    price: "Rs. 7,200",
-    note: "Ivory",
-    image:
-      "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    name: "Mira Satin Evening Top",
-    price: "Rs. 5,400",
-    note: "Sage",
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    name: "Zoya Cutwork Dress",
-    price: "Rs. 8,100",
-    note: "Black",
-    image:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
-  },
-];
 
 const edits = [
   {
@@ -86,11 +58,11 @@ const trustItems = [
   },
 ];
 
-function ProductCard({ product }: { product: (typeof products)[number] }) {
+function ProductCard({ product }: { product: HomeProduct }) {
   return (
     <article className="group">
       <Link
-        href="/shop"
+        href={product.href}
         prefetch={false}
         className="block"
         aria-label={`View ${product.name}`}
@@ -109,7 +81,11 @@ function ProductCard({ product }: { product: (typeof products)[number] }) {
             <h3 className="text-[0.95rem] font-medium leading-snug">
               {product.name}
             </h3>
-            <p className="mt-1 text-sm text-muted-foreground">{product.note}</p>
+            {product.note ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {product.note}
+              </p>
+            ) : null}
           </div>
           <p className="text-sm font-medium">{product.price}</p>
         </div>
@@ -118,7 +94,9 @@ function ProductCard({ product }: { product: (typeof products)[number] }) {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const products = await getHomeProducts();
+
   return (
     <main className="min-h-screen">
       <header className="fixed inset-x-0 top-0 z-30 border-border/70 border-b bg-background/92 backdrop-blur-sm">
@@ -264,11 +242,23 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((product) => (
-              <ProductCard key={product.name} product={product} />
-            ))}
-          </div>
+          {products.length > 0 ? (
+            <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="border border-border px-5 py-8 sm:px-8">
+              <h3 className="text-base font-medium">
+                New arrivals are not connected yet.
+              </h3>
+              <p className="mt-2 max-w-xl text-muted-foreground text-sm">
+                Start Medusa with a publishable key and published products to
+                populate this section.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

@@ -7,6 +7,7 @@ This folder contains the canonical planning and implementation context for the f
 - [Design Workshop](design-workshop.md): compact active decision summary and future workshop process.
 - [Architecture](architecture.md): platform, infrastructure, integrations, environments, security boundaries.
 - [Storefront Experience](storefront-experience.md): UX, design direction, page behavior, content standards.
+- [Storefront Design Rules](storefront-design-rules.md): distilled visual and UX guardrails from research.
 - [Engineering Standards](engineering-standards.md): code organization, tooling, state, forms, security, accessibility, performance.
 - [Secrets And Config](secrets-and-config.md): environment variable layout, secret handling, rotation, and hosted config rules.
 - [Implementation Plan](implementation-plan.md): MVP boundary, build phases, launch scope.
