@@ -38,6 +38,14 @@ Rules:
 - Do not create shared packages prematurely.
 - Duplicated config is acceptable if it keeps setup simple.
 
+## Runtime
+
+- Target Node.js 24 LTS for local development and deployments.
+- Record the runtime in repo-level `.nvmrc`, `.node-version`, and `package.json` engines during setup.
+- Use Corepack-managed pnpm through the root `packageManager` field.
+- Pin the exact pnpm version selected during setup.
+- Avoid global installs unless required by a platform or official scaffold command.
+
 ## Scaffolding
 
 Use official CLIs for framework scaffolding.
@@ -280,11 +288,17 @@ Keep setup simple and agent-friendly.
 - Obvious app boundaries.
 - No hidden setup steps.
 - Use Docker Compose for local Postgres and Redis from day one.
+- Run Next.js and Medusa directly with pnpm on the host during local development.
+- Do not containerize application servers for local development unless there is a clear need later.
 - Keep Docker Compose scoped to local development; production services are managed by hosted infrastructure.
 
 ## Dependency Updates
 
 - Use latest stable versions at setup time.
+- Configure `minimumReleaseAge: 4320` in `pnpm-workspace.yaml` so package versions must be at least 3 days old before pnpm installs them.
+- Keep `minimumReleaseAgeStrict` enabled so installs fail instead of silently bypassing the age gate.
+- Use `minimumReleaseAgeExclude` only for explicit, reviewed exceptions.
+- Do not disable pnpm's default transitive exotic dependency blocking.
 - Avoid experimental packages unless strongly justified.
 - Review release notes before major upgrades.
 - Do not auto-upgrade critical commerce dependencies blindly.

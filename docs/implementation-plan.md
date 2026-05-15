@@ -96,10 +96,14 @@ Use four buckets:
 Goal: get the repo and local development shape right.
 
 - Repository structure.
+- Node.js 24 LTS recorded in version and engine files.
+- Corepack-managed pnpm pinned in root `packageManager`.
+- pnpm supply-chain policy with 3-day minimum release age.
 - Next.js app scaffolded with official `create-next-app` CLI using Biome, `src/`, and `@/*`.
 - Medusa app scaffolded with official `create-medusa-app` CLI and placed at `apps/medusa`.
 - pnpm scripts.
 - Docker Compose for local Postgres/Redis from day one.
+- Apps run directly with pnpm on the host in local development.
 - `.env.example` files.
 - Basic README.
 - Initial docs wired.
