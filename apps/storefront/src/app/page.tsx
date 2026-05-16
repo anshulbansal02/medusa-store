@@ -1,17 +1,12 @@
-import {
-  Heart,
-  Ruler,
-  Search,
-  ShieldCheck,
-  ShoppingBag,
-  Truck,
-  UserRound,
-} from "lucide-react";
+import { Ruler, ShieldCheck, Truck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { SiteFooter } from "@/components/site/site-footer";
+import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
-import { getHomeProducts, type HomeProduct } from "@/lib/medusa/products";
+import { ProductCard } from "@/features/products/product-card";
+import { getHomeProducts } from "@/lib/medusa/products";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -58,125 +53,12 @@ const trustItems = [
   },
 ];
 
-function ProductCard({ product }: { product: HomeProduct }) {
-  return (
-    <article className="group">
-      <Link
-        href={product.href}
-        prefetch={false}
-        className="block"
-        aria-label={`View ${product.name}`}
-      >
-        <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-          <Image
-            src={product.image}
-            alt={`${product.name} styled on a model`}
-            fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition duration-500 ease-out group-hover:scale-[1.03]"
-          />
-        </div>
-        <div className="mt-3 flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-[0.95rem] font-medium leading-snug">
-              {product.name}
-            </h3>
-            {product.note ? (
-              <p className="mt-1 text-sm text-muted-foreground">
-                {product.note}
-              </p>
-            ) : null}
-          </div>
-          <p className="text-sm font-medium">{product.price}</p>
-        </div>
-      </Link>
-    </article>
-  );
-}
-
 export default async function Home() {
   const products = await getHomeProducts();
 
   return (
     <main className="min-h-screen">
-      <header className="fixed inset-x-0 top-0 z-30 border-border/70 border-b bg-background/92 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="font-heading text-2xl leading-none tracking-normal"
-          >
-            The Label
-          </Link>
-
-          <nav
-            className="hidden items-center gap-7 text-sm text-muted-foreground lg:flex"
-            aria-label="Primary navigation"
-          >
-            <Link
-              href="/shop"
-              prefetch={false}
-              className="transition hover:text-foreground"
-            >
-              New Arrivals
-            </Link>
-            <Link
-              href="/shop/dresses"
-              prefetch={false}
-              className="transition hover:text-foreground"
-            >
-              Dresses
-            </Link>
-            <Link
-              href="/shop/sets"
-              prefetch={false}
-              className="transition hover:text-foreground"
-            >
-              Sets
-            </Link>
-            <Link
-              href="/shop/tops"
-              prefetch={false}
-              className="transition hover:text-foreground"
-            >
-              Tops
-            </Link>
-            <Link
-              href="/shop/occasion-edit"
-              prefetch={false}
-              className="transition hover:text-foreground"
-            >
-              Occasion Edit
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-1.5">
-            <Link
-              href="/search"
-              prefetch={false}
-              aria-label="Search"
-              className="inline-flex size-9 items-center justify-center text-muted-foreground transition hover:text-foreground"
-            >
-              <Search className="size-4 stroke-[1.6]" />
-            </Link>
-            <Link
-              href="/account"
-              prefetch={false}
-              aria-label="Account"
-              className="hidden size-9 items-center justify-center text-muted-foreground transition hover:text-foreground sm:inline-flex"
-            >
-              <UserRound className="size-4 stroke-[1.6]" />
-            </Link>
-            <Link
-              href="/cart"
-              prefetch={false}
-              aria-label="Cart"
-              className="inline-flex size-9 items-center justify-center text-muted-foreground transition hover:text-foreground"
-            >
-              <ShoppingBag className="size-4 stroke-[1.6]" />
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <section className="relative min-h-[88svh] overflow-hidden pt-16">
         <Image
@@ -368,78 +250,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <footer className="px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-8 text-sm text-muted-foreground md:flex-row">
-          <div>
-            <Link href="/" className="font-heading text-3xl text-foreground">
-              The Label
-            </Link>
-            <p className="mt-3 max-w-sm">
-              Premium western occasion wear for India, built around newness,
-              visual appeal, and a low-friction shopping flow.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-            <div>
-              <h2 className="mb-3 text-foreground text-sm font-medium">Shop</h2>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/shop" prefetch={false}>
-                    New Arrivals
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/shop/dresses" prefetch={false}>
-                    Dresses
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/shop/sets" prefetch={false}>
-                    Sets
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h2 className="mb-3 text-foreground text-sm font-medium">Help</h2>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/contact" prefetch={false}>
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/size-guide" prefetch={false}>
-                    Size Guide
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/shipping" prefetch={false}>
-                    Shipping
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h2 className="mb-3 text-foreground text-sm font-medium">
-                Social
-              </h2>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="/instagram"
-                    prefetch={false}
-                    className="inline-flex items-center gap-2"
-                  >
-                    <Heart className="size-3.5 stroke-[1.6]" />
-                    Instagram
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

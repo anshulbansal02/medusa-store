@@ -25,7 +25,7 @@ type MedusaProductsResponse = {
   products?: MedusaProduct[];
 };
 
-export type HomeProduct = {
+export type StorefrontProduct = {
   id: string;
   name: string;
   href: string;
@@ -74,7 +74,7 @@ function getProductPrice(product: MedusaProduct) {
   }).format(amount);
 }
 
-function toHomeProduct(product: MedusaProduct): HomeProduct | null {
+function toStorefrontProduct(product: MedusaProduct): StorefrontProduct | null {
   const image = getProductImage(product);
   const price = getProductPrice(product);
 
@@ -92,7 +92,15 @@ function toHomeProduct(product: MedusaProduct): HomeProduct | null {
   };
 }
 
-export async function getHomeProducts(limit = 4): Promise<HomeProduct[]> {
+export async function getHomeProducts(limit = 4): Promise<StorefrontProduct[]> {
+  return getProducts({ limit });
+}
+
+export async function getProducts({
+  limit = 24,
+}: {
+  limit?: number;
+} = {}): Promise<StorefrontProduct[]> {
   const config = getMedusaConfig();
 
   if (!config) {
@@ -130,11 +138,11 @@ export async function getHomeProducts(limit = 4): Promise<HomeProduct[]> {
 
     const data = (await response.json()) as MedusaProductsResponse;
     const products =
-      data.products?.reduce<HomeProduct[]>((result, product) => {
-        const homeProduct = toHomeProduct(product);
+      data.products?.reduce<StorefrontProduct[]>((result, product) => {
+        const storefrontProduct = toStorefrontProduct(product);
 
-        if (homeProduct) {
-          result.push(homeProduct);
+        if (storefrontProduct) {
+          result.push(storefrontProduct);
         }
 
         return result;
