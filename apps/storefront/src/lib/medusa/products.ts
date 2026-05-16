@@ -1,3 +1,5 @@
+import { formatStorePrice, getMedusaConfig } from "@/lib/medusa/client";
+
 type MedusaImage = {
   url?: string;
 };
@@ -63,25 +65,6 @@ export type ProductDetailVariant = {
   price: string;
 };
 
-const medusaBackendUrl =
-  process.env.MEDUSA_BACKEND_URL ?? process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
-const medusaPublishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY;
-
-function isConfigured(value: string | undefined): value is string {
-  return typeof value === "string" && !value.includes("replace_me");
-}
-
-function getMedusaConfig() {
-  const backendUrl = medusaBackendUrl;
-  const publishableKey = medusaPublishableKey;
-
-  if (!isConfigured(backendUrl) || !isConfigured(publishableKey)) {
-    return null;
-  }
-
-  return { backendUrl, publishableKey };
-}
-
 function getProductImage(product: MedusaProduct) {
   return product.thumbnail ?? product.images?.find((image) => image.url)?.url;
 }
@@ -96,15 +79,7 @@ function getVariantPrice(variant: MedusaVariant | undefined) {
   const amount = price?.amount;
   const currencyCode = price?.currency_code;
 
-  if (typeof amount !== "number" || !currencyCode) {
-    return null;
-  }
-
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: currencyCode.toUpperCase(),
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return formatStorePrice(amount, currencyCode);
 }
 
 function getVariantOption(variant: MedusaVariant, optionTitle: string) {

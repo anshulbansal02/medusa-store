@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
+import { addToCartAction } from "@/features/cart/actions";
 import { getProductByHandle } from "@/lib/medusa/products";
 import { cn } from "@/lib/utils";
 
@@ -119,7 +120,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               ) : null}
             </div>
 
-            <form className="py-6">
+            <form action={addToCartAction} className="py-6">
               {product.color ? (
                 <div>
                   <p className="text-sm font-medium">Color</p>
@@ -168,8 +169,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </fieldset>
 
               <button
-                type="button"
-                disabled
+                type="submit"
+                disabled={product.variants.length === 0}
                 className={cn(
                   buttonVariants({ size: "lg" }),
                   "mt-6 h-12 w-full rounded-none",

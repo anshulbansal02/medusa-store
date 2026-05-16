@@ -1,6 +1,8 @@
 import { Search, ShoppingBag, UserRound } from "lucide-react";
 import Link from "next/link";
 
+import { getCartItemCount } from "@/lib/medusa/cart";
+
 const navItems = [
   { href: "/shop", label: "New Arrivals" },
   { href: "/shop/dresses", label: "Dresses" },
@@ -9,7 +11,9 @@ const navItems = [
   { href: "/shop/occasion-edit", label: "Occasion Edit" },
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const cartItemCount = await getCartItemCount();
+
   return (
     <header className="fixed inset-x-0 top-0 z-30 border-border/70 border-b bg-background/92 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -57,9 +61,14 @@ export function SiteHeader() {
             href="/cart"
             prefetch={false}
             aria-label="Cart"
-            className="inline-flex size-9 items-center justify-center text-muted-foreground transition hover:text-foreground"
+            className="relative inline-flex size-9 items-center justify-center text-muted-foreground transition hover:text-foreground"
           >
             <ShoppingBag className="size-4 stroke-[1.6]" />
+            {cartItemCount > 0 ? (
+              <span className="-right-0.5 -top-0.5 absolute flex size-4 items-center justify-center rounded-full bg-foreground text-[10px] text-background leading-none">
+                {cartItemCount}
+              </span>
+            ) : null}
           </Link>
         </div>
       </div>
