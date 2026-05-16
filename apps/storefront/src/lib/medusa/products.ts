@@ -7,13 +7,7 @@ type MedusaPrice = {
   currency_code?: string;
 };
 
-type MedusaCalculatedPrice = {
-  calculated_amount?: number;
-  currency_code?: string;
-};
-
 type MedusaVariant = {
-  calculated_price?: MedusaCalculatedPrice;
   prices?: MedusaPrice[];
 };
 
@@ -65,10 +59,9 @@ function getProductImage(product: MedusaProduct) {
 
 function getProductPrice(product: MedusaProduct) {
   const variant = product.variants?.[0];
-  const calculated = variant?.calculated_price;
   const price = variant?.prices?.[0];
-  const amount = calculated?.calculated_amount ?? price?.amount;
-  const currencyCode = calculated?.currency_code ?? price?.currency_code;
+  const amount = price?.amount;
+  const currencyCode = price?.currency_code;
 
   if (typeof amount !== "number" || !currencyCode) {
     return null;
@@ -120,7 +113,6 @@ export async function getHomeProducts(limit = 4): Promise<HomeProduct[]> {
       "*images",
       "*variants",
       "*variants.prices",
-      "*variants.calculated_price",
     ].join(","),
   );
 
