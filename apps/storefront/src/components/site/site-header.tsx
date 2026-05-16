@@ -1,4 +1,4 @@
-import { Search, ShoppingBag, UserRound } from "lucide-react";
+import { Search, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
 import { getCartItemCount } from "@/lib/medusa/cart";
@@ -48,14 +48,6 @@ export async function SiteHeader() {
             className="inline-flex size-9 items-center justify-center text-muted-foreground transition hover:text-foreground"
           >
             <Search className="size-4 stroke-[1.6]" />
-          </Link>
-          <Link
-            href="/account"
-            prefetch={false}
-            aria-label="Account"
-            className="hidden size-9 items-center justify-center text-muted-foreground transition hover:text-foreground sm:inline-flex"
-          >
-            <UserRound className="size-4 stroke-[1.6]" />
           </Link>
           <Link
             href="/cart"

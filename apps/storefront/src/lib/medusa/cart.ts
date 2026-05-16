@@ -350,13 +350,13 @@ export async function setCartShippingMethod(optionId: string) {
   return toStorefrontCart(data.cart);
 }
 
-export async function addVariantToCart(variantId: string) {
+export async function addVariantToCart(variantId: string, quantity = 1) {
   const cart = await getOrCreateCart();
   const data = await medusaFetch<MedusaCartResponse>(
     `/store/carts/${cart.id}/line-items`,
     {
       method: "POST",
-      body: JSON.stringify({ variant_id: variantId, quantity: 1 }),
+      body: JSON.stringify({ variant_id: variantId, quantity }),
       cache: "no-store",
       headers: {
         "content-type": "application/json",

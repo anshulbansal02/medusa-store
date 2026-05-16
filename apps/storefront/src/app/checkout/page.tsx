@@ -5,9 +5,9 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
-import { selectShippingMethodAction } from "@/features/checkout/actions";
 import { CheckoutAddressForm } from "@/features/checkout/checkout-address-form";
 import type { CheckoutAddressInput } from "@/features/checkout/schema";
+import { ShippingMethodForm } from "@/features/checkout/shipping-method-form";
 import { getCurrentCart, getCurrentShippingOptions } from "@/lib/medusa/cart";
 import { cn } from "@/lib/utils";
 
@@ -106,49 +106,10 @@ export default async function CheckoutPage() {
 
                 {cart.shippingAddress ? (
                   shippingOptions.length > 0 ? (
-                    <form
-                      action={selectShippingMethodAction}
-                      className="grid gap-4"
-                    >
-                      {shippingOptions.map((option, index) => (
-                        <label
-                          key={option.id}
-                          className="grid cursor-pointer grid-cols-[auto_1fr_auto] gap-3 border border-border p-4 transition hover:border-foreground"
-                        >
-                          <input
-                            type="radio"
-                            name="option_id"
-                            value={option.id}
-                            defaultChecked={
-                              cart.selectedShippingOptionId
-                                ? cart.selectedShippingOptionId === option.id
-                                : index === 0
-                            }
-                            className="mt-1 accent-foreground"
-                          />
-                          <span>
-                            <span className="block font-medium">
-                              {option.name}
-                            </span>
-                            {option.description ? (
-                              <span className="mt-1 block text-muted-foreground text-sm">
-                                {option.description}
-                              </span>
-                            ) : null}
-                          </span>
-                          <span className="font-medium">{option.price}</span>
-                        </label>
-                      ))}
-                      <button
-                        type="submit"
-                        className={cn(
-                          buttonVariants({ variant: "outline", size: "lg" }),
-                          "h-11 rounded-none px-6 sm:justify-self-start",
-                        )}
-                      >
-                        Save shipping method
-                      </button>
-                    </form>
+                    <ShippingMethodForm
+                      options={shippingOptions}
+                      selectedShippingOptionId={cart.selectedShippingOptionId}
+                    />
                   ) : (
                     <div className="border border-border px-5 py-6">
                       <h3 className="font-medium">

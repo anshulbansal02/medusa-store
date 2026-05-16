@@ -1,14 +1,14 @@
+import { RefreshCw, ShieldCheck, Truck } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { buttonVariants } from "@/components/ui/button";
-import { addToCartAction } from "@/features/cart/actions";
-import { getProductByHandle } from "@/lib/medusa/products";
-import { cn } from "@/lib/utils";
+import { AddToCartForm } from "@/features/cart/add-to-cart-form";
+import { ProductCard } from "@/features/products/product-card";
+import { ProductGallery } from "@/features/products/product-gallery";
+import { getProductByHandle, getProducts } from "@/lib/medusa/products";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,43 @@ type ProductPageProps = {
   }>;
 };
 
+const collectionPages = {
+  dresses: {
+    label: "Dresses",
+    title: "Dresses with presence.",
+    description:
+      "Polished western dresses for dinners, parties, and occasion-led wardrobes.",
+    terms: ["dress"],
+  },
+  sets: {
+    label: "Co-ords",
+    title: "Sets that do the work.",
+    description:
+      "Matching sets and co-ords for sharper dressing with less effort.",
+    terms: ["co-ord", "coord", "set"],
+  },
+  tops: {
+    label: "Tops",
+    title: "Tops with shape.",
+    description:
+      "Statement tops and refined separates for pairing across the wardrobe.",
+    terms: ["top"],
+  },
+  "occasion-edit": {
+    label: "Occasion Edit",
+    title: "Occasion pieces.",
+    description:
+      "A focused edit for wedding functions, celebrations, and dressed-up evenings.",
+    terms: [],
+  },
+} as const;
+
+type CollectionHandle = keyof typeof collectionPages;
+
+function getCollectionPage(handle: string) {
+  return collectionPages[handle as CollectionHandle];
+}
+
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
@@ -25,6 +62,15 @@ export async function generateMetadata({
   const product = await getProductByHandle(handle);
 
   if (!product) {
+    const collection = getCollectionPage(handle);
+
+    if (collection) {
+      return {
+        title: `${collection.label} | The Label`,
+        description: collection.description,
+      };
+    }
+
     return {
       title: "Product not found | The Label",
     };
@@ -41,6 +87,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = await getProductByHandle(handle);
 
   if (!product) {
+    const collection = getCollectionPage(handle);
+
+    if (collection) {
+      return <CollectionPage collection={collection} />;
+    }
+
     notFound();
   }
 
@@ -57,32 +109,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <main className="min-h-screen">
       <SiteHeader />
 
-      <section className="px-4 pt-24 pb-14 sm:px-6 sm:pt-28 sm:pb-20 lg:px-8">
+      <section className="px-4 pt-24 pb-28 sm:px-6 sm:pt-28 sm:pb-20 lg:px-8">
         <div className="mx-auto grid max-w-[1440px] gap-10 lg:grid-cols-[1.08fr_0.92fr] xl:gap-14">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {product.images.map((image, index) => (
-              <div
-                key={image}
-                className={cn(
-                  "relative overflow-hidden bg-muted",
-                  index === 0 ? "aspect-[4/5] sm:col-span-2" : "aspect-[4/5]",
-                )}
-              >
-                <Image
-                  src={image}
-                  alt={`${product.name} view ${index + 1}`}
-                  fill
-                  loading={index === 0 ? "eager" : "lazy"}
-                  sizes={
-                    index === 0
-                      ? "(min-width: 1024px) 56vw, 100vw"
-                      : "(min-width: 1024px) 28vw, 50vw"
-                  }
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
+          <ProductGallery images={product.images} productName={product.name} />
 
           <div className="lg:sticky lg:top-24 lg:self-start">
             <nav
@@ -120,90 +149,133 @@ export default async function ProductPage({ params }: ProductPageProps) {
               ) : null}
             </div>
 
-            <form action={addToCartAction} className="py-6">
-              {product.color ? (
-                <div>
-                  <p className="text-sm font-medium">Color</p>
-                  <p className="mt-2 text-muted-foreground text-sm">
-                    {product.color}
-                  </p>
-                </div>
-              ) : null}
-
-              <fieldset className="mt-6" aria-describedby="size-help">
-                <legend className="sr-only">Size</legend>
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-sm font-medium">Size</p>
-                  <Link
-                    href="/size-guide"
-                    prefetch={false}
-                    className="text-sm underline-offset-4 hover:underline"
-                  >
-                    Size guide
-                  </Link>
-                </div>
-                <p id="size-help" className="sr-only">
-                  Choose one available size for {product.name}.
-                </p>
-                <div className="mt-3 grid grid-cols-5 gap-2">
-                  {product.variants.map((variant, index) => (
-                    <div key={variant.id}>
-                      <input
-                        id={variant.id}
-                        type="radio"
-                        name="variant_id"
-                        value={variant.id}
-                        defaultChecked={index === 0}
-                        aria-label={`Size ${variant.size}`}
-                        className="peer sr-only"
-                      />
-                      <label
-                        htmlFor={variant.id}
-                        className="flex h-11 cursor-pointer items-center justify-center border border-border text-sm transition peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background"
-                      >
-                        {variant.size}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-
-              <button
-                type="submit"
-                disabled={product.variants.length === 0}
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "mt-6 h-12 w-full rounded-none",
-                )}
-              >
-                Add to bag
-              </button>
-            </form>
+            <AddToCartForm
+              productName={product.name}
+              productPrice={product.price}
+              color={product.color}
+              variants={product.variants}
+            />
 
             <div className="grid gap-4 border-border border-t pt-6 text-sm">
-              <div>
-                <h2 className="font-medium">Fit and fabric</h2>
-                <p className="mt-1 text-muted-foreground">
-                  Use the size guide before checkout. Measurements and fabric
-                  notes will become more detailed as real catalog content is
-                  added in Medusa.
-                </p>
+              <div className="flex gap-3">
+                <Truck
+                  className="mt-0.5 size-4 shrink-0 stroke-[1.6] text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <div>
+                  <h2 className="font-medium">Delivery</h2>
+                  <p className="mt-1 text-muted-foreground">
+                    India shipping with prepaid checkout planned for launch.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="font-medium">Delivery</h2>
-                <p className="mt-1 text-muted-foreground">
-                  India shipping with prepaid checkout planned for launch.
-                </p>
+              <div className="flex gap-3">
+                <RefreshCw
+                  className="mt-0.5 size-4 shrink-0 stroke-[1.6] text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <div>
+                  <h2 className="font-medium">Returns</h2>
+                  <p className="mt-1 text-muted-foreground">
+                    Return policy will be finalized before production checkout
+                    is enabled.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="font-medium">Returns</h2>
-                <p className="mt-1 text-muted-foreground">
-                  Return policy will be finalized before production checkout is
-                  enabled.
-                </p>
+              <div className="flex gap-3">
+                <ShieldCheck
+                  className="mt-0.5 size-4 shrink-0 stroke-[1.6] text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <div>
+                  <h2 className="font-medium">Fit and fabric</h2>
+                  <p className="mt-1 text-muted-foreground">
+                    Use the size guide before checkout. Measurements and fabric
+                    notes will become more detailed as real catalog content is
+                    added in Medusa.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <SiteFooter />
+    </main>
+  );
+}
+
+async function CollectionPage({
+  collection,
+}: {
+  collection: (typeof collectionPages)[CollectionHandle];
+}) {
+  const allProducts = await getProducts({ limit: 24 });
+  const products =
+    collection.terms.length > 0
+      ? allProducts.filter((product) => {
+          const searchableText =
+            `${product.name} ${product.note}`.toLowerCase();
+
+          return collection.terms.some((term) => searchableText.includes(term));
+        })
+      : allProducts;
+
+  return (
+    <main className="min-h-screen">
+      <SiteHeader />
+
+      <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="grid gap-8 border-border border-b pb-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+            <div>
+              <p className="text-muted-foreground text-sm">
+                {collection.label}
+              </p>
+              <h1 className="mt-3 max-w-3xl font-heading text-6xl leading-none sm:text-8xl">
+                {collection.title}
+              </h1>
+            </div>
+            <p className="max-w-2xl text-muted-foreground lg:justify-self-end">
+              {collection.description}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between gap-4 py-6">
+            <p className="text-muted-foreground text-sm">
+              {products.length} styles
+            </p>
+            <Link
+              href="/shop"
+              prefetch={false}
+              className="text-sm underline-offset-4 hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+
+          {products.length > 0 ? (
+            <div className="grid gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-4">
+              {products.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  priority={index < 4}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="border border-border px-5 py-8 sm:px-8">
+              <h2 className="text-base font-medium">
+                Products are not available yet.
+              </h2>
+              <p className="mt-2 max-w-xl text-muted-foreground text-sm">
+                Start Medusa with a publishable key and published products to
+                populate this collection.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

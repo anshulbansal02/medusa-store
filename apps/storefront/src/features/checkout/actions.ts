@@ -41,14 +41,32 @@ export async function saveCheckoutAddressAction(
   }
 }
 
-export async function selectShippingMethodAction(formData: FormData) {
+export async function selectShippingMethodAction(
+  _previousState: CheckoutActionResult,
+  formData: FormData,
+) {
   const optionId = formData.get("option_id");
 
   if (typeof optionId !== "string" || optionId.length === 0) {
-    return;
+    return {
+      ok: false,
+      message: "Choose a shipping method.",
+    } satisfies CheckoutActionResult;
   }
 
-  await setCartShippingMethod(optionId);
-  revalidatePath("/checkout");
-  revalidatePath("/cart");
+  try {
+    await setCartShippingMethod(optionId);
+    revalidatePath("/checkout");
+    revalidatePath("/cart");
+
+    return {
+      ok: true,
+      message: "Shipping method saved.",
+    } satisfies CheckoutActionResult;
+  } catch {
+    return {
+      ok: false,
+      message: "Shipping method could not be saved. Try again.",
+    } satisfies CheckoutActionResult;
+  }
 }

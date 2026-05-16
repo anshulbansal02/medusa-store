@@ -1,4 +1,3 @@
-import { Heart } from "lucide-react";
 import Link from "next/link";
 
 export function SiteFooter() {
@@ -14,7 +13,7 @@ export function SiteFooter() {
             visual appeal, and a low-friction shopping flow.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-8">
           <div>
             <h2 className="mb-3 text-foreground text-sm font-medium">Shop</h2>
             <ul className="space-y-2">
@@ -51,21 +50,6 @@ export function SiteFooter() {
               <li>
                 <Link href="/shipping" prefetch={false}>
                   Shipping
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h2 className="mb-3 text-foreground text-sm font-medium">Social</h2>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/instagram"
-                  prefetch={false}
-                  className="inline-flex items-center gap-2"
-                >
-                  <Heart className="size-3.5 stroke-[1.6]" />
-                  Instagram
                 </Link>
               </li>
             </ul>

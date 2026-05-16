@@ -68,3 +68,7 @@ Use official docs first when implementation depends on current platform behavior
 ## Historical Research
 
 - [Fashion Commerce Platform Research](fashion-commerce-platform-research.md)
+
+## Local Reference Projects
+
+- `/Users/optimus/Developer/trenzura`: use as a storefront UX and component-structure reference only. Do not copy its backend/platform direction into this project.

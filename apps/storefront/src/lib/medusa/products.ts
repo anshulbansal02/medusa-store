@@ -88,6 +88,16 @@ function getVariantOption(variant: MedusaVariant, optionTitle: string) {
   )?.value;
 }
 
+const sizeRank = new Map(
+  ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "ONE SIZE"].map(
+    (size, index) => [size, index],
+  ),
+);
+
+function getSizeRank(size: string) {
+  return sizeRank.get(size.trim().toUpperCase()) ?? sizeRank.size;
+}
+
 function getProductImages(product: MedusaProduct) {
   const images = [
     product.thumbnail,
@@ -144,9 +154,10 @@ function toProductDetail(product: MedusaProduct): ProductDetail | null {
       })
       .filter((variant): variant is ProductDetailVariant => Boolean(variant))
       .sort((first, second) => {
-        const sizeOrder = ["XS", "S", "M", "L", "XL"];
+        const rankDifference =
+          getSizeRank(first.size) - getSizeRank(second.size);
 
-        return sizeOrder.indexOf(first.size) - sizeOrder.indexOf(second.size);
+        return rankDifference || first.size.localeCompare(second.size);
       }) ?? [];
 
   return {

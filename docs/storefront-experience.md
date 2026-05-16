@@ -231,6 +231,13 @@ Rules:
 - Do not show exact stock count by default.
 - Show subtle low-stock/few-left hint only when meaningful.
 
+Reference interaction patterns:
+
+- Use a dedicated purchase panel structure: color, size, quantity, inline errors, add-to-cart, and trust notes close together.
+- Keep a sticky mobile add-to-cart summary on product pages.
+- Use an image gallery with thumbnails and a full-screen viewer rather than a static image wall.
+- Use quick add, quick look, recently viewed, wishlist, and fit helpers only when they stay lightweight and do not duplicate Medusa commerce logic.
+
 ## Product Images
 
 - Product-card display ratio: 4:5 vertical.

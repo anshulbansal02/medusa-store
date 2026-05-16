@@ -66,6 +66,7 @@ export default async function Home() {
           alt="Model in a structured evening dress photographed outdoors"
           fill
           sizes="100vw"
+          loading="eager"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-foreground/30" />
@@ -220,14 +221,14 @@ export default async function Home() {
                 Size guide
               </Link>
               <Link
-                href="/shop/bestsellers"
+                href="/shop"
                 prefetch={false}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "lg" }),
                   "h-11 rounded-none px-6",
                 )}
               >
-                Shop bestsellers
+                Shop new arrivals
               </Link>
             </div>
           </div>
