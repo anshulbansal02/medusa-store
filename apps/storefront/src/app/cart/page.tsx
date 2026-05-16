@@ -100,19 +100,19 @@ export default async function CartPage() {
                   <span>Total</span>
                   <span>{cart.total}</span>
                 </div>
-                <button
-                  type="button"
-                  disabled
+                <Link
+                  href="/checkout"
+                  prefetch={false}
                   className={cn(
                     buttonVariants({ size: "lg" }),
                     "mt-6 h-12 w-full rounded-none",
                   )}
                 >
-                  Checkout coming next
-                </button>
+                  Continue to checkout
+                </Link>
                 <p className="mt-4 text-muted-foreground text-sm">
-                  Razorpay checkout will be enabled after address and shipping
-                  setup.
+                  Add delivery details, choose shipping, then continue to
+                  payment.
                 </p>
               </aside>
             </div>
