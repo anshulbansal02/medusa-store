@@ -1,12 +1,18 @@
 "use client";
 
 import { Minus, Plus } from "lucide-react";
-import { useActionState, useEffect, useMemo, useState } from "react";
-
+import { useRouter } from "next/navigation";
 import {
-  type AddToCartActionState,
-  addToCartAction,
-} from "@/features/cart/actions";
+  type FormEvent,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
+
+import { Button } from "@/components/ui/button";
+import { addToCartAction } from "@/features/cart/actions";
+import { useBagStore } from "@/features/cart/bag-store";
 import type { ProductDetailVariant } from "@/lib/medusa/products";
 import { cn } from "@/lib/utils";
 
@@ -15,18 +21,21 @@ type AddToCartFormProps = {
   productPrice: string;
   color: string;
   variants: ProductDetailVariant[];
+  hasSizeChart: boolean;
 };
-
-const initialState = {
-  message: "",
-} satisfies AddToCartActionState;
 
 export function AddToCartForm({
   productName,
   productPrice,
   color,
   variants,
+  hasSizeChart,
 }: AddToCartFormProps) {
+  const router = useRouter();
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const setCart = useBagStore((state) => state.setCart);
+  const showAddedItem = useBagStore((state) => state.showAddedItem);
   const availableVariants = useMemo(
     () => variants.filter((variant) => variant.id),
     [variants],
@@ -35,14 +44,48 @@ export function AddToCartForm({
     availableVariants[0]?.id ?? "",
   );
   const [quantity, setQuantity] = useState(1);
-  const [state, formAction, isPending] = useActionState(
-    addToCartAction,
-    initialState,
-  );
   const selectedVariant = availableVariants.find(
     (variant) => variant.id === selectedVariantId,
   );
   const canSubmit = Boolean(selectedVariantId) && !isPending;
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    startTransition(async () => {
+      const result = await addToCartAction(formData);
+
+      if (result.status === "success") {
+        const addedCartItem =
+          result.cart?.items.find(
+            (item) => item.variant === selectedVariant?.title,
+          ) ??
+          result.cart?.items.at(-1) ??
+          null;
+        const addedItem = result.addedItem
+          ? result.addedItem
+          : addedCartItem
+            ? {
+                name: addedCartItem.name,
+                href: addedCartItem.href,
+                variant: addedCartItem.variant,
+                quantity,
+                total: addedCartItem.unitPrice,
+                image: addedCartItem.image,
+              }
+            : null;
+
+        setMessage("");
+        setCart(result.cart);
+        showAddedItem(addedItem);
+        router.refresh();
+        return;
+      }
+
+      setMessage(result.message);
+    });
+  }
 
   useEffect(() => {
     if (
@@ -55,8 +98,13 @@ export function AddToCartForm({
 
   return (
     <>
-      <form id="add-to-cart-form" action={formAction} className="py-6">
+      <form id="add-to-cart-form" onSubmit={handleSubmit} className="py-6">
         <input type="hidden" name="variant_id" value={selectedVariantId} />
+        <input
+          type="hidden"
+          name="variant_title"
+          value={selectedVariant?.title ?? ""}
+        />
         <input type="hidden" name="quantity" value={quantity} />
 
         {color ? (
@@ -70,12 +118,14 @@ export function AddToCartForm({
           <legend className="sr-only">Size</legend>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium">Size</p>
-            <a
-              href="/size-guide"
-              className="text-sm underline-offset-4 hover:underline"
-            >
-              Size guide
-            </a>
+            {hasSizeChart ? (
+              <a
+                href="#size-chart"
+                className="text-sm underline-offset-4 hover:underline"
+              >
+                Size chart
+              </a>
+            ) : null}
           </div>
           <p id="size-help" className="sr-only">
             Choose one available size for {productName}.
@@ -85,20 +135,22 @@ export function AddToCartForm({
               const isSelected = selectedVariantId === variant.id;
 
               return (
-                <button
+                <Button
                   key={variant.id}
                   type="button"
+                  variant="outline"
+                  size="lg"
                   aria-pressed={isSelected}
                   onClick={() => setSelectedVariantId(variant.id)}
                   className={cn(
-                    "flex h-11 items-center justify-center border border-border text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    "h-11 rounded-none",
                     isSelected
-                      ? "border-foreground bg-foreground text-background"
+                      ? "border-foreground bg-foreground text-background hover:bg-foreground hover:text-background"
                       : "hover:border-foreground",
                   )}
                 >
                   {variant.size}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -107,43 +159,48 @@ export function AddToCartForm({
         <div className="mt-6">
           <p className="text-sm font-medium">Quantity</p>
           <div className="mt-3 inline-flex h-11 items-center border border-border">
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               aria-label="Decrease quantity"
               disabled={quantity <= 1}
               onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-              className="grid h-full w-11 place-items-center text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:text-muted-foreground/40"
+              className="h-full w-11 rounded-none text-muted-foreground hover:bg-muted hover:text-foreground disabled:text-muted-foreground/40"
             >
               <Minus className="size-4 stroke-[1.6]" aria-hidden="true" />
-            </button>
+            </Button>
             <span className="w-10 text-center text-sm font-medium">
               {quantity}
             </span>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               aria-label="Increase quantity"
               disabled={quantity >= 9}
               onClick={() => setQuantity((value) => Math.min(9, value + 1))}
-              className="grid h-full w-11 place-items-center text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:text-muted-foreground/40"
+              className="h-full w-11 rounded-none text-muted-foreground hover:bg-muted hover:text-foreground disabled:text-muted-foreground/40"
             >
               <Plus className="size-4 stroke-[1.6]" aria-hidden="true" />
-            </button>
+            </Button>
           </div>
         </div>
 
-        {state.message ? (
+        {message ? (
           <p className="mt-4 border border-destructive/30 px-3 py-2 text-destructive text-sm">
-            {state.message}
+            {message}
           </p>
         ) : null}
 
-        <button
+        <Button
           type="submit"
           disabled={!canSubmit}
-          className="mt-6 flex h-12 w-full items-center justify-center bg-foreground px-6 text-background text-sm transition hover:bg-foreground/90 disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground"
+          size="lg"
+          className="mt-6 h-12 w-full rounded-none px-6 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
         >
           {isPending ? "Adding..." : "Add to bag"}
-        </button>
+        </Button>
       </form>
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-border border-t bg-background/95 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-sm sm:hidden">
@@ -158,14 +215,15 @@ export function AddToCartForm({
               {productPrice}
             </p>
           </div>
-          <button
+          <Button
             type="submit"
             form="add-to-cart-form"
             disabled={!canSubmit}
-            className="h-11 bg-foreground px-5 text-background text-sm transition hover:bg-foreground/90 disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground"
+            size="lg"
+            className="h-11 rounded-none px-5 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
           >
             {isPending ? "Adding" : "Add"}
-          </button>
+          </Button>
         </div>
       </div>
     </>

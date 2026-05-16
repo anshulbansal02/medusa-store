@@ -4,13 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { saveCheckoutAddressAction } from "@/features/checkout/actions";
 import {
   type CheckoutAddressInput,
   checkoutAddressSchema,
 } from "@/features/checkout/schema";
-import { cn } from "@/lib/utils";
 
 type CheckoutAddressFormProps = {
   defaultValues: CheckoutAddressInput;
@@ -214,16 +213,14 @@ export function CheckoutAddressForm({
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <button
+        <Button
           type="submit"
           disabled={isPending}
-          className={cn(
-            buttonVariants({ size: "lg" }),
-            "h-11 rounded-none px-6",
-          )}
+          size="lg"
+          className="h-11 rounded-none px-6"
         >
           {isPending ? "Saving address" : "Save and show shipping"}
-        </button>
+        </Button>
         {message ? (
           <output className="text-muted-foreground text-sm">{message}</output>
         ) : null}

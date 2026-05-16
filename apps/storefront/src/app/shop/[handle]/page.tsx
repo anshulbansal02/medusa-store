@@ -8,7 +8,12 @@ import { SiteHeader } from "@/components/site/site-header";
 import { AddToCartForm } from "@/features/cart/add-to-cart-form";
 import { ProductCard } from "@/features/products/product-card";
 import { ProductGallery } from "@/features/products/product-gallery";
-import { getProductByHandle, getProducts } from "@/lib/medusa/products";
+import { ProductSizeChart } from "@/features/products/product-size-chart";
+import {
+  getCategoryByHandle,
+  getProductByHandle,
+  getProductsByCategoryHandle,
+} from "@/lib/medusa/products";
 
 export const dynamic = "force-dynamic";
 
@@ -18,43 +23,6 @@ type ProductPageProps = {
   }>;
 };
 
-const collectionPages = {
-  dresses: {
-    label: "Dresses",
-    title: "Dresses with presence.",
-    description:
-      "Polished western dresses for dinners, parties, and occasion-led wardrobes.",
-    terms: ["dress"],
-  },
-  sets: {
-    label: "Co-ords",
-    title: "Sets that do the work.",
-    description:
-      "Matching sets and co-ords for sharper dressing with less effort.",
-    terms: ["co-ord", "coord", "set"],
-  },
-  tops: {
-    label: "Tops",
-    title: "Tops with shape.",
-    description:
-      "Statement tops and refined separates for pairing across the wardrobe.",
-    terms: ["top"],
-  },
-  "occasion-edit": {
-    label: "Occasion Edit",
-    title: "Occasion pieces.",
-    description:
-      "A focused edit for wedding functions, celebrations, and dressed-up evenings.",
-    terms: [],
-  },
-} as const;
-
-type CollectionHandle = keyof typeof collectionPages;
-
-function getCollectionPage(handle: string) {
-  return collectionPages[handle as CollectionHandle];
-}
-
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
@@ -62,12 +30,12 @@ export async function generateMetadata({
   const product = await getProductByHandle(handle);
 
   if (!product) {
-    const collection = getCollectionPage(handle);
+    const category = await getCategoryByHandle(handle);
 
-    if (collection) {
+    if (category) {
       return {
-        title: `${collection.label} | The Label`,
-        description: collection.description,
+        title: `${category.name} | The Label`,
+        description: category.description || `Shop ${category.name}.`,
       };
     }
 
@@ -87,10 +55,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = await getProductByHandle(handle);
 
   if (!product) {
-    const collection = getCollectionPage(handle);
+    const category = await getCategoryByHandle(handle);
 
-    if (collection) {
-      return <CollectionPage collection={collection} />;
+    if (category) {
+      return <CollectionPage handle={handle} />;
     }
 
     notFound();
@@ -154,6 +122,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               productPrice={product.price}
               color={product.color}
               variants={product.variants}
+              hasSizeChart={Boolean(product.sizeChart)}
             />
 
             <div className="grid gap-4 border-border border-t pt-6 text-sm">
@@ -190,13 +159,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <div>
                   <h2 className="font-medium">Fit and fabric</h2>
                   <p className="mt-1 text-muted-foreground">
-                    Use the size guide before checkout. Measurements and fabric
-                    notes will become more detailed as real catalog content is
-                    added in Medusa.
+                    Use the size chart before checkout. Fabric, care, and fit
+                    notes stay close to the purchase decision.
                   </p>
                 </div>
               </div>
             </div>
+
+            <ProductSizeChart sizeChart={product.sizeChart} />
           </div>
         </div>
       </section>
@@ -206,21 +176,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
   );
 }
 
-async function CollectionPage({
-  collection,
-}: {
-  collection: (typeof collectionPages)[CollectionHandle];
-}) {
-  const allProducts = await getProducts({ limit: 24 });
-  const products =
-    collection.terms.length > 0
-      ? allProducts.filter((product) => {
-          const searchableText =
-            `${product.name} ${product.note}`.toLowerCase();
+async function CollectionPage({ handle }: { handle: string }) {
+  const { category, products } = await getProductsByCategoryHandle({
+    handle,
+    limit: 24,
+  });
 
-          return collection.terms.some((term) => searchableText.includes(term));
-        })
-      : allProducts;
+  if (!category) {
+    notFound();
+  }
 
   return (
     <main className="min-h-screen">
@@ -230,15 +194,14 @@ async function CollectionPage({
         <div className="mx-auto max-w-[1440px]">
           <div className="grid gap-8 border-border border-b pb-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
             <div>
-              <p className="text-muted-foreground text-sm">
-                {collection.label}
-              </p>
+              <p className="text-muted-foreground text-sm">{category.name}</p>
               <h1 className="mt-3 max-w-3xl font-heading text-6xl leading-none sm:text-8xl">
-                {collection.title}
+                {category.name}
               </h1>
             </div>
             <p className="max-w-2xl text-muted-foreground lg:justify-self-end">
-              {collection.description}
+              {category.description ||
+                "Browse this live Medusa category from the current catalog."}
             </p>
           </div>
 

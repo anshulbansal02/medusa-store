@@ -43,7 +43,7 @@ Rules:
 - Railway stores Medusa QA/prod environment variables.
 - QA and production use separate Razorpay keys, webhook secrets, database URLs, admin credentials, JWT secrets, cookie secrets, and object storage credentials.
 - QA must not write to production data stores.
-- Local uses Docker Compose Postgres/Redis and local app env files.
+- Local uses portless for UI app URLs, direct fixed nonstandard API ports, Docker Compose Postgres/Redis, and local app env files.
 
 ## Public Vs Secret Values
 

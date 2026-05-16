@@ -82,7 +82,7 @@ Avoid phrases like:
 
 Buttons should be plain and useful:
 
-- Add to cart.
+- Add to bag.
 - Shop new arrivals.
 - Find your size.
 - Checkout.
@@ -96,7 +96,7 @@ Core shopping pages:
 - Collection page.
 - Product detail page.
 - Search.
-- Cart drawer/page.
+- Bag drawer/page.
 - Checkout.
 - Order confirmation.
 
@@ -130,7 +130,7 @@ Tops
 Occasion Edit
 Search
 Account, optional
-Cart
+Bag
 ```
 
 Mobile menu:
@@ -209,8 +209,8 @@ Must include:
 - Size selector.
 - Size chart/size guide.
 - Stock/unavailable variant state.
-- Add to cart.
-- Mobile sticky add-to-cart.
+- Add to bag.
+- Mobile sticky add-to-bag.
 - Fabric.
 - Fit.
 - Care.
@@ -226,15 +226,16 @@ Optional if data exists:
 
 Rules:
 
-- Do not make customers hunt for price, size, delivery/returns, or add-to-cart.
+- Do not make customers hunt for price, size, delivery/returns, or add-to-bag.
+- Product-specific size chart measurements must be managed in Medusa product metadata, not embedded in the storefront.
 - Unavailable sizes/colors must be obvious.
 - Do not show exact stock count by default.
 - Show subtle low-stock/few-left hint only when meaningful.
 
 Reference interaction patterns:
 
-- Use a dedicated purchase panel structure: color, size, quantity, inline errors, add-to-cart, and trust notes close together.
-- Keep a sticky mobile add-to-cart summary on product pages.
+- Use a dedicated purchase panel structure: color, size, quantity, inline errors, add-to-bag, and trust notes close together.
+- Keep a sticky mobile add-to-bag summary on product pages.
 - Use an image gallery with thumbnails and a full-screen viewer rather than a static image wall.
 - Use quick add, quick look, recently viewed, wishlist, and fit helpers only when they stay lightweight and do not duplicate Medusa commerce logic.
 
@@ -292,13 +293,14 @@ Product card:
 - Desktop hover can show second image.
 - No quick add in v1.
 
-## Cart And Checkout
+## Bag And Checkout
 
-Cart:
+Bag:
 
 - Drawer-first.
-- Full cart page also exists.
-- Add to Cart opens cart drawer.
+- Full bag page also exists.
+- Add to Bag shows a minimal confirmation toast and keeps the customer on the product page.
+- Header bag icon opens a Base UI side drawer backed by the current Medusa cart.
 - Mobile drawer behaves like bottom sheet/full-screen panel.
 
 Checkout:
@@ -337,7 +339,7 @@ V1 search should be fast, visual, and simple.
 Must-have:
 
 - Product image lightbox/zoom.
-- Mobile sticky add-to-cart.
+- Mobile sticky add-to-bag.
 - Related products.
 
 Nice if simple:
@@ -364,7 +366,7 @@ Do not build if they become complex.
 
 Required:
 
-- Empty cart with action.
+- Empty bag with action.
 - Empty wishlist if wishlist exists.
 - No search results with useful links.
 - Product unavailable state.
@@ -378,7 +380,7 @@ Required:
 - Use semantic HTML and landmarks.
 - Use Base UI or established primitives for complex interactions.
 - Prefer native semantics before ARIA.
-- Menus, dialogs, search, cart, filters, and checkout must be keyboard usable.
+- Menus, dialogs, search, bag, filters, and checkout must be keyboard usable.
 - Focus states must be visible.
 - Forms need proper labels.
 - Contrast must be checked.

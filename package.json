@@ -9,8 +9,11 @@
     "pnpm": ">=11.1.2 <12"
   },
   "scripts": {
+    "dev": "pnpm dev:storefront",
     "dev:storefront": "pnpm --dir apps/storefront dev",
     "dev:medusa": "pnpm --dir apps/medusa dev",
+    "medusa:admin:alias": "PORTLESS_HTTPS=0 portless alias medusa 29181",
+    "medusa:admin:alias:remove": "PORTLESS_HTTPS=0 portless alias --remove medusa",
     "build:storefront": "pnpm --dir apps/storefront build",
     "build:medusa": "pnpm --dir apps/medusa build",
     "services:up": "docker compose up -d",
@@ -19,6 +22,12 @@
     "lint": "pnpm --dir apps/storefront lint",
     "typecheck": "pnpm --recursive --if-present typecheck",
     "format": "pnpm --dir apps/storefront format",
-    "format:check": "pnpm --dir apps/storefront format:check"
+    "format:check": "pnpm --dir apps/storefront format:check",
+    "portless:list": "portless list",
+    "portless:trust": "portless trust",
+    "portless:proxy:stop": "portless proxy stop"
+  },
+  "devDependencies": {
+    "portless": "^0.13.0"
   }
 }

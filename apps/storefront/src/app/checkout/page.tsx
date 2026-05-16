@@ -48,7 +48,7 @@ export default async function CheckoutPage() {
           <div className="mx-auto max-w-[900px] border-border border-b pb-10">
             <p className="text-muted-foreground text-sm">Checkout</p>
             <h1 className="mt-3 font-heading text-6xl leading-none sm:text-8xl">
-              Your cart is empty.
+              Your bag is empty.
             </h1>
             <p className="mt-5 max-w-xl text-muted-foreground">
               Add a style before entering delivery details.

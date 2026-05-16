@@ -81,7 +81,7 @@ apps/storefront/styles/       global styles/tokens
 Preferred component structure:
 
 ```txt
-apps/storefront/src/components/ui/       shadcn-style local components using Base UI/native primitives
+apps/storefront/src/components/ui/       shadcn CLI-installed local components
 apps/storefront/src/components/layout/   header, footer, container, section
 apps/storefront/src/features/            commerce/domain UI and behavior
 apps/storefront/src/lib/utils/           small utilities such as cn()
@@ -98,8 +98,10 @@ Rules:
 - Avoid random API calls inside components.
 - Keep UI components local to the storefront; do not create a shared UI package yet.
 - Do not invent interactive/accessibility primitives.
-- Use Base UI and shadcn-style components/patterns for interactive UI.
-- If shadcn does not provide a component, compose a local component with the same style pattern using Base UI primitives.
+- Install shared UI primitives from shadcn with the shadcn CLI when shadcn provides a suitable component.
+- Customize installed shadcn local components through variants, tokens, and Tailwind utilities instead of forking ad hoc copies.
+- Do not hand-roll components that shadcn already provides.
+- If shadcn does not provide a suitable component, compose a local component with the same style pattern using Base UI, Vaul, or another established accessible primitive.
 - Compose non-interactive layout/content components from semantic HTML and design-token-backed Tailwind utilities.
 - Use a local `cn()` helper based on `clsx` and `tailwind-merge`.
 
@@ -130,7 +132,7 @@ Use these where they fit:
 - Next.js latest stable at setup time.
 - Tailwind CSS v4 if compatible.
 - `@base-ui/react`.
-- shadcn-style local components.
+- shadcn CLI-installed local components.
 - Zod.
 - React Hook Form.
 - Zustand.
@@ -331,7 +333,16 @@ Keep setup simple and agent-friendly.
 - Run Next.js and Medusa directly with pnpm on the host during local development.
 - Do not containerize application servers for local development unless there is a clear need later.
 - Keep Docker Compose scoped to local development; production services are managed by hosted infrastructure.
-- Use conventional local ports: storefront `3000`, Medusa `9000`, Postgres `5432`, Redis `6379`.
+- Run local UI apps through portless to avoid port collisions and give agents stable URLs:
+  - Storefront UI: `http://storefront.localhost`.
+- Use plain HTTP and the default `.localhost` TLD for portless commands in this repo.
+- Do not hard-code local UI app ports. Portless assigns random internal app ports.
+- Run Medusa directly as the API server on fixed nonstandard local port `29181`.
+- Optional Medusa Admin alias is `http://medusa.localhost` via `pnpm medusa:admin:alias`; keep storefront API calls pointed at `http://localhost:29181`.
+- Use fixed nonstandard local host ports only for Docker services:
+  - Postgres host port: `25433`.
+  - Redis host port: `26380`.
+- Do not move local app development to common ports such as `3000`, `4000`, `8000`, `8080`, or `9000`.
 
 ## Dependency Updates
 

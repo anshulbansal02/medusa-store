@@ -11,30 +11,6 @@ import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-const heroImage =
-  "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1800&q=82";
-
-const edits = [
-  {
-    title: "Dinner plans",
-    text: "Clean lines, soft shine, and enough structure for a long evening.",
-    image:
-      "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    title: "Wedding guest",
-    text: "Dressy without feeling heavy, made for photographs and movement.",
-    image:
-      "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    title: "After-hours",
-    text: "Sharper separates for launches, birthdays, and late reservations.",
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80",
-  },
-];
-
 const trustItems = [
   {
     icon: ShieldCheck,
@@ -55,36 +31,44 @@ const trustItems = [
 
 export default async function Home() {
   const products = await getHomeProducts();
+  const primaryHeroProduct = products[0];
+  const heroProducts = primaryHeroProduct
+    ? [
+        primaryHeroProduct,
+        ...products
+          .filter((product) => product.id !== primaryHeroProduct.id)
+          .slice(0, 2),
+      ]
+    : [];
+  const occasionProducts = products.filter((product) =>
+    product.categories.some((category) => category.handle === "occasion-edit"),
+  );
 
   return (
     <main className="min-h-screen">
       <SiteHeader />
 
-      <section className="relative min-h-[88svh] overflow-hidden pt-16">
-        <Image
-          src={heroImage}
-          alt="Model in a structured evening dress photographed outdoors"
-          fill
-          sizes="100vw"
-          loading="eager"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-foreground/30" />
-        <div className="relative mx-auto flex min-h-[calc(88svh-4rem)] max-w-[1440px] items-end px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-          <div className="max-w-3xl pb-8 text-primary-foreground">
-            <p className="mb-4 text-sm font-medium">
-              New occasion pieces, ready for evenings out
+      <section className="px-4 pt-20 pb-10 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8">
+        <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+          <div className="order-1 max-w-2xl">
+            <p className="text-sm font-medium text-muted-foreground">
+              The first edit
             </p>
-            <h1 className="font-heading text-[clamp(3.75rem,10vw,9.5rem)] leading-[0.86] tracking-normal">
-              Shape, ease, and a little ceremony.
+            <h1 className="mt-4 font-heading text-[clamp(3.35rem,14vw,5rem)] leading-[0.86] tracking-normal sm:text-[clamp(4rem,9vw,9rem)]">
+              Designed to be noticed.
             </h1>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <p className="mt-6 max-w-xl text-muted-foreground">
+              Limited-run western occasion pieces for dinners, wedding
+              functions, launches, and dressed-up weekends.
+            </p>
+
+            <div className="mt-7 grid grid-cols-2 gap-3 sm:flex sm:flex-row">
               <Link
                 href="/shop"
                 prefetch={false}
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "h-11 rounded-none bg-background px-6 text-foreground hover:bg-background/90",
+                  "h-11 rounded-none px-4 sm:px-6",
                 )}
               >
                 Shop new arrivals
@@ -94,12 +78,142 @@ export default async function Home() {
                 prefetch={false}
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "h-11 rounded-none border-primary-foreground/70 bg-transparent px-6 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground",
+                  "h-11 rounded-none px-4 sm:px-6",
                 )}
               >
                 Find your size
               </Link>
             </div>
+
+            <nav
+              aria-label="Featured categories"
+              className="mt-8 hidden flex-wrap gap-x-5 gap-y-2 border-border border-t pt-5 text-sm sm:flex"
+            >
+              <Link
+                href="/shop/dresses"
+                prefetch={false}
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Dresses
+              </Link>
+              <Link
+                href="/shop/sets"
+                prefetch={false}
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Co-ords
+              </Link>
+              <Link
+                href="/shop/tops"
+                prefetch={false}
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Tops
+              </Link>
+              <Link
+                href="/shop/occasion-edit"
+                prefetch={false}
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Occasion edit
+              </Link>
+            </nav>
+          </div>
+
+          {primaryHeroProduct ? (
+            <div className="order-2 grid gap-3 sm:grid-cols-[1fr_0.52fr] lg:min-h-[620px]">
+              <Link
+                href={primaryHeroProduct.href}
+                prefetch={false}
+                className="group block"
+              >
+                <article>
+                  <div className="relative aspect-[4/5] overflow-hidden bg-muted sm:min-h-[620px]">
+                    <Image
+                      src={primaryHeroProduct.image}
+                      alt={`${primaryHeroProduct.name} styled on a model`}
+                      fill
+                      priority
+                      loading="eager"
+                      sizes="(min-width: 1024px) 54vw, 100vw"
+                      className="object-cover transition duration-500 ease-out group-hover:scale-[1.025]"
+                    />
+                  </div>
+                  <div className="mt-3 flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="font-medium">{primaryHeroProduct.name}</h2>
+                      {primaryHeroProduct.note ? (
+                        <p className="mt-1 max-w-md text-muted-foreground text-sm">
+                          {primaryHeroProduct.note}
+                        </p>
+                      ) : null}
+                    </div>
+                    <p className="text-sm font-medium">
+                      {primaryHeroProduct.price}
+                    </p>
+                  </div>
+                </article>
+              </Link>
+
+              {heroProducts.length > 1 ? (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-1">
+                  {heroProducts.slice(1).map((product, index) => (
+                    <Link
+                      key={product.id}
+                      href={product.href}
+                      prefetch={false}
+                      className="group block"
+                    >
+                      <article>
+                        <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                          <Image
+                            src={product.image}
+                            alt={`${product.name} styled on a model`}
+                            fill
+                            loading={index === 0 ? "eager" : "lazy"}
+                            sizes="(min-width: 1024px) 26vw, 50vw"
+                            className="object-cover transition duration-500 ease-out group-hover:scale-[1.03]"
+                          />
+                        </div>
+                        <div className="mt-2 flex items-start justify-between gap-3 text-sm">
+                          <h2 className="font-medium leading-snug">
+                            {product.name}
+                          </h2>
+                          <p className="shrink-0">{product.price}</p>
+                        </div>
+                      </article>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className="border border-border px-5 py-8 sm:px-8">
+              <h2 className="text-base font-medium">
+                The first edit is waiting for products.
+              </h2>
+              <p className="mt-2 max-w-xl text-muted-foreground text-sm">
+                Publish products in Medusa to turn the homepage into a
+                product-led storefront.
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="mx-auto mt-10 max-w-[1440px] border-border border-t pt-5">
+          <div className="grid gap-4 text-sm sm:grid-cols-3">
+            <p>
+              <span className="font-medium">Small catalog, sharper edit.</span>{" "}
+              About 20-25 pieces at launch.
+            </p>
+            <p>
+              <span className="font-medium">Premium price confidence.</span> Fit
+              notes and size support stay close to purchase decisions.
+            </p>
+            <p>
+              <span className="font-medium">India-first checkout.</span> Prepaid
+              flow and clear shipping details before launch.
+            </p>
           </div>
         </div>
       </section>
@@ -145,46 +259,34 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="bg-secondary px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-        <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-          <div>
-            <h2 className="font-heading text-5xl leading-none sm:text-7xl">
-              Occasion edit
-            </h2>
-            <p className="mt-5 max-w-md text-secondary-foreground/75">
-              Shop by plan, not by trend. Each edit keeps the silhouette,
-              fabric, and repeat wear in view.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            {edits.map((edit) => (
+      {occasionProducts.length > 0 ? (
+        <section className="border-border border-y px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+          <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <h2 className="font-heading text-5xl leading-none sm:text-7xl">
+                Occasion edit
+              </h2>
+              <p className="mt-5 max-w-md text-muted-foreground">
+                Shop by plan, not by trend. This edit pulls from the live Medusa
+                catalog.
+              </p>
               <Link
                 href="/shop/occasion-edit"
                 prefetch={false}
-                key={edit.title}
-                className="group block"
+                className="mt-7 inline-flex text-sm font-medium underline-offset-4 hover:underline"
               >
-                <article>
-                  <div className="relative aspect-[3/4] overflow-hidden bg-background">
-                    <Image
-                      src={edit.image}
-                      alt={`${edit.title} fashion edit`}
-                      fill
-                      sizes="(min-width: 1024px) 22vw, (min-width: 640px) 33vw, 100vw"
-                      className="object-cover transition duration-500 ease-out group-hover:scale-[1.03]"
-                    />
-                  </div>
-                  <h3 className="mt-4 text-base font-medium">{edit.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {edit.text}
-                  </p>
-                </article>
+                View the edit
               </Link>
-            ))}
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              {occasionProducts.slice(0, 3).map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <div className="mx-auto grid max-w-[1440px] gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
@@ -206,7 +308,7 @@ export default async function Home() {
             </h2>
             <p className="mt-5 max-w-xl text-muted-foreground">
               Product pages will keep measurements, fabric, care, and fit notes
-              close to the add-to-cart flow, so customers can decide without
+              close to the add-to-bag flow, so customers can decide without
               searching through policy text.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">

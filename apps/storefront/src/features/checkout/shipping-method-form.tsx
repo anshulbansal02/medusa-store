@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { selectShippingMethodAction } from "@/features/checkout/actions";
 import type { StorefrontShippingOption } from "@/lib/medusa/cart";
 import { cn } from "@/lib/utils";
@@ -69,16 +69,15 @@ export function ShippingMethodForm({
         </p>
       ) : null}
 
-      <button
+      <Button
         type="submit"
         disabled={isPending}
-        className={cn(
-          buttonVariants({ variant: "outline", size: "lg" }),
-          "h-11 rounded-none px-6 sm:justify-self-start",
-        )}
+        variant="outline"
+        size="lg"
+        className="h-11 rounded-none px-6 sm:justify-self-start"
       >
         {isPending ? "Saving..." : "Save shipping method"}
-      </button>
+      </Button>
     </form>
   );
 }

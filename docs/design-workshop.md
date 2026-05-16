@@ -29,7 +29,7 @@ Use this file for future high-level design discussions. When a decision becomes 
 
 - Commerce core: Medusa.
 - Storefront: custom Next.js App Router application.
-- UI foundation: Tailwind CSS, shadcn-style local components, `@base-ui/react`.
+- UI foundation: Tailwind CSS, shadcn CLI-installed local components, `@base-ui/react`.
 - Package manager: pnpm.
 - Client state: Zustand where global client state is needed.
 - Forms: React Hook Form + Zod.

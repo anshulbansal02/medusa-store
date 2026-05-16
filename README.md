@@ -6,7 +6,7 @@ Single-brand premium fashion ecommerce storefront.
 
 - Commerce core: Medusa.
 - Storefront: Next.js App Router.
-- Styling/components: Tailwind CSS, shadcn-style local components, `@base-ui/react`.
+- Styling/components: Tailwind CSS, shadcn CLI-installed local components, `@base-ui/react`.
 - Payments: Razorpay prepaid.
 - Email: Resend.
 - Media: Cloudflare R2.
@@ -50,6 +50,18 @@ pnpm dev:storefront
 pnpm dev:medusa
 ```
 
+Local ports are intentionally fixed and nonstandard:
+
+- Storefront UI: `http://storefront.localhost`
+- Medusa API/Admin: `http://localhost:29181`
+- Optional Medusa Admin alias: `http://medusa.localhost` via `pnpm medusa:admin:alias`
+- Postgres host port: `25433`
+- Redis host port: `26380`
+
+The storefront UI runs through portless, which gives a stable named URL while assigning a random internal app port. Local portless runs use plain HTTP. Medusa runs directly on a fixed nonstandard port because it is the API server; use the optional alias only when you want a named browser URL for the Admin UI.
+
+Do not switch local HTTP app development to standard ports like `3000`, `4000`, `8000`, `8080`, or `9000`.
+
 ## Docs
 
 - [Agent Guide](AGENTS.md): rules and context for AI-assisted development.
@@ -81,6 +93,6 @@ Continue with Phase 1 from [Implementation Plan](docs/implementation-plan.md):
 Design foundation:
   visual system
   Tailwind tokens
-  shadcn-style component structure
+  shadcn CLI-installed component structure
   Base UI primitives
 ```

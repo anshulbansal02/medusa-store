@@ -22,8 +22,8 @@ Use four buckets:
 - Product image lightbox/zoom.
 - Collection/listing pages.
 - Search.
-- Cart drawer and cart page.
-- Mobile sticky add-to-cart.
+- Bag drawer and bag page.
+- Mobile sticky add-to-bag.
 - Related products / "you may also like".
 - Guest checkout.
 - Razorpay prepaid payment.
@@ -127,7 +127,7 @@ Rules:
 Goal: establish the visual system before building many pages.
 
 - Tailwind setup.
-- shadcn-style component structure.
+- shadcn CLI-installed component structure.
 - Base UI primitives.
 - Design tokens.
 - Typography.
@@ -150,17 +150,17 @@ Goal: let customers browse real catalog data.
 - Related products.
 - Image lightbox/zoom.
 
-### Phase 3: Cart And Checkout
+### Phase 3: Bag And Checkout
 
 Goal: complete the purchase path.
 
-- Cart drawer.
-- Cart page.
+- Bag drawer.
+- Bag page.
 - Guest checkout.
 - Razorpay test integration.
 - Order confirmation.
 - Payment failure/retry states.
-- Mobile sticky add-to-cart.
+- Mobile sticky add-to-bag.
 
 ### Phase 4: Operations
 

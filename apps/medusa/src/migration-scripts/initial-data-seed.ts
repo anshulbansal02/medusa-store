@@ -322,6 +322,23 @@ export default async function initial_data_seed({
       ],
     }));
 
+  const standardDressSizeChart = {
+    unit: "in",
+    note: "Garment measurements. Compare with a similar piece that fits you well.",
+    columns: [
+      { key: "bust", label: "Bust" },
+      { key: "waist", label: "Waist" },
+      { key: "hip", label: "Hip" },
+    ],
+    rows: [
+      { size: "XS", values: { bust: "32", waist: "26", hip: "34" } },
+      { size: "S", values: { bust: "34", waist: "28", hip: "36" } },
+      { size: "M", values: { bust: "36", waist: "30", hip: "38" } },
+      { size: "L", values: { bust: "38", waist: "32", hip: "40" } },
+      { size: "XL", values: { bust: "40", waist: "34", hip: "42" } },
+    ],
+  };
+
   await createProductsWorkflow(container).run({
     input: {
       products: [
@@ -331,6 +348,9 @@ export default async function initial_data_seed({
           description:
             "Draped midi dress in deep wine with a clean neckline and soft movement.",
           handle: "noor-draped-midi-dress",
+          metadata: {
+            size_chart: standardDressSizeChart,
+          },
           weight: 400,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
@@ -369,6 +389,9 @@ export default async function initial_data_seed({
           description:
             "Structured ivory co-ord with a tailored top and easy evening fit.",
           handle: "ira-structured-coord",
+          metadata: {
+            size_chart: standardDressSizeChart,
+          },
           weight: 500,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
@@ -404,6 +427,9 @@ export default async function initial_data_seed({
           description:
             "Satin evening top in sage with a sharper shoulder and fluid drape.",
           handle: "mira-satin-evening-top",
+          metadata: {
+            size_chart: standardDressSizeChart,
+          },
           weight: 250,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
@@ -439,6 +465,9 @@ export default async function initial_data_seed({
           description:
             "Cutwork occasion dress in black with a fitted waist and photo-ready shape.",
           handle: "zoya-cutwork-dress",
+          metadata: {
+            size_chart: standardDressSizeChart,
+          },
           weight: 420,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,

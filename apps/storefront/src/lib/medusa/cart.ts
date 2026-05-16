@@ -14,6 +14,7 @@ type MedusaRegionsResponse = {
 
 type MedusaCartLineItem = {
   id: string;
+  variant_id?: string | null;
   thumbnail?: string | null;
   product_title?: string | null;
   product_handle?: string | null;
@@ -57,6 +58,10 @@ type MedusaCartResponse = {
   cart?: MedusaCart;
 };
 
+type MedusaCartParentResponse = {
+  parent?: MedusaCart;
+};
+
 type MedusaShippingOption = {
   id: string;
   name: string;
@@ -76,6 +81,7 @@ type MedusaShippingOptionsResponse = {
 
 export type CartItem = {
   id: string;
+  variantId: string;
   name: string;
   href: string;
   variant: string;
@@ -157,6 +163,7 @@ function toStorefrontCart(cart: MedusaCart): StorefrontCart {
 
       return {
         id: item.id,
+        variantId: item.variant_id ?? "",
         name: item.product_title ?? "Product",
         href: handle ? `/shop/${handle}` : "/shop",
         variant: item.variant_title ?? "",
@@ -369,4 +376,42 @@ export async function addVariantToCart(variantId: string, quantity = 1) {
   }
 
   return toStorefrontCart(data.cart);
+}
+
+export async function updateCartLineItem(lineItemId: string, quantity: number) {
+  const cart = await getOrCreateCart();
+  const data = await medusaFetch<MedusaCartResponse>(
+    `/store/carts/${cart.id}/line-items/${lineItemId}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ quantity }),
+      cache: "no-store",
+      headers: {
+        "content-type": "application/json",
+      },
+    },
+  );
+
+  if (!data?.cart) {
+    throw new Error("Bag item could not be updated.");
+  }
+
+  return toStorefrontCart(data.cart);
+}
+
+export async function removeCartLineItem(lineItemId: string) {
+  const cart = await getOrCreateCart();
+  const data = await medusaFetch<MedusaCartParentResponse>(
+    `/store/carts/${cart.id}/line-items/${lineItemId}`,
+    {
+      method: "DELETE",
+      cache: "no-store",
+    },
+  );
+
+  if (!data?.parent) {
+    throw new Error("Bag item could not be removed.");
+  }
+
+  return toStorefrontCart(data.parent);
 }

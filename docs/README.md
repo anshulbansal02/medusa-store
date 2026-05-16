@@ -27,7 +27,7 @@ This folder contains the canonical planning and implementation context for the f
 ## Current Default Stack
 
 ```txt
-Storefront: Next.js App Router, React, Tailwind CSS, shadcn-style components, Base UI
+Storefront: Next.js App Router, React, Tailwind CSS, shadcn CLI-installed components, Base UI
 Commerce: Medusa
 Payments: Razorpay prepaid
 Email: Resend

@@ -10,7 +10,7 @@ Current direction:
 
 - Commerce core: Medusa.
 - Storefront: Next.js App Router.
-- Styling/components: Tailwind CSS, shadcn-style local components, `@base-ui/react`.
+- Styling/components: Tailwind CSS, shadcn CLI-installed local components, `@base-ui/react`.
 - Payments: Razorpay prepaid.
 - Email: Resend.
 - Media: Cloudflare R2.
@@ -52,6 +52,14 @@ Canonical docs:
 - Do not install Medusa's optional Next.js Starter Storefront.
 - Use Docker Compose for local Postgres and Redis only.
 - Run Next.js and Medusa directly with pnpm during local development.
+- Run local UI apps through portless.
+- Use stable portless URL `http://storefront.localhost` for the storefront UI.
+- Use plain HTTP and the default `.localhost` TLD for portless commands in this repo.
+- Do not hard-code local UI app ports. Portless assigns random internal app ports.
+- Run Medusa directly as the API server on fixed nonstandard local port `29181`.
+- Optional Medusa Admin alias is `http://medusa.localhost` via `pnpm medusa:admin:alias`; keep storefront API calls pointed at `http://localhost:29181`.
+- Use fixed nonstandard local host ports only for Docker services: Postgres `25433`, Redis `26380`.
+- Do not use common dev ports such as `3000`, `4000`, `8000`, `8080`, or `9000` for this project.
 - Keep app-generated TypeScript configs initially; do not add a root `tsconfig.base.json` until useful.
 - Use simple conventional commit messages; no commit tooling yet.
 - Use feature branches merged to `dev`, then `dev` merged to `main`.
@@ -67,7 +75,10 @@ Canonical docs:
 - Use Zustand for global client-only state when needed.
 - Do not put product/catalog server data into Zustand unnecessarily.
 - Use React Hook Form + Zod for forms.
-- Use `@base-ui/react` or established accessible primitives for complex UI.
+- For shared UI primitives, install shadcn components with the shadcn CLI first.
+- Customize installed shadcn local components through variants, tokens, and Tailwind utilities.
+- Do not hand-roll components that shadcn already provides.
+- Use `@base-ui/react`, Vaul, or established accessible primitives directly only when shadcn does not provide a suitable component or when building a domain-specific composition.
 
 ## Design Rules
 

@@ -1,7 +1,10 @@
-import { Search, ShoppingBag } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 
-import { getCartItemCount } from "@/lib/medusa/cart";
+import { BagDrawer } from "@/features/cart/bag-drawer";
+import { BagHydrator } from "@/features/cart/bag-hydrator";
+import { BagToast } from "@/features/cart/bag-toast";
+import { getCurrentCart } from "@/lib/medusa/cart";
 
 const navItems = [
   { href: "/shop", label: "New Arrivals" },
@@ -12,7 +15,8 @@ const navItems = [
 ];
 
 export async function SiteHeader() {
-  const cartItemCount = await getCartItemCount();
+  const cart = await getCurrentCart();
+  const cartItemCount = cart?.itemCount ?? 0;
 
   return (
     <header className="fixed inset-x-0 top-0 z-30 border-border/70 border-b bg-background/92 backdrop-blur-sm">
@@ -49,21 +53,11 @@ export async function SiteHeader() {
           >
             <Search className="size-4 stroke-[1.6]" />
           </Link>
-          <Link
-            href="/cart"
-            prefetch={false}
-            aria-label="Cart"
-            className="relative inline-flex size-9 items-center justify-center text-muted-foreground transition hover:text-foreground"
-          >
-            <ShoppingBag className="size-4 stroke-[1.6]" />
-            {cartItemCount > 0 ? (
-              <span className="-right-0.5 -top-0.5 absolute flex size-4 items-center justify-center rounded-full bg-foreground text-[10px] text-background leading-none">
-                {cartItemCount}
-              </span>
-            ) : null}
-          </Link>
+          <BagDrawer initialCart={cart} initialItemCount={cartItemCount} />
         </div>
       </div>
+      <BagHydrator cart={cart} />
+      <BagToast />
     </header>
   );
 }

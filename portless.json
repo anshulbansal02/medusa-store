@@ -1,0 +1,9 @@
+{
+  "turbo": false,
+  "apps": {
+    "apps/storefront": {
+      "name": "storefront",
+      "script": "dev:app"
+    }
+  }
+}

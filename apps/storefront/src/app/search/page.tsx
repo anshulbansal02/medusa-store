@@ -3,8 +3,10 @@ import Link from "next/link";
 
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { buttonVariants } from "@/components/ui/button";
 import { ProductCard } from "@/features/products/product-card";
 import { getProducts } from "@/lib/medusa/products";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -55,7 +57,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             />
             <button
               type="submit"
-              className="h-12 bg-foreground px-6 text-background text-sm transition hover:bg-foreground/90"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "h-12 rounded-none px-6 hover:bg-primary/90",
+              )}
             >
               Search
             </button>

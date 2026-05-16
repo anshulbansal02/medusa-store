@@ -27,7 +27,7 @@ export async function saveCheckoutAddressAction(
   try {
     await updateCartAddress(result.data);
     revalidatePath("/checkout");
-    revalidatePath("/cart");
+    revalidatePath("/bag");
 
     return {
       ok: true,
@@ -57,7 +57,7 @@ export async function selectShippingMethodAction(
   try {
     await setCartShippingMethod(optionId);
     revalidatePath("/checkout");
-    revalidatePath("/cart");
+    revalidatePath("/bag");
 
     return {
       ok: true,

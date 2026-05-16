@@ -14,9 +14,9 @@ These rules distill the design research into build-time guardrails. Use them bef
 
 ## Visual System
 
-- Use a warm ivory / espresso / deep wine / taupe palette.
+- Use a clean near-white / espresso / clean red / neutral taupe palette.
 - Product photography must dominate the page.
-- Use deep wine and accent colors sparingly for brand moments, not every CTA.
+- Use the clean red accent sparingly for primary action and brand moments, not broad decorative backgrounds or tinted page surfaces.
 - Maintain strong text contrast. Do not use pale beige or grey for important text.
 - Use Instrument Serif for brand/editorial headings and Geist for UI/body unless we intentionally test another approved pairing.
 - Use consistent image ratios: product cards `4:5`, editorial blocks `3:4`, larger story images `5:4` or theme-specific ratios.
@@ -25,8 +25,8 @@ These rules distill the design research into build-time guardrails. Use them bef
 
 - Homepage hierarchy: hero image, strong headline, CTA, new arrivals, curated edits, size/trust support.
 - Product card hierarchy: image, product name, price, color/short note.
-- PDP hierarchy later: image gallery, name, price, size, size guide, add to cart, fit/fabric/care, delivery/returns.
-- Size guidance must stay close to size selection and add-to-cart flows.
+- PDP hierarchy later: image gallery, name, price, size, size guide, add to bag, fit/fabric/care, delivery/returns.
+- Size guidance must stay close to size selection and add-to-bag flows.
 - Keep mobile layouts first-class; fashion browsing will often start on mobile.
 
 ## Anti-Generic Rules
@@ -40,9 +40,13 @@ These rules distill the design research into build-time guardrails. Use them bef
 
 ## Implementation Rules
 
-- Use Tailwind v4 tokens and shadcn-style local components.
+- Use Tailwind v4 tokens and shadcn CLI-installed local components.
+- Install shadcn components before composing equivalent primitives by hand.
+- Customize shadcn components locally through tokens, variants, and Tailwind utilities.
 - Keep CSS in global/token files only unless a specific CSS feature demands otherwise.
 - Keep Medusa data access inside `apps/storefront/src/lib/medusa`.
 - Fetch commerce/catalog data through Medusa helpers, not directly inside reusable UI components.
+- Product names, prices, descriptions, images, categories, product-led homepage selections, and product-specific size chart data must come from Medusa.
+- Product-specific size charts are read from `product.metadata.size_chart` with `unit`, `note`, `columns`, and `rows`; the storefront renders this data but does not define measurement values.
 - Do not use substitute commerce or product fallback data. Use empty, loading, and error states when Medusa data is unavailable.
 - Review UI with desktop and mobile screenshots before accepting significant storefront changes.
