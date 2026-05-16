@@ -30,6 +30,7 @@ export function CheckoutAddressForm({
   const [message, setMessage] = useState("");
   const {
     formState: { errors },
+    clearErrors,
     handleSubmit,
     register,
     setError,
@@ -39,6 +40,7 @@ export function CheckoutAddressForm({
 
   function onSubmit(values: CheckoutAddressInput) {
     setMessage("");
+    clearErrors();
     const result = checkoutAddressSchema.safeParse(values);
 
     if (!result.success) {
@@ -75,6 +77,7 @@ export function CheckoutAddressForm({
           id="email"
           type="email"
           autoComplete="email"
+          aria-invalid={Boolean(errors.email)}
           className={fieldClassName}
           {...register("email")}
         />
@@ -91,6 +94,7 @@ export function CheckoutAddressForm({
           <input
             id="firstName"
             autoComplete="given-name"
+            aria-invalid={Boolean(errors.firstName)}
             className={fieldClassName}
             {...register("firstName")}
           />
@@ -105,6 +109,7 @@ export function CheckoutAddressForm({
           <input
             id="lastName"
             autoComplete="family-name"
+            aria-invalid={Boolean(errors.lastName)}
             className={fieldClassName}
             {...register("lastName")}
           />
@@ -122,6 +127,7 @@ export function CheckoutAddressForm({
           id="phone"
           type="tel"
           autoComplete="tel"
+          aria-invalid={Boolean(errors.phone)}
           className={fieldClassName}
           {...register("phone")}
         />
@@ -137,6 +143,7 @@ export function CheckoutAddressForm({
         <input
           id="address1"
           autoComplete="address-line1"
+          aria-invalid={Boolean(errors.address1)}
           className={fieldClassName}
           {...register("address1")}
         />
@@ -165,6 +172,7 @@ export function CheckoutAddressForm({
           <input
             id="city"
             autoComplete="address-level2"
+            aria-invalid={Boolean(errors.city)}
             className={fieldClassName}
             {...register("city")}
           />
@@ -179,6 +187,7 @@ export function CheckoutAddressForm({
           <input
             id="province"
             autoComplete="address-level1"
+            aria-invalid={Boolean(errors.province)}
             className={fieldClassName}
             {...register("province")}
           />
@@ -194,6 +203,7 @@ export function CheckoutAddressForm({
             id="postalCode"
             inputMode="numeric"
             autoComplete="postal-code"
+            aria-invalid={Boolean(errors.postalCode)}
             className={fieldClassName}
             {...register("postalCode")}
           />

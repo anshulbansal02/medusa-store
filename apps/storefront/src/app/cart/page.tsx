@@ -93,7 +93,11 @@ export default async function CartPage() {
                   </div>
                   <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span>Calculated later</span>
+                    <span>
+                      {cart.selectedShippingOptionId
+                        ? cart.shippingTotal
+                        : "Calculated later"}
+                    </span>
                   </div>
                 </div>
                 <div className="mt-5 flex justify-between gap-4 font-medium">
