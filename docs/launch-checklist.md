@@ -21,6 +21,8 @@ This checklist is intentionally lightweight. There is no written test suite for 
   - `push` to `dev` deploys to Railway `qa` and Vercel QA preview.
   - `main` deploy is deliberately not configured yet (phase 1: QA only).
 - Confirm Railway Medusa deploy shows a successful build step without `ERR_PNPM_IGNORED_BUILDS` before smoke testing API endpoints.
+- Confirm Vercel storefront QA deploy is enabled by adding the GitHub `qa` environment secret `VERCEL_TOKEN`.
+- Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL` and, when ready, `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`.
 
 ## Storefront UX
 

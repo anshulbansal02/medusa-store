@@ -1,14 +1,28 @@
 name: Deploy Storefront
 
 on:
+  push:
+    branches: [dev]
   workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target"
+        required: true
+        default: qa
+        type: choice
+        options:
+          - qa
+          - production
 
 jobs:
-  deploy:
+  deploy-qa:
+    if: github.event_name == 'push' || github.event.inputs.target == 'qa'
     runs-on: ubuntu-latest
     permissions:
       contents: read
     environment: qa
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,15 +38,127 @@ jobs:
           version: 11.1.2
 
       - name: Install Vercel CLI
-        run: pnpm add -g vercel@latest
+        run: npm install --global vercel@latest
 
       - name: Install dependencies
         run: corepack enable && pnpm install --frozen-lockfile
 
-      - name: Deploy QA preview
+      - name: Build QA
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          MEDUSA_BACKEND_URL: ${{ vars.MEDUSA_BACKEND_URL }}
+          NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ vars.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
+          NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN }}
         run: |
-          vercel deploy --yes --cwd ./apps/storefront --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" --project "$VERCEL_PROJECT_ID"
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::notice::Skipping storefront QA deploy because VERCEL_TOKEN is not configured yet."
+            exit 0
+          fi
+          if [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "Missing Vercel org id or project id"
+            echo "Set VERCEL_ORG_ID and VERCEL_PROJECT_ID as qa environment variables."
+            exit 1
+          fi
+          vercel pull --yes --environment=preview --cwd ./apps/storefront --token "$VERCEL_TOKEN"
+          args=()
+          [ -n "$MEDUSA_BACKEND_URL" ] && args+=(--build-env "MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL")
+          [ -n "$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" ] && args+=(--build-env "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY")
+          [ -n "$NEXT_PUBLIC_RAZORPAY_KEY_ID" ] && args+=(--build-env "NEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID")
+          [ -n "$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN" ] && args+=(--build-env "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN=$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN")
+          vercel build --cwd ./apps/storefront --token "$VERCEL_TOKEN" "${args[@]}"
+
+      - name: Deploy QA
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          MEDUSA_BACKEND_URL: ${{ vars.MEDUSA_BACKEND_URL }}
+          NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ vars.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
+          NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::notice::Skipping storefront QA deploy because VERCEL_TOKEN is not configured yet."
+            exit 0
+          fi
+          args=()
+          [ -n "$MEDUSA_BACKEND_URL" ] && args+=(--env "MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL")
+          [ -n "$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" ] && args+=(--env "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY")
+          [ -n "$NEXT_PUBLIC_RAZORPAY_KEY_ID" ] && args+=(--env "NEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID")
+          [ -n "$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN" ] && args+=(--env "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN=$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN")
+          vercel deploy --prebuilt --cwd ./apps/storefront --token "$VERCEL_TOKEN" "${args[@]}"
+
+  deploy-production:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'production'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    environment: production
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Install dependencies
+        run: corepack enable && pnpm install --frozen-lockfile
+
+      - name: Build production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          MEDUSA_BACKEND_URL: ${{ vars.MEDUSA_BACKEND_URL }}
+          NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ vars.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
+          NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::notice::Skipping storefront production deploy because VERCEL_TOKEN is not configured yet."
+            exit 0
+          fi
+          if [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "Missing Vercel org id or project id"
+            echo "Set VERCEL_ORG_ID and VERCEL_PROJECT_ID as production environment variables."
+            exit 1
+          fi
+          vercel pull --yes --environment=production --cwd ./apps/storefront --token "$VERCEL_TOKEN"
+          args=()
+          [ -n "$MEDUSA_BACKEND_URL" ] && args+=(--build-env "MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL")
+          [ -n "$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" ] && args+=(--build-env "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY")
+          [ -n "$NEXT_PUBLIC_RAZORPAY_KEY_ID" ] && args+=(--build-env "NEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID")
+          [ -n "$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN" ] && args+=(--build-env "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN=$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN")
+          vercel build --prod --cwd ./apps/storefront --token "$VERCEL_TOKEN" "${args[@]}"
+
+      - name: Deploy production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          MEDUSA_BACKEND_URL: ${{ vars.MEDUSA_BACKEND_URL }}
+          NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ vars.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
+          NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::notice::Skipping storefront production deploy because VERCEL_TOKEN is not configured yet."
+            exit 0
+          fi
+          args=()
+          [ -n "$MEDUSA_BACKEND_URL" ] && args+=(--env "MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL")
+          [ -n "$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" ] && args+=(--env "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY")
+          [ -n "$NEXT_PUBLIC_RAZORPAY_KEY_ID" ] && args+=(--env "NEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID")
+          [ -n "$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN" ] && args+=(--env "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN=$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN")
+          vercel deploy --prebuilt --prod --cwd ./apps/storefront --token "$VERCEL_TOKEN" "${args[@]}"

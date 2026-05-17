@@ -122,6 +122,29 @@ Rules:
   - `qa` environment only for now.
   - Production environment values should be configured but not used until rollout.
 
+## Vercel Storefront Deployment Notes
+
+- Vercel project: `medusa-store-storefront`.
+- GitHub Actions owns storefront deployment; Vercel Git auto-deploys are not required.
+- `dev` pushes run the QA deploy workflow.
+- Production storefront deployment is manual through workflow dispatch until production rollout.
+- GitHub environment variables hold non-secret deployment config:
+  - `VERCEL_ORG_ID`
+  - `VERCEL_PROJECT_ID`
+  - `MEDUSA_BACKEND_URL`
+  - `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`
+  - `NEXT_PUBLIC_RAZORPAY_KEY_ID`
+  - `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN`
+- GitHub environment secrets hold deploy credentials:
+  - `VERCEL_TOKEN`
+- Pending QA config:
+  - Add `VERCEL_TOKEN`.
+  - Add `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` from Medusa Admin/API key settings.
+  - Add `NEXT_PUBLIC_RAZORPAY_KEY_ID` when Razorpay test mode is configured.
+  - Add `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` when Cloudflare Web Analytics is configured.
+- Pending production config:
+  - Add production Vercel environment variables and secrets only when production rollout starts.
+
 ## Local Handling
 
 - Use `.env.example` as the source of required variable names.
