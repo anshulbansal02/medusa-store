@@ -47,7 +47,7 @@ Rules:
 - Use Corepack-managed pnpm through the root `packageManager` field.
 - Pin the exact pnpm version selected during setup.
 - Avoid global installs unless required by a platform or official scaffold command.
-- For Railway deploys that point to `apps/medusa`, place pnpm trust policy (`minimumReleaseAge`, `onlyBuiltDependencies`) in `apps/medusa/.npmrc` so build-script approval is applied in that install context.
+- For Railway deploys that point to `apps/medusa`, place pnpm trust policy (`minimumReleaseAge`, `allowBuilds`) in `apps/medusa/pnpm-workspace.yaml` so build-script approval is applied in that install context.
 - Keep workspace-level `pnpm-workspace.yaml` for monorepo package graph policy and `minimumReleaseAge` consistency.
 
 ## Scaffolding
@@ -358,6 +358,7 @@ Keep setup simple and agent-friendly.
 - Use latest stable versions at setup time.
 - Configure `minimumReleaseAge: 4320` in `pnpm-workspace.yaml` so package versions must be at least 3 days old before pnpm installs them.
 - Keep `minimumReleaseAgeStrict` enabled so installs fail instead of silently bypassing the age gate.
+- Use pnpm v11 `allowBuilds` in `pnpm-workspace.yaml` for reviewed dependency lifecycle scripts; do not use removed `onlyBuiltDependencies` settings.
 - Use `minimumReleaseAgeExclude` only for explicit, reviewed exceptions.
 - Do not disable pnpm's default transitive exotic dependency blocking.
 - Avoid experimental packages unless strongly justified.
