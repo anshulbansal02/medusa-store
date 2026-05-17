@@ -1,7 +1,7 @@
 # References
 
 Status: source index
-Last reviewed: 2026-05-15
+Last reviewed: 2026-05-17
 
 Use official docs first when implementation depends on current platform behavior, limits, pricing, or APIs.
 
@@ -13,6 +13,8 @@ Use official docs first when implementation depends on current platform behavior
 - Medusa deployment: https://docs.medusajs.com/learn/deployment/general
 - Medusa payment module: https://docs.medusajs.com/resources/commerce-modules/payment
 - Medusa fulfillment module: https://docs.medusajs.com/resources/commerce-modules/fulfillment
+- Medusa Admin order details: https://docs.medusajs.com/user-guide/orders/manage
+- Medusa Admin fulfillments: https://docs.medusajs.com/user-guide/orders/fulfillments
 - Medusa S3 file provider: https://docs.medusajs.com/resources/infrastructure-modules/file/s3
 - Medusa Redis event module: https://docs.medusajs.com/resources/infrastructure-modules/event/redis
 
@@ -21,8 +23,15 @@ Use official docs first when implementation depends on current platform behavior
 - Next.js docs: https://nextjs.org/docs
 - Next.js create-next-app CLI: https://nextjs.org/docs/app/api-reference/cli/create-next-app
 - Next.js production checklist: https://nextjs.org/docs/app/guides/production-checklist
+- Next.js Server and Client Components: https://nextjs.org/docs/app/getting-started/server-and-client-components
+- Next.js caching and revalidating: https://nextjs.org/docs/app/getting-started/caching-and-revalidating
 - Next.js metadata and OG images: https://nextjs.org/docs/app/getting-started/metadata-and-og-images
+- Next.js manifest metadata route: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest
+- Next.js app icons metadata routes: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/app-icons
 - Next.js Image component: https://nextjs.org/docs/app/api-reference/components/image
+- React Server Components: https://react.dev/reference/rsc/server-components
+- React `use client`: https://react.dev/reference/rsc/use-client
+- React effects guidance: https://react.dev/learn/you-might-not-need-an-effect
 - Base UI: https://base-ui.com/
 - Tailwind CSS: https://tailwindcss.com/docs
 
@@ -64,6 +73,11 @@ Use official docs first when implementation depends on current platform behavior
 - Baymard mobile category navigation: https://baymard.com/blog/main-navigation-product-categories
 - Baymard checkout UX: https://baymard.com/blog/current-state-of-checkout-ux
 - Baymard apparel UX audits: https://baymard.com/audits/apparel-and-accessories
+
+## Storefront Design References
+
+- Shopify Reformation theme preset: https://themes.shopify.com/themes/reformation/presets/reformation
+- Shopify Taiga Meadow theme preset: https://themes.shopify.com/themes/taiga/presets/meadow
 
 ## Historical Research
 

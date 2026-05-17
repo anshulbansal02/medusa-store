@@ -2,15 +2,10 @@
 
 import { Minus, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  type FormEvent,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from "react";
+import { type FormEvent, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { addToCartAction } from "@/features/cart/actions";
 import { useBagStore } from "@/features/cart/bag-store";
 import type { ProductDetailVariant } from "@/lib/medusa/products";
@@ -36,10 +31,7 @@ export function AddToCartForm({
   const [isPending, startTransition] = useTransition();
   const setCart = useBagStore((state) => state.setCart);
   const showAddedItem = useBagStore((state) => state.showAddedItem);
-  const availableVariants = useMemo(
-    () => variants.filter((variant) => variant.id),
-    [variants],
-  );
+  const availableVariants = variants.filter((variant) => variant.id);
   const [selectedVariantId, setSelectedVariantId] = useState(
     availableVariants[0]?.id ?? "",
   );
@@ -87,19 +79,9 @@ export function AddToCartForm({
     });
   }
 
-  useEffect(() => {
-    if (
-      !availableVariants.some((variant) => variant.id === selectedVariantId)
-    ) {
-      setSelectedVariantId(availableVariants[0]?.id ?? "");
-      setQuantity(1);
-    }
-  }, [availableVariants, selectedVariantId]);
-
   return (
     <>
       <form id="add-to-cart-form" onSubmit={handleSubmit} className="py-6">
-        <input type="hidden" name="variant_id" value={selectedVariantId} />
         <input
           type="hidden"
           name="variant_title"
@@ -130,30 +112,31 @@ export function AddToCartForm({
           <p id="size-help" className="sr-only">
             Choose one available size for {productName}.
           </p>
-          <div className="mt-3 grid grid-cols-5 gap-2">
+          <RadioGroup
+            name="variant_id"
+            value={selectedVariantId}
+            onValueChange={(value) => setSelectedVariantId(value)}
+            className="mt-3 grid grid-cols-5 gap-2"
+          >
             {availableVariants.map((variant) => {
               const isSelected = selectedVariantId === variant.id;
 
               return (
-                <Button
+                <RadioGroupItem
                   key={variant.id}
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  aria-pressed={isSelected}
-                  onClick={() => setSelectedVariantId(variant.id)}
+                  value={variant.id}
                   className={cn(
-                    "h-11 rounded-none",
+                    "flex aspect-auto h-11 w-full cursor-pointer items-center justify-center rounded-none border-border bg-background text-sm font-medium transition hover:border-foreground focus-visible:ring-2 focus-visible:ring-ring",
                     isSelected
                       ? "border-foreground bg-foreground text-background hover:bg-foreground hover:text-background"
                       : "hover:border-foreground",
                   )}
                 >
                   {variant.size}
-                </Button>
+                </RadioGroupItem>
               );
             })}
-          </div>
+          </RadioGroup>
         </fieldset>
 
         <div className="mt-6">

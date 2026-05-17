@@ -1,16 +1,9 @@
 import { cookies } from "next/headers";
 
 import { formatStorePrice, medusaFetch } from "@/lib/medusa/client";
+import { getDefaultRegionId } from "@/lib/medusa/regions";
 
 const cartCookieName = "the_label_cart_id";
-
-type MedusaRegion = {
-  id: string;
-};
-
-type MedusaRegionsResponse = {
-  regions?: MedusaRegion[];
-};
 
 type MedusaCartLineItem = {
   id: string;
@@ -215,14 +208,6 @@ async function getCartById(cartId: string) {
   return data?.cart ? toStorefrontCart(data.cart) : null;
 }
 
-async function getDefaultRegionId() {
-  const data = await medusaFetch<MedusaRegionsResponse>("/store/regions", {
-    cache: "no-store",
-  });
-
-  return data?.regions?.[0]?.id ?? null;
-}
-
 async function createCart() {
   const regionId = await getDefaultRegionId();
 
@@ -264,6 +249,16 @@ async function getOrCreateCart() {
   return cart;
 }
 
+async function requireCurrentCart(errorMessage: string) {
+  const cart = await getCurrentCart();
+
+  if (!cart) {
+    throw new Error(errorMessage);
+  }
+
+  return cart;
+}
+
 export async function getCurrentCart() {
   const cookieStore = await cookies();
   const cartId = cookieStore.get(cartCookieName)?.value;
@@ -275,21 +270,29 @@ export async function getCurrentCart() {
   return getCartById(cartId);
 }
 
+export async function clearCurrentCart() {
+  const cookieStore = await cookies();
+
+  cookieStore.delete(cartCookieName);
+}
+
 export async function getCartItemCount() {
   const cart = await getCurrentCart();
 
   return cart?.itemCount ?? 0;
 }
 
-export async function getCurrentShippingOptions() {
-  const cart = await getCurrentCart();
+export async function getCurrentShippingOptions(
+  cart: StorefrontCart | null = null,
+) {
+  const currentCart = cart ?? (await getCurrentCart());
 
-  if (!cart || cart.items.length === 0) {
+  if (!currentCart || currentCart.items.length === 0) {
     return [];
   }
 
   const data = await medusaFetch<MedusaShippingOptionsResponse>(
-    `/store/shipping-options?cart_id=${cart.id}`,
+    `/store/shipping-options?cart_id=${currentCart.id}`,
     {
       cache: "no-store",
     },
@@ -337,7 +340,7 @@ export async function updateCartAddress(address: CheckoutAddressPayload) {
 }
 
 export async function setCartShippingMethod(optionId: string) {
-  const cart = await getOrCreateCart();
+  const cart = await requireCurrentCart("Cart is not available.");
   const data = await medusaFetch<MedusaCartResponse>(
     `/store/carts/${cart.id}/shipping-methods`,
     {
@@ -379,7 +382,7 @@ export async function addVariantToCart(variantId: string, quantity = 1) {
 }
 
 export async function updateCartLineItem(lineItemId: string, quantity: number) {
-  const cart = await getOrCreateCart();
+  const cart = await requireCurrentCart("Cart is not available.");
   const data = await medusaFetch<MedusaCartResponse>(
     `/store/carts/${cart.id}/line-items/${lineItemId}`,
     {
@@ -400,7 +403,7 @@ export async function updateCartLineItem(lineItemId: string, quantity: number) {
 }
 
 export async function removeCartLineItem(lineItemId: string) {
-  const cart = await getOrCreateCart();
+  const cart = await requireCurrentCart("Cart is not available.");
   const data = await medusaFetch<MedusaCartParentResponse>(
     `/store/carts/${cart.id}/line-items/${lineItemId}`,
     {

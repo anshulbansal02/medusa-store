@@ -90,12 +90,19 @@ apps/storefront/src/lib/utils/           small utilities such as cn()
 Rules:
 
 - Keep Medusa access inside `lib/medusa`.
+- Mark the Medusa data layer as server-only so it cannot be imported into Client Components by accident.
 - Keep product/cart/checkout behavior inside feature modules.
 - Keep components presentational unless they intentionally own interaction state.
 - Keep `"use client"` boundaries small.
+- Do not add `"use client"` to pages, layouts, or broad feature shells just to make one nested control interactive.
+- Prefer Server Components for catalog, product, order, policy, SEO, and layout rendering.
+- Use Client Components only for state, event handlers, browser APIs, lifecycle effects, form libraries, client stores, or third-party widgets that require the browser.
+- Keep effects for synchronizing with external systems such as timers, focus management, browser storage, scripts, subscriptions, or non-React widgets.
+- Do not use `useEffect` to derive render data, handle user events, or mirror props into state when the value can be calculated during render.
 - Use server rendering for product/collection data where practical.
 - Use typed data contracts at API boundaries.
 - Avoid random API calls inside components.
+- Keep `dynamic = "force-dynamic"` as an explicit exception for routes that truly need it; do not use it as a default.
 - Keep UI components local to the storefront; do not create a shared UI package yet.
 - Do not invent interactive/accessibility primitives.
 - Install shared UI primitives from shadcn with the shadcn CLI when shadcn provides a suitable component.

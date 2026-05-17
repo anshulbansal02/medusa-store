@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
 import { CheckoutAddressForm } from "@/features/checkout/checkout-address-form";
+import { RazorpayPaymentButton } from "@/features/checkout/razorpay-payment-button";
 import type { CheckoutAddressInput } from "@/features/checkout/schema";
 import { ShippingMethodForm } from "@/features/checkout/shipping-method-form";
 import { getCurrentCart, getCurrentShippingOptions } from "@/lib/medusa/cart";
@@ -37,8 +38,9 @@ function getAddressDefaults(cart: Awaited<ReturnType<typeof getCurrentCart>>) {
 export default async function CheckoutPage() {
   const cart = await getCurrentCart();
   const shippingOptions = cart?.shippingAddress
-    ? await getCurrentShippingOptions()
+    ? await getCurrentShippingOptions(cart)
     : [];
+  const razorpayPublicKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? null;
 
   if (!cart || cart.items.length === 0) {
     return (
@@ -183,20 +185,12 @@ export default async function CheckoutPage() {
                 <span>{cart.total}</span>
               </div>
 
-              <button
-                type="button"
-                disabled
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "mt-6 h-12 w-full rounded-none",
+              <RazorpayPaymentButton
+                publicKey={razorpayPublicKey}
+                isReadyForPayment={Boolean(
+                  cart.shippingAddress && cart.selectedShippingOptionId,
                 )}
-              >
-                Payment coming next
-              </button>
-              <p className="mt-4 text-muted-foreground text-sm">
-                Razorpay payment will be connected after this checkout
-                foundation is stable.
-              </p>
+              />
             </aside>
           </div>
         </div>

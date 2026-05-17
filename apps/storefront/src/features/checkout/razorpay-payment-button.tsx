@@ -1,0 +1,155 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import Script from "next/script";
+import { useState, useTransition } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  startRazorpayPaymentAction,
+  verifyAndCompleteRazorpayPaymentAction,
+} from "@/features/checkout/actions";
+
+type RazorpayCheckoutResponse = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+};
+
+type RazorpayConstructorOptions = {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  order_id: string;
+  prefill?: {
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
+  handler: (response: RazorpayCheckoutResponse) => void;
+  modal?: {
+    ondismiss?: () => void;
+  };
+};
+
+type RazorpayCheckout = {
+  open: () => void;
+};
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: RazorpayConstructorOptions) => RazorpayCheckout;
+  }
+}
+
+type RazorpayPaymentButtonProps = {
+  publicKey: string | null;
+  isReadyForPayment: boolean;
+};
+
+function isConfigured(value: string | null) {
+  return typeof value === "string" && !value.includes("replace_me");
+}
+
+export function RazorpayPaymentButton({
+  publicKey,
+  isReadyForPayment,
+}: RazorpayPaymentButtonProps) {
+  const router = useRouter();
+  const [scriptReady, setScriptReady] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const isPaymentConfigured = isConfigured(publicKey);
+  const disabled =
+    !isReadyForPayment || !isPaymentConfigured || !scriptReady || isPending;
+
+  function handlePayment() {
+    if (!publicKey || !window.Razorpay) {
+      setMessage("Payment is not ready yet.");
+      return;
+    }
+
+    const RazorpayCheckout = window.Razorpay;
+
+    setMessage("");
+    startTransition(async () => {
+      const result = await startRazorpayPaymentAction();
+
+      if (!result.ok) {
+        setMessage(result.message);
+        return;
+      }
+
+      const checkout = new RazorpayCheckout({
+        key: publicKey,
+        amount: result.payment.amount,
+        currency: result.payment.currency,
+        name: "The Label",
+        order_id: result.payment.orderId,
+        prefill: {
+          name: result.customer.name,
+          email: result.customer.email,
+          contact: result.customer.phone,
+        },
+        handler: (response) => {
+          startTransition(async () => {
+            const completion = await verifyAndCompleteRazorpayPaymentAction({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            if (!completion.ok) {
+              setMessage(completion.message);
+              return;
+            }
+
+            router.push(`/order-confirmation/${completion.orderId}`);
+          });
+        },
+        modal: {
+          ondismiss: () => setMessage("Payment was not completed."),
+        },
+      });
+
+      checkout.open();
+    });
+  }
+
+  return (
+    <>
+      {isPaymentConfigured ? (
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="afterInteractive"
+          onLoad={() => setScriptReady(true)}
+          onError={() => setMessage("Payment could not be loaded. Try again.")}
+        />
+      ) : null}
+      <Button
+        type="button"
+        disabled={disabled}
+        size="lg"
+        className="mt-6 h-12 w-full rounded-none"
+        onClick={handlePayment}
+      >
+        {isPending ? "Processing..." : "Pay securely"}
+      </Button>
+      <p className="mt-4 text-muted-foreground text-sm">
+        {!isPaymentConfigured
+          ? "Razorpay is not configured for this environment."
+          : !isReadyForPayment
+            ? "Add address and shipping before payment."
+            : !scriptReady
+              ? "Preparing secure payment."
+              : "Secure prepaid checkout powered by Razorpay."}
+      </p>
+      {message ? (
+        <p className="mt-3 border border-destructive/30 px-3 py-2 text-destructive text-sm">
+          {message}
+        </p>
+      ) : null}
+    </>
+  );
+}

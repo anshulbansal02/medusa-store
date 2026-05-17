@@ -3,6 +3,8 @@
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { selectShippingMethodAction } from "@/features/checkout/actions";
 import type { StorefrontShippingOption } from "@/lib/medusa/cart";
 import { cn } from "@/lib/utils";
@@ -26,35 +28,33 @@ export function ShippingMethodForm({
     initialState,
   );
 
+  const defaultValue = selectedShippingOptionId ?? options[0]?.id ?? "";
+
   return (
     <form action={formAction} className="grid gap-4">
-      {options.map((option, index) => (
-        <label
-          key={option.id}
-          className="grid cursor-pointer grid-cols-[auto_1fr_auto] gap-3 border border-border p-4 transition hover:border-foreground"
-        >
-          <input
-            type="radio"
-            name="option_id"
-            value={option.id}
-            defaultChecked={
-              selectedShippingOptionId
-                ? selectedShippingOptionId === option.id
-                : index === 0
-            }
-            className="mt-1 accent-foreground"
-          />
-          <span>
-            <span className="block font-medium">{option.name}</span>
-            {option.description ? (
-              <span className="mt-1 block text-muted-foreground text-sm">
-                {option.description}
-              </span>
-            ) : null}
-          </span>
-          <span className="font-medium">{option.price}</span>
-        </label>
-      ))}
+      <RadioGroup
+        name="option_id"
+        defaultValue={defaultValue}
+        className="gap-4"
+      >
+        {options.map((option) => (
+          <Label
+            key={option.id}
+            className="grid cursor-pointer grid-cols-[auto_1fr_auto] items-start gap-3 border border-border p-4 transition hover:border-foreground"
+          >
+            <RadioGroupItem value={option.id} className="mt-0.5" />
+            <span>
+              <span className="block font-medium">{option.name}</span>
+              {option.description ? (
+                <span className="mt-1 block text-muted-foreground text-sm">
+                  {option.description}
+                </span>
+              ) : null}
+            </span>
+            <span className="font-medium">{option.price}</span>
+          </Label>
+        ))}
+      </RadioGroup>
 
       {state.message ? (
         <p

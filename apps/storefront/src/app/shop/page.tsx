@@ -4,26 +4,38 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { ProductCard } from "@/features/products/product-card";
+import { absoluteUrl } from "@/lib/config/site";
+import { getProductCategories } from "@/lib/medusa/categories";
 import { getProducts } from "@/lib/medusa/products";
-
-export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Shop New Arrivals | The Label",
   description:
     "Shop premium western occasion wear, dresses, co-ords, and statement tops for India.",
+  alternates: {
+    canonical: absoluteUrl("/shop"),
+  },
+  openGraph: {
+    title: "Shop New Arrivals | The Label",
+    description:
+      "Shop premium western occasion wear, dresses, co-ords, and statement tops for India.",
+    url: absoluteUrl("/shop"),
+    type: "website",
+  },
 };
 
-const categoryLinks = [
-  { href: "/shop", label: "All" },
-  { href: "/shop/dresses", label: "Dresses" },
-  { href: "/shop/sets", label: "Co-ords" },
-  { href: "/shop/tops", label: "Tops" },
-  { href: "/shop/occasion-edit", label: "Occasion Edit" },
-];
-
 export default async function ShopPage() {
-  const products = await getProducts({ limit: 24 });
+  const [products, categories] = await Promise.all([
+    getProducts({ limit: 24 }),
+    getProductCategories(12),
+  ]);
+  const categoryLinks = [
+    { href: "/shop", label: "All" },
+    ...categories.map((category) => ({
+      href: `/shop/${category.handle}`,
+      label: category.name,
+    })),
+  ];
 
   return (
     <main className="min-h-screen">
@@ -73,7 +85,7 @@ export default async function ShopPage() {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  priority={index < 4}
+                  eager={index < 4}
                 />
               ))}
             </div>

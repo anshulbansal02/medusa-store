@@ -9,13 +9,17 @@ import { AddToCartForm } from "@/features/cart/add-to-cart-form";
 import { ProductCard } from "@/features/products/product-card";
 import { ProductGallery } from "@/features/products/product-gallery";
 import { ProductSizeChart } from "@/features/products/product-size-chart";
+import { absoluteUrl } from "@/lib/config/site";
+import { getCategoryByHandle } from "@/lib/medusa/categories";
 import {
-  getCategoryByHandle,
   getProductByHandle,
   getProductsByCategoryHandle,
+  getRelatedProducts,
 } from "@/lib/medusa/products";
-
-export const dynamic = "force-dynamic";
+import {
+  createProductJsonLd,
+  serializeJsonLd,
+} from "@/lib/seo/product-json-ld";
 
 type ProductPageProps = {
   params: Promise<{
@@ -47,6 +51,16 @@ export async function generateMetadata({
   return {
     title: `${product.name} | The Label`,
     description: product.description,
+    alternates: {
+      canonical: absoluteUrl(`/shop/${product.handle}`),
+    },
+    openGraph: {
+      title: `${product.name} | The Label`,
+      description: product.description,
+      url: absoluteUrl(`/shop/${product.handle}`),
+      images: product.images[0] ? [{ url: product.images[0] }] : undefined,
+      type: "website",
+    },
   };
 }
 
@@ -64,6 +78,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
+  const relatedProducts = await getRelatedProducts(product, 4);
+  const primaryCategory = product.categories[0];
+  const productJsonLd = createProductJsonLd(product);
   const productNameWords: Array<{ key: string; word: string }> = [];
   let productNameCursor = 0;
 
@@ -75,6 +92,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD is generated server-side and serialized with "<" escaped.
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(productJsonLd),
+        }}
+      />
       <SiteHeader />
 
       <section className="px-4 pt-24 pb-28 sm:px-6 sm:pt-28 sm:pb-20 lg:px-8">
@@ -118,6 +142,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
 
             <AddToCartForm
+              key={product.id}
               productName={product.name}
               productPrice={product.price}
               color={product.color}
@@ -151,25 +176,62 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   </p>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <ShieldCheck
-                  className="mt-0.5 size-4 shrink-0 stroke-[1.6] text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <div>
-                  <h2 className="font-medium">Fit and fabric</h2>
-                  <p className="mt-1 text-muted-foreground">
-                    Use the size chart before checkout. Fabric, care, and fit
-                    notes stay close to the purchase decision.
-                  </p>
-                </div>
-              </div>
             </div>
+
+            {product.detailSections.length > 0 ? (
+              <div className="grid gap-4 border-border border-t pt-6 text-sm">
+                {product.detailSections.map((section) => (
+                  <section key={section.key} className="flex gap-3">
+                    <ShieldCheck
+                      className="mt-0.5 size-4 shrink-0 stroke-[1.6] text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <h2 className="font-medium">{section.title}</h2>
+                      <p className="mt-1 text-muted-foreground">
+                        {section.text}
+                      </p>
+                    </div>
+                  </section>
+                ))}
+              </div>
+            ) : null}
 
             <ProductSizeChart sizeChart={product.sizeChart} />
           </div>
         </div>
       </section>
+
+      {relatedProducts.length > 0 ? (
+        <section className="px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+          <div className="mx-auto max-w-[1440px] border-border border-t pt-9">
+            <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-muted-foreground text-sm">
+                  {primaryCategory?.name ?? "Keep browsing"}
+                </p>
+                <h2 className="mt-2 font-heading text-5xl leading-none sm:text-6xl">
+                  More from this edit
+                </h2>
+              </div>
+              {primaryCategory ? (
+                <Link
+                  href={`/shop/${primaryCategory.handle}`}
+                  prefetch={false}
+                  className="text-sm font-medium underline-offset-4 hover:underline"
+                >
+                  View edit
+                </Link>
+              ) : null}
+            </div>
+            <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <SiteFooter />
     </main>
@@ -224,7 +286,7 @@ async function CollectionPage({ handle }: { handle: string }) {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  priority={index < 4}
+                  eager={index < 4}
                 />
               ))}
             </div>

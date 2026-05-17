@@ -4,7 +4,7 @@ import { Minus, Plus, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -30,6 +30,7 @@ type BagDrawerProps = {
 
 export function BagDrawer({ initialCart, initialItemCount }: BagDrawerProps) {
   const router = useRouter();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
   const cart = useBagStore((state) => state.cart) ?? initialCart;
@@ -40,6 +41,12 @@ export function BagDrawer({ initialCart, initialItemCount }: BagDrawerProps) {
   const items = cart?.items ?? [];
   const hasItems = items.length > 0;
   const itemCount = cart?.itemCount ?? initialItemCount;
+
+  useEffect(() => {
+    if (isOpen) {
+      closeButtonRef.current?.focus();
+    }
+  }, [isOpen]);
 
   function updateQuantity(lineItemId: string, quantity: number) {
     startTransition(async () => {
@@ -97,6 +104,7 @@ export function BagDrawer({ initialCart, initialItemCount }: BagDrawerProps) {
             </DrawerDescription>
           </div>
           <DrawerClose
+            ref={closeButtonRef}
             aria-label="Close bag"
             className="inline-flex size-9 cursor-pointer items-center justify-center text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >

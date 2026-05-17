@@ -3,12 +3,10 @@ import Link from "next/link";
 
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ProductCard } from "@/features/products/product-card";
 import { getProducts } from "@/lib/medusa/products";
-import { cn } from "@/lib/utils";
-
-export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Search | The Label",
@@ -48,22 +46,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
 
           <form action="/search" className="flex max-w-2xl gap-3 py-7">
-            <input
+            <Input
               type="search"
               name="q"
               defaultValue={query}
-              placeholder="Search dresses, sets, tops"
-              className="h-12 min-w-0 flex-1 border border-border bg-background px-4 text-sm outline-none transition placeholder:text-muted-foreground focus:border-foreground"
+              placeholder="Search dresses, co-ords, tops"
+              className="h-12 min-w-0 flex-1 rounded-none border-border bg-background px-4"
             />
-            <button
-              type="submit"
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "h-12 rounded-none px-6 hover:bg-primary/90",
-              )}
-            >
+            <Button type="submit" size="lg" className="h-12 rounded-none px-6">
               Search
-            </button>
+            </Button>
           </form>
 
           <div className="mb-6 flex items-center justify-between gap-4 text-sm">
@@ -89,7 +81,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  priority={index < 4}
+                  eager={index < 4}
                 />
               ))}
             </div>

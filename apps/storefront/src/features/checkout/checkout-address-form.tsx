@@ -1,10 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import type { BaseSyntheticEvent } from "react";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { saveCheckoutAddressAction } from "@/features/checkout/actions";
 import {
   type CheckoutAddressInput,
@@ -15,10 +18,7 @@ type CheckoutAddressFormProps = {
   defaultValues: CheckoutAddressInput;
 };
 
-const fieldClassName =
-  "h-11 w-full border border-border bg-background px-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-foreground";
-
-const labelClassName = "text-sm font-medium";
+const fieldClassName = "h-11 rounded-none border-border bg-background px-3";
 const errorClassName = "mt-1 text-destructive text-xs";
 
 export function CheckoutAddressForm({
@@ -37,10 +37,26 @@ export function CheckoutAddressForm({
     defaultValues,
   });
 
-  function onSubmit(values: CheckoutAddressInput) {
+  function onSubmit(_values: CheckoutAddressInput, event?: BaseSyntheticEvent) {
     setMessage("");
     clearErrors();
-    const result = checkoutAddressSchema.safeParse(values);
+    const form = event?.target instanceof HTMLFormElement ? event.target : null;
+    const formData = form ? new FormData(form) : null;
+    const result = checkoutAddressSchema.safeParse(
+      formData
+        ? {
+            email: formData.get("email"),
+            firstName: formData.get("firstName"),
+            lastName: formData.get("lastName"),
+            phone: formData.get("phone"),
+            address1: formData.get("address1"),
+            address2: formData.get("address2"),
+            city: formData.get("city"),
+            province: formData.get("province"),
+            postalCode: formData.get("postalCode"),
+          }
+        : _values,
+    );
 
     if (!result.success) {
       for (const issue of result.error.issues) {
@@ -67,12 +83,10 @@ export function CheckoutAddressForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5">
+    <form noValidate onSubmit={handleSubmit(onSubmit)} className="grid gap-5">
       <div className="grid gap-2">
-        <label htmlFor="email" className={labelClassName}>
-          Email
-        </label>
-        <input
+        <Label htmlFor="email">Email</Label>
+        <Input
           id="email"
           type="email"
           autoComplete="email"
@@ -87,10 +101,8 @@ export function CheckoutAddressForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="grid gap-2">
-          <label htmlFor="firstName" className={labelClassName}>
-            First name
-          </label>
-          <input
+          <Label htmlFor="firstName">First name</Label>
+          <Input
             id="firstName"
             autoComplete="given-name"
             aria-invalid={Boolean(errors.firstName)}
@@ -102,10 +114,8 @@ export function CheckoutAddressForm({
           ) : null}
         </div>
         <div className="grid gap-2">
-          <label htmlFor="lastName" className={labelClassName}>
-            Last name
-          </label>
-          <input
+          <Label htmlFor="lastName">Last name</Label>
+          <Input
             id="lastName"
             autoComplete="family-name"
             aria-invalid={Boolean(errors.lastName)}
@@ -119,10 +129,8 @@ export function CheckoutAddressForm({
       </div>
 
       <div className="grid gap-2">
-        <label htmlFor="phone" className={labelClassName}>
-          Phone
-        </label>
-        <input
+        <Label htmlFor="phone">Phone</Label>
+        <Input
           id="phone"
           type="tel"
           autoComplete="tel"
@@ -136,10 +144,8 @@ export function CheckoutAddressForm({
       </div>
 
       <div className="grid gap-2">
-        <label htmlFor="address1" className={labelClassName}>
-          Address
-        </label>
-        <input
+        <Label htmlFor="address1">Address</Label>
+        <Input
           id="address1"
           autoComplete="address-line1"
           aria-invalid={Boolean(errors.address1)}
@@ -152,10 +158,8 @@ export function CheckoutAddressForm({
       </div>
 
       <div className="grid gap-2">
-        <label htmlFor="address2" className={labelClassName}>
-          Apartment, floor, landmark
-        </label>
-        <input
+        <Label htmlFor="address2">Apartment, floor, landmark</Label>
+        <Input
           id="address2"
           autoComplete="address-line2"
           className={fieldClassName}
@@ -165,10 +169,8 @@ export function CheckoutAddressForm({
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="grid gap-2">
-          <label htmlFor="city" className={labelClassName}>
-            City
-          </label>
-          <input
+          <Label htmlFor="city">City</Label>
+          <Input
             id="city"
             autoComplete="address-level2"
             aria-invalid={Boolean(errors.city)}
@@ -180,10 +182,8 @@ export function CheckoutAddressForm({
           ) : null}
         </div>
         <div className="grid gap-2">
-          <label htmlFor="province" className={labelClassName}>
-            State
-          </label>
-          <input
+          <Label htmlFor="province">State</Label>
+          <Input
             id="province"
             autoComplete="address-level1"
             aria-invalid={Boolean(errors.province)}
@@ -195,10 +195,8 @@ export function CheckoutAddressForm({
           ) : null}
         </div>
         <div className="grid gap-2">
-          <label htmlFor="postalCode" className={labelClassName}>
-            PIN code
-          </label>
-          <input
+          <Label htmlFor="postalCode">PIN code</Label>
+          <Input
             id="postalCode"
             inputMode="numeric"
             autoComplete="postal-code"

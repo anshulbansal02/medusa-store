@@ -1,11 +1,18 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import {
   addVariantToCart,
   removeCartLineItem,
   type StorefrontCart,
   updateCartLineItem,
 } from "@/lib/medusa/cart";
+
+function revalidateBagViews() {
+  revalidatePath("/bag");
+  revalidatePath("/checkout");
+}
 
 export type AddedBagItem = {
   name: string;
@@ -60,6 +67,8 @@ export async function addToCartAction(
         : null) ??
       cart.items.at(-1);
 
+    revalidateBagViews();
+
     return {
       status: "success",
       message: "Added to bag.",
@@ -98,7 +107,10 @@ export async function updateBagLineAction(
     throw new Error("Choose a quantity between 1 and 9.");
   }
 
-  return updateCartLineItem(lineItemId, quantity);
+  const cart = await updateCartLineItem(lineItemId, quantity);
+  revalidateBagViews();
+
+  return cart;
 }
 
 export async function removeBagLineAction(lineItemId: string) {
@@ -106,5 +118,8 @@ export async function removeBagLineAction(lineItemId: string) {
     throw new Error("Bag item is missing.");
   }
 
-  return removeCartLineItem(lineItemId);
+  const cart = await removeCartLineItem(lineItemId);
+  revalidateBagViews();
+
+  return cart;
 }

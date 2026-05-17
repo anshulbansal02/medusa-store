@@ -35,6 +35,14 @@ export default async function initial_data_seed({
   );
 
   const countries = ["in"];
+  const razorpayConfigured =
+    typeof process.env.RAZORPAY_KEY_ID === "string" &&
+    !process.env.RAZORPAY_KEY_ID.includes("replace_me") &&
+    typeof process.env.RAZORPAY_KEY_SECRET === "string" &&
+    !process.env.RAZORPAY_KEY_SECRET.includes("replace_me");
+  const paymentProviders = razorpayConfigured
+    ? ["pp_system_default", "pp_razorpay_razorpay"]
+    : ["pp_system_default"];
 
   logger.info("Seeding store data...");
   const {
@@ -98,7 +106,7 @@ export default async function initial_data_seed({
           name: "India",
           currency_code: "inr",
           countries,
-          payment_providers: ["pp_system_default"],
+          payment_providers: paymentProviders,
         },
       ],
     },
@@ -349,6 +357,12 @@ export default async function initial_data_seed({
             "Draped midi dress in deep wine with a clean neckline and soft movement.",
           handle: "noor-draped-midi-dress",
           metadata: {
+            product_details: {
+              fabric: "Mid-weight draped crepe with a soft matte finish.",
+              fit: "Skims the body through the waist with easy movement through the skirt.",
+              care: "Dry clean recommended. Steam lightly from the reverse side.",
+              model: "Model is 5'8\" and wears size S.",
+            },
             size_chart: standardDressSizeChart,
           },
           weight: 400,
@@ -390,6 +404,12 @@ export default async function initial_data_seed({
             "Structured ivory co-ord with a tailored top and easy evening fit.",
           handle: "ira-structured-coord",
           metadata: {
+            product_details: {
+              fabric: "Structured woven blend with a smooth lining in the top.",
+              fit: "Tailored through the shoulder and relaxed through the trouser.",
+              care: "Dry clean only to preserve the set shape.",
+              model: "Model is 5'7\" and wears size S.",
+            },
             size_chart: standardDressSizeChart,
           },
           weight: 500,
@@ -428,6 +448,12 @@ export default async function initial_data_seed({
             "Satin evening top in sage with a sharper shoulder and fluid drape.",
           handle: "mira-satin-evening-top",
           metadata: {
+            product_details: {
+              fabric: "Fluid satin with a soft sheen and clean fall.",
+              fit: "Sharp shoulder line with a relaxed body for easy tucking.",
+              care: "Dry clean recommended. Avoid high-heat ironing on the face.",
+              model: "Model is 5'8\" and wears size S.",
+            },
             size_chart: standardDressSizeChart,
           },
           weight: 250,
@@ -466,6 +492,12 @@ export default async function initial_data_seed({
             "Cutwork occasion dress in black with a fitted waist and photo-ready shape.",
           handle: "zoya-cutwork-dress",
           metadata: {
+            product_details: {
+              fabric: "Cutwork textured fabric with a smooth inner lining.",
+              fit: "Defined at the waist with a clean, occasion-ready shape.",
+              care: "Dry clean only. Store flat or on a padded hanger.",
+              model: "Model is 5'7\" and wears size S.",
+            },
             size_chart: standardDressSizeChart,
           },
           weight: 420,

@@ -59,10 +59,12 @@ The storefront talks to Medusa through a small data layer.
 ```txt
 apps/storefront/lib/medusa/
   client.ts
+  regions.ts
+  categories.ts
   products.ts
-  collections.ts
   cart.ts
-  checkout.ts
+  payments.ts
+  orders.ts
   customer.ts
 ```
 
@@ -70,6 +72,7 @@ Rules:
 
 - No complex backend-for-frontend layer unless a real need appears.
 - No random Medusa API calls inside deeply nested UI components.
+- Keep shared Store API context, such as default region lookup, in one helper.
 - Next.js owns UI, SEO, rendering, and customer interactions.
 - Medusa owns commerce state and final payment/order/fulfillment behavior.
 
@@ -123,6 +126,8 @@ Rules:
 - Use R2 Standard storage for product media.
 - Prefer a custom media domain such as `media.brand.com`.
 - Use Medusa S3-compatible file provider configuration for R2.
+- Configure the Medusa file module only when all R2/S3 environment variables are present; local placeholder environments keep the default local file provider.
+- Add the production media hostname to the storefront `NEXT_PUBLIC_IMAGE_HOSTNAMES` allow-list so `next/image` can render Medusa-uploaded product media.
 - Use `next/image` with correct remote patterns/loader.
 - Add Cloudflare Images only if image transformation or Vercel image costs become a real problem.
 
@@ -136,8 +141,8 @@ Rules:
 
 - No COD in v1.
 - No custom EMI/pay-later UX in v1.
-- Create/verify payments server-side.
-- Verify Razorpay signatures.
+- Create payment sessions through Medusa Store API.
+- Verify Razorpay signatures server-side through the Medusa backend.
 - Use webhooks for final payment state where available.
 - Never mark orders paid from only a frontend callback.
 
@@ -152,6 +157,7 @@ Rules:
 - Keep checkout shipping simple.
 - Prefer free shipping on prepaid orders if margins allow; fallback to free-shipping threshold.
 - Architect future shipping automation as a Medusa fulfillment provider.
+- Keep the operational process in `docs/operations.md`.
 
 Future providers:
 
@@ -170,6 +176,13 @@ Expected v1 emails:
 - Owner new-order notification.
 
 Resend free plan is expected to be enough for early volume. Keep marketing email separate.
+
+Implementation:
+
+- Register Resend as a Medusa notification provider when `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are configured.
+- Send order confirmation from an `order.placed` subscriber through a Medusa workflow and `sendNotificationsStep`.
+- Send owner new-order notifications from the same workflow when `OWNER_ORDER_EMAIL` is configured.
+- Keep email content in the Medusa app because order data and notification delivery are backend concerns.
 
 ## Analytics
 

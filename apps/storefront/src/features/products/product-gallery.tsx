@@ -38,14 +38,16 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       {hasThumbnails ? (
         <div className="-mx-4 order-2 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 lg:order-1 lg:block lg:space-y-3 lg:overflow-visible lg:pb-0">
           {images.map((image, index) => (
-            <button
+            <Button
               key={image}
               type="button"
+              variant="ghost"
+              size="icon"
               aria-label={`View ${productName} image ${index + 1}`}
               aria-pressed={activeIndex === index}
               onClick={() => setActiveIndex(index)}
               className={cn(
-                "relative aspect-[4/5] w-20 shrink-0 cursor-pointer overflow-hidden border bg-muted transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:w-full",
+                "relative aspect-[4/5] h-auto w-20 shrink-0 cursor-pointer overflow-hidden rounded-none border bg-muted p-0 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:w-full",
                 activeIndex === index
                   ? "border-foreground"
                   : "border-transparent hover:border-border",
@@ -55,11 +57,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 src={image}
                 alt=""
                 fill
-                loading="lazy"
+                loading={index === 0 ? "eager" : "lazy"}
                 sizes="88px"
                 className="object-cover"
               />
-            </button>
+            </Button>
           ))}
         </div>
       ) : null}
@@ -67,10 +69,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       <Dialog>
         <DialogTrigger
           render={
-            <button
+            <Button
               type="button"
+              variant="ghost"
               className={cn(
-                "group relative order-1 aspect-[4/5] cursor-pointer overflow-hidden bg-muted text-left",
+                "group relative order-1 aspect-[4/5] h-auto w-full cursor-pointer overflow-hidden rounded-none bg-muted p-0 text-left hover:bg-muted",
                 hasThumbnails
                   ? "lg:order-2 lg:aspect-[5/6]"
                   : "lg:aspect-[4/5]",
@@ -84,6 +87,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             alt={`${productName} view ${activeIndex + 1}`}
             fill
             loading="eager"
+            fetchPriority="high"
             sizes="(min-width: 1024px) 52vw, 100vw"
             className="object-cover transition duration-300 ease-out group-hover:scale-[1.015]"
           />

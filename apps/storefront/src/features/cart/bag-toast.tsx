@@ -3,8 +3,7 @@
 import { ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useBagStore } from "@/features/cart/bag-store";
@@ -13,11 +12,6 @@ export function BagToast() {
   const addedItem = useBagStore((state) => state.addedItem);
   const dismissAddedItem = useBagStore((state) => state.dismissAddedItem);
   const openBag = useBagStore((state) => state.openBag);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!addedItem) {
@@ -29,11 +23,11 @@ export function BagToast() {
     return () => window.clearTimeout(timeout);
   }, [addedItem, dismissAddedItem]);
 
-  if (!mounted || !addedItem) {
+  if (!addedItem) {
     return null;
   }
 
-  return createPortal(
+  return (
     <div
       aria-live="polite"
       className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] left-4 z-50 border border-border bg-background p-3 shadow-sm sm:left-auto sm:w-[420px]"
@@ -94,7 +88,6 @@ export function BagToast() {
           Checkout
         </Link>
       </div>
-    </div>,
-    document.body,
+    </div>
   );
 }

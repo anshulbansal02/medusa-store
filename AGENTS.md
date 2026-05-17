@@ -25,6 +25,7 @@ Canonical docs:
 - `docs/storefront-experience.md`
 - `docs/engineering-standards.md`
 - `docs/secrets-and-config.md`
+- `docs/operations.md`
 - `docs/implementation-plan.md`
 - `docs/launch-checklist.md`
 - `docs/cost-model.md`
@@ -69,9 +70,14 @@ Canonical docs:
 ## Storefront Rules
 
 - Keep Medusa API access inside `apps/storefront/lib/medusa`.
+- Keep the Medusa data layer server-only; Client Components should receive typed props or call Server Actions, not import Medusa fetch helpers.
 - Do not scatter API calls through UI components.
 - Use feature folders for product, collection, cart, checkout, and search behavior.
 - Keep `"use client"` boundaries small.
+- Do not add `"use client"` to pages, layouts, or broad feature shells for one nested interactive control.
+- Use `useEffect` only to synchronize with external systems such as timers, focus, browser APIs, scripts, subscriptions, or non-React widgets.
+- Do not use `useEffect` for derived render state or click/form logic that belongs in render code or event handlers.
+- Avoid route-level `dynamic = "force-dynamic"` unless the route itself truly requires explicit dynamic rendering.
 - Use Zustand for global client-only state when needed.
 - Do not put product/catalog server data into Zustand unnecessarily.
 - Use React Hook Form + Zod for forms.

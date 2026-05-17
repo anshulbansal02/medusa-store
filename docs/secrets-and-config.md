@@ -66,10 +66,12 @@ Expected secret/config groups:
 - Storefront URL and Medusa backend URL.
 - Razorpay key ID, key secret, and webhook secret.
 - Resend API key and sender domain config.
+- Owner new-order notification email address.
 - R2 account, bucket, endpoint, access key, and secret key.
+- Storefront image host allow-list for Medusa/R2 media domains.
 - Cloudflare Turnstile keys if enabled.
 - Cloudflare Access configuration if enabled.
-- Analytics site token/config if required.
+- Cloudflare Web Analytics site token for the storefront.
 
 ## Rotation
 

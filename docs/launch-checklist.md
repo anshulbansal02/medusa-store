@@ -67,8 +67,10 @@ This checklist is intentionally lightweight. There is no written test suite for 
 ## Shipping And Fulfillment
 
 - Shipping method/rules are visible in checkout.
-- Manual fulfillment/tracking workflow is documented for the business team.
-- Tracking number/status can be added manually if used.
+- Manual fulfillment/tracking workflow is documented in `docs/operations.md`.
+- Store team can create fulfillment from Medusa Admin.
+- Store team can add tracking number and tracking URL from Medusa Admin.
+- Store team understands when shipment/delivery actions become irreversible.
 - Customer shipping/tracking communication works if implemented.
 - No Shiprocket/Delhivery API integration is expected in v1.
 

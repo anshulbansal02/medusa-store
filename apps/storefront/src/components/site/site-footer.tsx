@@ -13,7 +13,7 @@ export function SiteFooter() {
             visual appeal, and a low-friction shopping flow.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
           <div>
             <h2 className="mb-3 text-foreground text-sm font-medium">Shop</h2>
             <ul className="space-y-2">
@@ -30,6 +30,11 @@ export function SiteFooter() {
               <li>
                 <Link href="/shop/sets" prefetch={false}>
                   Sets
+                </Link>
+              </li>
+              <li>
+                <Link href="/wishlist" prefetch={false}>
+                  Wishlist
                 </Link>
               </li>
             </ul>
@@ -50,6 +55,41 @@ export function SiteFooter() {
               <li>
                 <Link href="/shipping" prefetch={false}>
                   Shipping
+                </Link>
+              </li>
+              <li>
+                <Link href="/returns" prefetch={false}>
+                  Returns
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" prefetch={false}>
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/track-order" prefetch={false}>
+                  Track Order
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="mb-3 text-foreground text-sm font-medium">Legal</h2>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/terms" prefetch={false}>
+                  Terms
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" prefetch={false}>
+                  Privacy
+                </Link>
+              </li>
+              <li>
+                <Link href="/refund-cancellation" prefetch={false}>
+                  Refunds
                 </Link>
               </li>
             </ul>

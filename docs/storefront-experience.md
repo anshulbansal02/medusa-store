@@ -28,6 +28,8 @@ Design defaults:
 - Large product imagery.
 - Thin borders and restrained dividers.
 - Refined product cards.
+- Compact trust/announcement strip when it carries useful operational promises.
+- Product-led editorial hero with live catalog imagery, not decorative illustration.
 - Calm, polished forms and checkout.
 - `lucide-react` outline icons for UI actions, inheriting `currentColor` with consistent refined stroke width.
 - Official SVG assets for brand, payment, and social logos.
@@ -61,6 +63,11 @@ Prefer:
 - Useful content.
 - Fewer, better sections.
 - Screenshot review before accepting UI.
+
+Current design references:
+
+- Shopify Reformation theme preset: dense editorial commerce shell, clear header actions, hover-rich product cards, cart/search surfaces.
+- Shopify Taiga Meadow theme preset: compact trust strip, product-led section rhythm, simple utility footer/newsletter patterns.
 
 ## Copywriting
 
@@ -228,6 +235,7 @@ Rules:
 
 - Do not make customers hunt for price, size, delivery/returns, or add-to-bag.
 - Product-specific size chart measurements must be managed in Medusa product metadata, not embedded in the storefront.
+- Product-specific fabric, fit, care, model, and measurement notes must be managed in Medusa product metadata under `product_details` or `details`, not embedded in the storefront.
 - Unavailable sizes/colors must be obvious.
 - Do not show exact stock count by default.
 - Show subtle low-stock/few-left hint only when meaningful.
