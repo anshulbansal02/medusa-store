@@ -129,6 +129,7 @@ Rules:
 - GitHub Actions owns storefront deployment; Vercel Git auto-deploys are not required.
 - `dev` pushes run the QA deploy workflow.
 - Production storefront deployment is manual through workflow dispatch until production rollout.
+- The deploy workflow uses `vercel deploy --cwd ./apps/storefront`; Vercel performs the remote build for the linked storefront project.
 - Vercel preview deployments are currently protected by Vercel SSO. Keep QA private unless the team explicitly needs public QA access.
 - Vercel Git repository connection is pending because the Vercel account needs a GitHub login connection added in the Vercel dashboard. This is optional while GitHub Actions owns deployments.
 - GitHub environment variables hold non-secret deployment config:
@@ -141,7 +142,6 @@ Rules:
 - GitHub environment secrets hold deploy credentials:
   - `VERCEL_TOKEN`
 - Pending QA config:
-  - Add `VERCEL_TOKEN`.
   - Add `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` from Medusa Admin/API key settings.
   - Add `NEXT_PUBLIC_RAZORPAY_KEY_ID` when Razorpay test mode is configured.
   - Add `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` when Cloudflare Web Analytics is configured.
