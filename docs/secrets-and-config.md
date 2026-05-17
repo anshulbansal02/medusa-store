@@ -115,6 +115,8 @@ Rules:
 ## Railway Operational Security Notes
 
 - Use Project Tokens in GitHub Actions for Railway deploys instead of account/workspace tokens.
+- For the QA Medusa service, use Railway reference variables for database access, such as `DATABASE_URL=${{Postgres.DATABASE_URL}}`, instead of copying rendered database credentials.
+- Keep `NODE_ENV=production`, `MEDUSA_WORKER_MODE=shared`, `JWT_SECRET`, `COOKIE_SECRET`, `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, and `MEDUSA_BACKEND_URL` configured on the Railway QA Medusa service.
 - Keep audit logs enabled by workspace plan; use them before changing secrets/variables or redeploying.
 - Keep project and environment boundaries explicit:
   - `qa` environment only for now.

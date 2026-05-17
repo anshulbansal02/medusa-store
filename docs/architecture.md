@@ -87,7 +87,7 @@ Vercel Pro:
 Railway Pro:
   QA Medusa backend/admin
   QA Postgres
-  QA Redis
+  QA Redis only when needed for production-like QA flows
   Production Medusa/Postgres/Redis configured, production deploy disabled in phase 1
 
 Cloudflare:
@@ -115,7 +115,7 @@ Redis is used for:
 
 Postgres remains the durable data store for products, orders, customers, carts, payments, and inventory.
 
-QA should not share production Redis. Add QA Redis only if QA backend flows require production-like behavior.
+QA should not share production Redis. Do not run QA Redis initially; add it only if QA backend flows require production-like behavior.
 
 ## Media
 
