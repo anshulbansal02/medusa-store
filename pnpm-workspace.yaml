@@ -5,7 +5,7 @@ minimumReleaseAge: 4320
 minimumReleaseAgeStrict: true
 
 allowBuilds:
-  '@medusajs/telemetry': false
+  '@medusajs/telemetry': true
   '@swc/core': true
   esbuild: true
   msgpackr-extract: true
