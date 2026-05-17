@@ -28,4 +28,5 @@ jobs:
             echo "Set RAILWAY_TOKEN and RAILWAY_PROJECT_ID as environment secrets for the qa environment."
             exit 1
           fi
-          railway up ./apps/medusa --path-as-root --service medusa --environment qa --project "$RAILWAY_PROJECT_ID" --detach --json
+          railway up ./apps/medusa --path-as-root --service medusa --environment qa --project "$RAILWAY_PROJECT_ID" --ci
+          curl --fail --silent --show-error https://medusa-qa.up.railway.app/health
