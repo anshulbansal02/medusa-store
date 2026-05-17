@@ -12,6 +12,7 @@ const extraImageHostnames = new Set(
 );
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: workspaceRoot,
   images: {
     remotePatterns: [
       {
