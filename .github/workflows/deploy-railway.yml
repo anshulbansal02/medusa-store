@@ -21,5 +21,11 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_CI: "1"
         run: |
-          railway up ./apps/medusa --path-as-root --service medusa --environment qa --project "$RAILWAY_PROJECT_ID" --token "$RAILWAY_TOKEN" --detach --json
+          if [ -z "$RAILWAY_TOKEN" ] || [ -z "$RAILWAY_PROJECT_ID" ]; then
+            echo "Missing Railway token or project id"
+            echo "Set RAILWAY_TOKEN and RAILWAY_PROJECT_ID as environment secrets for the qa environment."
+            exit 1
+          fi
+          railway up ./apps/medusa --path-as-root --service medusa --environment qa --project "$RAILWAY_PROJECT_ID" --detach --json
