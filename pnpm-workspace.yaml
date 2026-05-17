@@ -4,12 +4,12 @@ packages:
 minimumReleaseAge: 4320
 minimumReleaseAgeStrict: true
 
-allowBuilds:
-  '@medusajs/telemetry': true
-  '@swc/core': true
-  esbuild: true
-  msgpackr-extract: true
-  msw: false
-  protobufjs: true
-  sharp: true
-  unrs-resolver: false
+onlyBuiltDependencies:
+  - "@medusajs/telemetry"
+  - "@medusajs/admin-sdk"
+  - "@swc/core"
+  - "esbuild"
+  - "msgpackr-extract"
+  - "protobufjs"
+  - "sharp"
+  - "unrs-resolver"

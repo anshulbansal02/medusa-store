@@ -47,6 +47,8 @@ Rules:
 - Use Corepack-managed pnpm through the root `packageManager` field.
 - Pin the exact pnpm version selected during setup.
 - Avoid global installs unless required by a platform or official scaffold command.
+- For Railway deploys that point to `apps/medusa`, place pnpm trust policy (`minimumReleaseAge`, `onlyBuiltDependencies`) in `apps/medusa/.npmrc` so build-script approval is applied in that install context.
+- Keep workspace-level `pnpm-workspace.yaml` for monorepo package graph policy and `minimumReleaseAge` consistency.
 
 ## Scaffolding
 

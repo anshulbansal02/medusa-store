@@ -20,6 +20,7 @@ This checklist is intentionally lightweight. There is no written test suite for 
 - CI/CD deploy mapping:
   - `push` to `dev` deploys to Railway `qa` and Vercel QA preview.
   - `main` deploy is deliberately not configured yet (phase 1: QA only).
+- Confirm Railway Medusa deploy shows a successful build step without `ERR_PNPM_IGNORED_BUILDS` before smoke testing API endpoints.
 
 ## Storefront UX
 
