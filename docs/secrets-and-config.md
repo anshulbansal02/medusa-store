@@ -45,6 +45,29 @@ Rules:
 - QA must not write to production data stores.
 - Local uses portless for UI app URLs, direct fixed nonstandard API ports, Docker Compose Postgres/Redis, and local app env files.
 
+## Railway Auth And Access Controls (Phase 1)
+
+Use Railway’s built-in access controls instead of custom auth:
+
+- Keep the workspace/project membership tight:
+  - Workspace roles: Admin, Member, Deployer.
+  - Project roles: Owner, Editor, Viewer.
+- Prefer assigning only the minimum role needed for each teammate.
+- Avoid workspace-level account sharing and do not reuse personal accounts.
+- Require team MFA:
+  - Enable 2FA for all workspace members from workspace People settings.
+  - Keep account MFA enabled in user security settings.
+- Use short-lived token types for CI:
+  - Use a Project Token for deployment workflows (scoped to one project environment).
+  - Avoid using account tokens in CI.
+- Use Railway-provided domains for QA until custom domains exist.
+- Keep secrets in Railway Variables (and project scoped when needed), not in code.
+- Restrict who can view variables:
+  - Viewer role cannot access environment variables.
+- For QA security only:
+  - Do not rotate production keys into QA.
+  - Keep CORS and JWT/cookie secrets separate.
+
 ## Public Vs Secret Values
 
 Storefront variables prefixed with `NEXT_PUBLIC_` are public because they are bundled for the browser.
@@ -88,6 +111,14 @@ Rules:
 - Update hosted env vars first, then redeploy.
 - Verify checkout, email, media upload, and admin access after rotation.
 - Do not paste secrets into chat or issue trackers.
+
+## Railway Operational Security Notes
+
+- Use Project Tokens in GitHub Actions for Railway deploys instead of account/workspace tokens.
+- Keep audit logs enabled by workspace plan; use them before changing secrets/variables or redeploying.
+- Keep project and environment boundaries explicit:
+  - `qa` environment only for now.
+  - Production environment values should be configured but not used until rollout.
 
 ## Local Handling
 

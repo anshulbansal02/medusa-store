@@ -82,13 +82,13 @@ Rules:
 Vercel Pro:
   Next.js storefront
   QA storefront from dev branch
-  Production storefront from main branch
+  Production storefront from main branch (not deployed in phase 1)
 
 Railway Pro:
-  Production Medusa backend/admin
-  Production Postgres
-  Production Redis
-  Optional small QA Medusa/Postgres if usage stays within plan credit
+  QA Medusa backend/admin
+  QA Postgres
+  QA Redis
+  Production Medusa/Postgres/Redis configured, production deploy disabled in phase 1
 
 Cloudflare:
   DNS after transfer from Shopify-managed domain
@@ -230,9 +230,10 @@ Branches:
 QA:
 
 - QA storefront from `dev`.
-- QA backend/database only if usage stays within existing Railway Pro credit.
+- QA backend/database from `qa` environment only.
 - QA secrets must be separate from production.
 - QA must not mutate production orders, live payments, production customers, or inventory.
+- Phase 1 is QA-only: production deployment is intentionally not enabled.
 
 Production:
 

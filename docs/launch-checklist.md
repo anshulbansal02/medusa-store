@@ -15,7 +15,11 @@ This checklist is intentionally lightweight. There is no written test suite for 
 - Real secrets are not committed.
 - `dev` and `main` branches are protected.
 - `dev` deploys to QA.
-- `main` deploys to production.
+- `main` is reserved for future production release only.
+- GitHub Actions CI runs on `dev` and `main` for lint/typecheck/build checks.
+- CI/CD deploy mapping:
+  - `push` to `dev` deploys to Railway `qa` and Vercel QA preview.
+  - `main` deploy is deliberately not configured yet (phase 1: QA only).
 
 ## Storefront UX
 
@@ -126,6 +130,8 @@ This checklist is intentionally lightweight. There is no written test suite for 
 ## Security
 
 - HTTPS configured for all public domains.
+- Railway/Vercel deploy secrets are stored only in platform secret stores and injected at runtime.
+- Use Railway-provided domains for QA until custom domains are connected.
 - Medusa Admin has strong credentials.
 - No shared admin passwords.
 - CORS restricted to known origins.
@@ -151,7 +157,7 @@ This checklist is intentionally lightweight. There is no written test suite for 
 
 ## Production Cutover
 
-- Domain DNS records configured.
+- Domain DNS records configured (can be added later).
 - `www` points to production storefront.
 - Apex/root redirects to `www`.
 - Admin/API subdomains configured if used.
