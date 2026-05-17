@@ -63,12 +63,7 @@ jobs:
             exit 1
           fi
           vercel pull --yes --environment=preview --cwd ./apps/storefront --token "$VERCEL_TOKEN"
-          args=()
-          [ -n "$MEDUSA_BACKEND_URL" ] && args+=(--build-env "MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL")
-          [ -n "$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" ] && args+=(--build-env "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY")
-          [ -n "$NEXT_PUBLIC_RAZORPAY_KEY_ID" ] && args+=(--build-env "NEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID")
-          [ -n "$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN" ] && args+=(--build-env "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN=$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN")
-          vercel build --cwd ./apps/storefront --token "$VERCEL_TOKEN" "${args[@]}"
+          vercel build --cwd ./apps/storefront --token "$VERCEL_TOKEN"
 
       - name: Deploy QA
         env:
@@ -137,12 +132,7 @@ jobs:
             exit 1
           fi
           vercel pull --yes --environment=production --cwd ./apps/storefront --token "$VERCEL_TOKEN"
-          args=()
-          [ -n "$MEDUSA_BACKEND_URL" ] && args+=(--build-env "MEDUSA_BACKEND_URL=$MEDUSA_BACKEND_URL")
-          [ -n "$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" ] && args+=(--build-env "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY")
-          [ -n "$NEXT_PUBLIC_RAZORPAY_KEY_ID" ] && args+=(--build-env "NEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID")
-          [ -n "$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN" ] && args+=(--build-env "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN=$NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN")
-          vercel build --prod --cwd ./apps/storefront --token "$VERCEL_TOKEN" "${args[@]}"
+          vercel build --prod --cwd ./apps/storefront --token "$VERCEL_TOKEN"
 
       - name: Deploy production
         env:
