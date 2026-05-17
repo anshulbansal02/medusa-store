@@ -125,9 +125,12 @@ Rules:
 ## Vercel Storefront Deployment Notes
 
 - Vercel project: `medusa-store-storefront`.
+- Current QA preview URL: `https://medusa-store-storefront-okdjppru3-anshul-bansal-s-projects.vercel.app`.
 - GitHub Actions owns storefront deployment; Vercel Git auto-deploys are not required.
 - `dev` pushes run the QA deploy workflow.
 - Production storefront deployment is manual through workflow dispatch until production rollout.
+- Vercel preview deployments are currently protected by Vercel SSO. Keep QA private unless the team explicitly needs public QA access.
+- Vercel Git repository connection is pending because the Vercel account needs a GitHub login connection added in the Vercel dashboard. This is optional while GitHub Actions owns deployments.
 - GitHub environment variables hold non-secret deployment config:
   - `VERCEL_ORG_ID`
   - `VERCEL_PROJECT_ID`
