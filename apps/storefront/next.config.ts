@@ -4,6 +4,7 @@ import type { NextConfig } from "next";
 
 const projectRoot = dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = resolve(projectRoot, "../..");
+const turbopackRoot = process.env.VERCEL ? projectRoot : workspaceRoot;
 const extraImageHostnames = new Set(
   (process.env.NEXT_PUBLIC_IMAGE_HOSTNAMES ?? "")
     .split(",")
@@ -31,7 +32,7 @@ const nextConfig: NextConfig = {
     ],
   },
   turbopack: {
-    root: workspaceRoot,
+    root: turbopackRoot,
   },
 };
 
