@@ -38,7 +38,7 @@ Use official docs first when implementation depends on current platform behavior
 ## Payments And Email
 
 - Razorpay docs: https://razorpay.com/docs/
-- Razorpay Standard Checkout integration: https://razorpay.com/docs/payments/payment-gateway/quick-integration/integration-steps/
+- Razorpay Standard Checkout integration: https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/integration-steps/
 - Razorpay webhook validation: https://razorpay.com/docs/webhooks/validate-test/
 - Razorpay payment capture settings: https://razorpay.com/docs/payments/payments/capture-settings/
 - Razorpay payment methods: https://razorpay.com/docs/payments/payment-methods/
