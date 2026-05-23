@@ -12,6 +12,7 @@
     "dev": "pnpm dev:storefront",
     "dev:storefront": "pnpm --dir apps/storefront dev",
     "dev:medusa": "pnpm --dir apps/medusa dev",
+    "dev:email": "pnpm --dir apps/medusa email:dev",
     "medusa:admin:alias": "PORTLESS_HTTPS=0 portless alias medusa 29181",
     "medusa:admin:alias:remove": "PORTLESS_HTTPS=0 portless alias --remove medusa",
     "build:storefront": "pnpm --dir apps/storefront build",

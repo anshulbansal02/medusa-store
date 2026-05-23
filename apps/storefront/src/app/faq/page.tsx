@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { PolicyPage } from "@/components/content/policy-page";
-import { policyPages } from "@/lib/config/policies";
+import { policyPages } from "@/content/policies";
 import { absoluteUrl } from "@/lib/config/site";
 
 const page = policyPages.faq;

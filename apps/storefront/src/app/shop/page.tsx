@@ -111,7 +111,7 @@ export default async function ShopPage() {
           </p>
           <p>
             <span className="font-medium">Prepaid checkout.</span> Razorpay
-            integration is planned for the checkout phase.
+            payment is available after address and shipping are saved.
           </p>
           <p>
             <span className="font-medium">India shipping.</span> Dispatch and

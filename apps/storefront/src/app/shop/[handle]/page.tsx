@@ -159,7 +159,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <div>
                   <h2 className="font-medium">Delivery</h2>
                   <p className="mt-1 text-muted-foreground">
-                    India shipping with prepaid checkout planned for launch.
+                    India shipping with prepaid Razorpay checkout.
                   </p>
                 </div>
               </div>
@@ -171,8 +171,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <div>
                   <h2 className="font-medium">Returns</h2>
                   <p className="mt-1 text-muted-foreground">
-                    Return policy will be finalized before production checkout
-                    is enabled.
+                    Final return rules should be confirmed before production
+                    launch.
                   </p>
                 </div>
               </div>

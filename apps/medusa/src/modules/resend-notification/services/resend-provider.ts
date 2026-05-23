@@ -82,9 +82,9 @@ export default class ResendNotificationProviderService extends AbstractNotificat
 
       const rendered =
         notification.template === ownerOrderPlacedTemplate
-          ? buildOwnerOrderPlacedEmail(order)
+          ? await buildOwnerOrderPlacedEmail(order)
           : notification.template === orderPlacedTemplate
-            ? buildOrderPlacedEmail(order)
+            ? await buildOrderPlacedEmail(order)
             : null;
 
       if (!rendered) {

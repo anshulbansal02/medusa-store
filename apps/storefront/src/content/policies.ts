@@ -117,7 +117,7 @@ export const policyPages = {
       },
       {
         title: "Is cash on delivery available?",
-        body: "No. The v1 checkout is planned as prepaid only through Razorpay-supported payment methods.",
+        body: "No. The v1 checkout is prepaid only through Razorpay-supported payment methods.",
       },
       {
         title: "How should I choose a size?",

@@ -29,7 +29,7 @@ const trustItems = [
   {
     icon: ShieldCheck,
     title: "Secure prepaid checkout",
-    text: "Razorpay payments planned for launch.",
+    text: "Razorpay-powered payment after address and shipping.",
   },
   {
     icon: Truck,
@@ -197,7 +197,7 @@ export default async function Home() {
               </p>
               <p>
                 <span className="font-medium">India-first checkout.</span>{" "}
-                Prepaid flow and clear shipping details before launch.
+                Prepaid flow with clear shipping details before payment.
               </p>
             </div>
           </div>
