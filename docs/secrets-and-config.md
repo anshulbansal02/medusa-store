@@ -85,31 +85,6 @@ Rules:
 - Commit only non-secret Terraform tfvars; never commit secret values in tfvars.
 - GitHub environment secrets should hold only deploy/bootstrap credentials needed to run Terraform, read SSM, and access Lightsail, not duplicate the full Medusa app secret set.
 
-## Railway Auth And Access Controls (Historical Phase 1 Notes)
-
-These notes applied to the original Railway-based phase 1 plan. Keep them only as historical reference until QA/staging is re-decided.
-
-Use Railway’s built-in access controls instead of custom auth if Railway remains in use for QA:
-
-- Keep the workspace/project membership tight:
-  - Workspace roles: Admin, Member, Deployer.
-  - Project roles: Owner, Editor, Viewer.
-- Prefer assigning only the minimum role needed for each teammate.
-- Avoid workspace-level account sharing and do not reuse personal accounts.
-- Require team MFA:
-  - Enable 2FA for all workspace members from workspace People settings.
-  - Keep account MFA enabled in user security settings.
-- Use short-lived token types for CI:
-  - Use a Project Token for deployment workflows (scoped to one project environment).
-  - Avoid using account tokens in CI.
-- Use Railway-provided domains for QA until custom domains exist.
-- Keep secrets in Railway Variables (and project scoped when needed), not in code.
-- Restrict who can view variables:
-  - Viewer role cannot access environment variables.
-- For QA security only:
-  - Do not rotate production keys into QA.
-  - Keep CORS and JWT/cookie secrets separate.
-
 ## Public Vs Secret Values
 
 Storefront variables prefixed with `NEXT_PUBLIC_` are public because they are bundled for the browser.
@@ -153,6 +128,13 @@ Redis:
 - Start QA/staging Redis on Upstash pay-as-you-go pricing.
 - QA/staging must not share production Redis.
 
+R2:
+
+- Terraform manages the R2 bucket and media DNS/custom-domain resources where supported.
+- R2 S3 access credentials are created manually in Cloudflare.
+- Store R2 access key ID and secret access key in SSM `SecureString` parameters.
+- Rotate R2 credentials through a documented manual runbook.
+
 QA/staging compute:
 
 - QA Medusa may run on the production Lightsail instance only during active test windows.
@@ -175,42 +157,21 @@ Rules:
 - Verify checkout, email, media upload, and admin access after rotation.
 - Do not paste secrets into chat or issue trackers.
 
-## Railway Operational Security Notes
-
-- These notes apply only if Railway remains in use for QA/staging.
-- Use Project Tokens in GitHub Actions for Railway deploys instead of account/workspace tokens.
-- For the QA Medusa service, use Railway reference variables for database access, such as `DATABASE_URL=${{Postgres.DATABASE_URL}}`, instead of copying rendered database credentials.
-- Keep `NODE_ENV=production`, `MEDUSA_WORKER_MODE=shared`, `JWT_SECRET`, `COOKIE_SECRET`, `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, and `MEDUSA_BACKEND_URL` configured on the Railway QA Medusa service.
-- Keep audit logs enabled by workspace plan; use them before changing secrets/variables or redeploying.
-- Keep project and environment boundaries explicit:
-  - `qa` environment only for now.
-  - Production environment values should be configured but not used until rollout.
-
 ## Vercel Storefront Deployment Notes
 
 - Vercel project: `medusa-store-storefront`.
 - Current QA preview URL: `https://medusa-store-storefront-okdjppru3-anshul-bansal-s-projects.vercel.app`.
+- Terraform manages the Vercel project/configuration where provider support is reliable.
 - GitHub Actions owns storefront deployment; Vercel Git auto-deploys are not required.
 - `dev` pushes run the QA deploy workflow.
-- Production storefront deployment is manual through workflow dispatch until production rollout.
+- Production storefront deployment is manual workflow dispatch for v1.
 - The deploy workflow uses `vercel deploy --cwd ./apps/storefront`; Vercel performs the remote build for the linked storefront project.
 - Vercel preview deployments are currently protected by Vercel SSO. Keep QA private unless the team explicitly needs public QA access.
-- Vercel Git repository connection is pending because the Vercel account needs a GitHub login connection added in the Vercel dashboard. This is optional while GitHub Actions owns deployments.
-- GitHub environment variables hold non-secret deployment config:
+- Terraform manages Vercel environment variables where practical. Secret values require provider behavior review and secret-bearing state controls.
+- GitHub environment variables/secrets hold deploy credentials and any deployment-only values not managed by Terraform:
   - `VERCEL_ORG_ID`
   - `VERCEL_PROJECT_ID`
-  - `MEDUSA_BACKEND_URL`
-  - `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`
-  - `NEXT_PUBLIC_RAZORPAY_KEY_ID`
-  - `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN`
-- GitHub environment secrets hold deploy credentials:
   - `VERCEL_TOKEN`
-- Pending QA config:
-  - Add `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` from Medusa Admin/API key settings.
-  - Add `NEXT_PUBLIC_RAZORPAY_KEY_ID` when Razorpay test mode is configured.
-  - Add `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` when Cloudflare Web Analytics is configured.
-- Pending production config:
-  - Add production Vercel environment variables and secrets only when production rollout starts.
 
 ## Local Handling
 

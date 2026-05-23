@@ -52,15 +52,22 @@ Use official docs first when implementation depends on current platform behavior
 
 - Vercel docs: https://vercel.com/docs
 - Vercel Web Analytics pricing: https://vercel.com/docs/analytics/limits-and-pricing
-- Railway docs: https://docs.railway.com/
-- Railway pricing: https://docs.railway.com/pricing/plans
-- Railway environments: https://docs.railway.com/environments
-- Railway Postgres: https://docs.railway.com/databases/postgresql
-- Railway Redis: https://docs.railway.com/databases/redis
+- AWS Lightsail docs: https://docs.aws.amazon.com/lightsail/
+- AWS Lightsail pricing: https://aws.amazon.com/lightsail/pricing/
+- Neon docs: https://neon.com/docs
+- Neon regions: https://neon.com/docs/conceptual-guides/regions
+- Upstash Redis docs: https://upstash.com/docs/redis
+- Upstash pricing: https://upstash.com/pricing
+- Terraform docs: https://developer.hashicorp.com/terraform/docs
+- Terraform AWS S3 backend: https://developer.hashicorp.com/terraform/language/backend/s3
 - Cloudflare R2 docs: https://developers.cloudflare.com/r2/
 - Cloudflare R2 pricing: https://developers.cloudflare.com/r2/pricing/
 - Cloudflare Web Analytics: https://developers.cloudflare.com/web-analytics/about/
 - Cloudflare Turnstile: https://developers.cloudflare.com/turnstile/
+- Cloudflare Access: https://developers.cloudflare.com/cloudflare-one/applications/
+- Tailscale SSH: https://tailscale.com/kb/1193/tailscale-ssh
+- Better Stack docs: https://betterstack.com/docs/
+- Sentry docs: https://docs.sentry.io/
 
 ## Analytics Alternatives
 

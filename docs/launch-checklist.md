@@ -15,15 +15,17 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - `.env.example` files are current.
 - Real secrets are not committed.
 - `dev` and `main` branches are protected.
+- GitHub repo settings, Actions environments, and Actions secrets are configured manually for v1.
 - `dev` deploys to QA.
-- `main` is reserved for future production release only.
+- Production deploys from `main` are manual workflow dispatch for v1.
 - GitHub Actions CI runs on `dev` and `main` for lint/typecheck/build checks.
+- CI stays lean: no heavy/fancy checks unless they catch a real current risk.
 - CI/CD deploy mapping:
   - `push` to `dev` deploys the Vercel QA preview.
-  - Medusa QA/staging deploy mapping is pending the infrastructure decision.
-  - Production Medusa compute target is AWS Lightsail 4 GB, but `main` production deploy is deliberately not configured yet.
+  - Medusa QA/staging may auto-deploy from `dev`.
+  - Production Medusa deploy from `main` is manual workflow dispatch.
 - Confirm the Medusa deploy target shows a successful build step before smoke testing API endpoints.
-- Confirm Medusa QA deploy credentials only after the QA/staging host is decided.
+- Confirm Medusa QA deploy credentials for the shared Lightsail QA setup.
 - Confirm Vercel storefront QA deploy is enabled through the GitHub `qa` environment secret `VERCEL_TOKEN`.
 - Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL` and, when ready, `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`.
 - Confirm the QA preview URL loads after Vercel SSO authentication.
@@ -154,6 +156,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Docker Compose is running separate Medusa server and worker services.
 - Lightsail bootstrap script/runbook has been run and is committed under `infra/`.
 - Lightsail host OS is Ubuntu 22.04 LTS; Node.js runtime is inside the Medusa Docker image.
+- Lightsail 2 GB swap file with low swappiness is configured and understood as an emergency cushion.
 - Medusa Docker image uses Node 24 Debian slim, not Alpine, unless compatibility is revalidated.
 - Production Lightsail automatic snapshots are enabled and understood as host recovery only.
 - Medusa production image is stored privately in GHCR.
@@ -169,38 +172,50 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Terraform production/QA applies are run locally with S3 remote state and DynamoDB locking.
 - GitHub Actions fetches SSM parameters and writes Lightsail runtime env files during deploy.
 - Generated Lightsail env files have restrictive permissions.
-- QA backend domains are pending the QA/staging infrastructure decision.
+- QA backend domains `qa-api` and `qa-admin` are configured when QA backend is exposed.
 - QA Medusa containers are stopped by default if sharing the production Lightsail instance.
 - QA uses separate Neon branch/database, Redis, secrets, and Razorpay test credentials.
 - Medusa Admin has strong credentials.
 - Cloudflare Access protects production `admin.brand.com`.
+- Cloudflare Access email OTP allowlist contains only approved admin emails.
+- Cloudflare Access app/policies for admin are Terraform-managed and reviewed.
+- Conservative Cloudflare WAF/security baseline is enabled for proxied API/admin records.
+- Bot Fight Mode and aggressive WAF/rate-limit rules are not enabled at launch unless tested against checkout, webhooks, API, and admin flows.
+- Cloudflare Turnstile protects public forms and is verified server-side.
 - No shared admin passwords.
 - CORS restricted to known origins.
 - Production secrets are only in approved Vercel and Medusa runtime secret stores.
 - QA/prod secrets are separate.
 - No secrets in logs.
 - R2 tokens are least-privilege.
+- R2 bucket/media DNS are Terraform-managed where supported.
+- R2 S3 access credentials are created manually and stored in SSM `SecureString`.
 - Neon Postgres production project is in the selected Singapore region.
 - Neon backup/restore behavior is verified before launch.
+- No external `pg_dump` backup is required for v1 unless recovery requirements change.
 - Neon pooled and direct connection strings are understood and stored only in approved secret stores.
 - QA Neon branch exists with separate credentials and reset/refresh rules.
 - Upstash Redis production database is in Singapore.
 - Upstash Redis starts on pay-as-you-go and usage monitoring/review is planned.
 - QA Upstash Redis is separate from production and also in Singapore.
 - Restore process understood at a basic level.
-- Cloudflare Access for admin added if simple.
-- Cloudflare Turnstile added only if public form protection is needed.
 
 ## Analytics And Visibility
 
 - Cloudflare Web Analytics enabled.
 - Better Stack uptime checks and alerts configured for storefront and Medusa API.
+- Medusa `/health` and `/ready` endpoints exist for liveness and readiness checks.
+- Better Stack email/mobile push alerts are tested.
+- Better Stack Terraform-managed monitors are reviewed where provider support is used.
 - Sentry error tracking configured for storefront and Medusa backend if included before launch.
+- Sentry Terraform-managed projects/alerts are reviewed where provider support is used.
 - No Google Analytics.
 - No Meta/ads pixels.
 - No customer/payment/order data sent to analytics.
 - Vercel and Medusa runtime logs accessible.
 - Caddy and Docker logs accessible on Lightsail.
+- Docker/Caddy/app logs ship to Better Stack through Vector.
+- Docker local log rotation is configured.
 - Razorpay dashboard accessible.
 - Resend dashboard accessible.
 - Medusa Admin order visibility confirmed.

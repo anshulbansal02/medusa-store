@@ -38,8 +38,10 @@ Use this file for future high-level design discussions. When a decision becomes 
 - Email: Resend transactional email, free plan expected to be enough initially.
 - Media: Cloudflare R2 plus Next.js image optimization.
 - Analytics: Cloudflare Web Analytics for basic v1 visibility.
-- Hosting: Vercel Pro for storefront; Railway Pro for Medusa/Postgres/Redis.
-- DNS: move DNS management to Cloudflare later; domain remains registered wherever appropriate.
+- Hosting: Vercel Pro for storefront; AWS Lightsail 4 GB in Singapore for production Medusa compute.
+- Database/cache: Neon Postgres Singapore and Upstash Redis Singapore pay-as-you-go.
+- DNS/security/media: Cloudflare DNS, proxied API/admin records, R2 media, Access for admin, Turnstile for public forms.
+- Terraform: broad durable infrastructure under `infra/terraform`; local applies with S3 remote state and DynamoDB locking.
 - Markets: India-only, INR-only, English-only.
 - Dark mode: not v1.
 
@@ -78,10 +80,14 @@ Use this file for future high-level design discussions. When a decision becomes 
 - Vercel:
   - QA storefront from `dev`.
   - Production storefront from `main`.
-- Railway:
-  - Production Medusa + production Postgres + production Redis.
-  - QA Medusa + QA Postgres only if usage stays within existing Railway Pro credit.
-  - QA Redis only if needed.
+- Medusa:
+  - Production Medusa runs on AWS Lightsail Singapore.
+  - QA Medusa may share the production Lightsail instance, but stays stopped by default.
+  - Production deploys from `main` are manual workflow dispatch for v1.
+- Data:
+  - Production Postgres uses Neon Singapore.
+  - QA Postgres uses a Neon branch with separate credentials.
+  - Production and QA Redis use separate Upstash Singapore databases.
 - QA should stay small, simple, and cost-aware.
 
 ## Explicit Not V1

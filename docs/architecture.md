@@ -100,8 +100,8 @@ Cloudflare:
   Proxied API/admin records in front of the Lightsail origin
   R2 media storage
   Web Analytics
-  Optional Turnstile
-  Optional Access for admin
+  Turnstile for public forms
+  Access for admin
 ```
 
 Core backend services run in Singapore for v1:
@@ -123,6 +123,8 @@ Launch with Lightsail `80/443` open publicly for simpler DNS/TLS validation. Aft
 Use Tailscale for routine human SSH and GitHub Actions deploy access to Lightsail. After Tailscale access is tested, close public port `22`; keep Lightsail browser SSH or temporary IP-restricted public SSH as emergency access.
 
 Run Medusa with Docker Compose using one production image and separate `medusa-server` and `medusa-worker` services. Keep deployment mechanics, registry choice, and image tagging as CI/CD decisions.
+Production Medusa containers use Docker `restart: unless-stopped`; QA containers do not auto-start by default.
+Defer hard Docker memory limits until after QA usage shows real Medusa server/worker memory behavior.
 
 Use GitHub Container Registry for v1 Medusa production images. Keep images private and deploy immutable version tags so rollback does not depend on `latest`.
 
@@ -144,6 +146,8 @@ Terraform uses separate environment directories for `prod` and `qa`, with separa
 
 Run Terraform `plan` and `apply` locally for v1 while using S3 remote state and DynamoDB locking. GitHub Actions may validate Terraform code later, but must not apply infrastructure until the team intentionally changes that decision.
 
+GitHub repository settings, branch protection, Actions environments, and Actions secrets are configured manually for v1 and documented in checklists. Do not manage GitHub repository settings with Terraform for v1.
+
 Create the S3 state bucket and DynamoDB lock table through a small `infra/terraform/bootstrap` config with local state. Use local state only for this backend bootstrap boundary.
 
 Pin Terraform CLI and provider versions in each root module, commit `.terraform.lock.hcl`, and upgrade providers intentionally in separate changes.
@@ -158,9 +162,17 @@ Lightsail host bootstrap is a separate committed script/runbook under `infra/`. 
 
 The Lightsail host uses Ubuntu 22.04 LTS. Node.js 24 is provided by the Medusa Docker image, not by the host OS.
 
+Configure a 2 GB swap file with low swappiness during Lightsail bootstrap. Treat swap as an emergency cushion only; if it is used regularly, tune containers or scale the instance.
+
 Medusa production Docker builds use an official Node 24 Debian slim base image with multi-stage builds. Do not use Alpine for v1 unless image-size pressure becomes real and native dependency compatibility is verified.
 
-Use Better Stack for uptime checks/alerts and Sentry for storefront and Medusa application error tracking. Keep local Docker and Caddy logs available on Lightsail for server investigation. Do not self-host the observability stack on the production VM for v1.
+Use Better Stack for uptime checks/alerts and Sentry for storefront and Medusa application error tracking. Manage Better Stack and Sentry resources through Terraform where provider support is stable, with account/API-token bootstrap done manually. Ship Docker/Caddy/app logs to Better Stack via Vector from day one, while keeping local Docker and Caddy logs available on Lightsail as fallback. Do not self-host the observability stack on the production VM for v1.
+
+Add cheap unauthenticated Medusa health endpoints: `/health` for shallow liveness and `/ready` for dependency-aware readiness checks including Postgres/Redis connectivity. Better Stack alerts use email and mobile push for v1. Do not configure Slack or build custom WhatsApp/Telegram/Signal alert bridges for v1.
+
+Do not add a worker heartbeat at launch unless the Medusa worker can emit a real periodic signal. Use worker logs, Sentry backend errors, and Docker restart status initially.
+
+Do not create a public status page for v1; Better Stack is internal monitoring/alerting only.
 
 Enable automatic Lightsail snapshots for the production instance as host recovery convenience. Treat snapshots as separate from data backups; durable data remains in Neon, Upstash, R2, GHCR, Terraform, and bootstrap/deploy automation. Review snapshot storage cost after the first month.
 
@@ -171,6 +183,10 @@ QA/staging Redis uses a separate Upstash Redis database in Singapore on pay-as-y
 QA/staging Postgres uses a Neon branch with separate QA/staging credentials. QA must never write to the production Neon branch/database. Document branch reset/refresh rules before launch.
 
 Use Neon Postgres in Singapore for production Medusa. Use pooled application connection strings unless Medusa or Neon guidance requires direct connections for a specific operation. Use Upstash Redis in Singapore for production Redis, starting on pay-as-you-go pricing. Do not provision production database or cache on the Lightsail disk.
+
+Rely on Neon built-in backup/restore/time-travel recovery for v1 and verify restore before launch. Do not add external `pg_dump` backups to R2/S3 unless business risk or recovery requirements change.
+
+Treat Redis as non-source-of-truth infrastructure. Do not add a separate Redis backup/export plan for v1; recover from Medusa/Postgres state if Redis loss disrupts in-flight work.
 
 ## Redis
 
@@ -203,6 +219,10 @@ Rules:
 - Use `next/image` with correct remote patterns/loader.
 - Add Cloudflare Images only if image transformation or Vercel image costs become a real problem.
 
+Terraform manages the R2 bucket and media DNS/custom-domain resources where provider support is reliable. R2 S3 access credentials are created manually in Cloudflare and stored in AWS SSM Parameter Store as `SecureString`.
+
+Do not add separate cross-provider R2 media backups for v1. Keep original product media files organized outside the app and revisit media replication if catalog/media risk grows.
+
 ## Payments
 
 Use Razorpay prepaid payments for v1.
@@ -222,6 +242,8 @@ Rules:
 - Subscribe Razorpay webhooks to `order.paid`, `payment.captured`, `payment.authorized`, and `payment.failed`.
 - Configure automatic capture in the Razorpay Dashboard for QA and production unless the business intentionally changes to manual capture later.
 - Never mark orders paid from only a frontend callback.
+
+Razorpay account/dashboard setup remains manual outside Terraform. Store Razorpay app config values and secrets in the approved runtime config stores and keep QA/test separate from production/live.
 
 ## Shipping
 
@@ -271,9 +293,13 @@ Rules:
 - Do not use Google Analytics.
 - Do not use Meta/ads pixels.
 - Do not track customer/payment/order data.
-- Keep commerce visibility in Medusa Admin, Razorpay, Resend, and logs.
+- Keep commerce visibility in Medusa Admin, Razorpay, Resend, Better Stack, Sentry, and logs.
 
-If open-source analytics becomes a hard requirement later, evaluate GoatCounter before heavier tools.
+If custom events or lightweight funnel visibility becomes necessary later, evaluate Umami Cloud before heavier product analytics tools.
+
+## Search Infrastructure
+
+Do not provision dedicated search infrastructure in the initial infra build. Keep search implementation modular so Algolia can be added later without scattering provider calls through UI components. Use Postgres/Medusa-native search as the launch fallback until a dedicated provider is intentionally added.
 
 ## Domains
 
@@ -302,7 +328,7 @@ Branches:
 
 - Feature branches are used for development work.
 - `dev` deploys to QA.
-- `main` deploys to production.
+- `main` is the production release branch.
 - Feature branches merge into `dev`.
 - `dev` merges into `main` for production release.
 - `dev` should be the default GitHub branch.
@@ -314,7 +340,7 @@ QA:
 - QA backend/database from `qa` environment only.
 - QA secrets must be separate from production.
 - QA must not mutate production orders, live payments, production customers, or inventory.
-- Phase 1 is QA-only: production deployment is intentionally not enabled.
+- QA Medusa may share the production Lightsail instance, but uses separate Neon branch, Upstash Redis, secrets, and Razorpay test credentials.
 
 Production:
 
@@ -322,6 +348,8 @@ Production:
 - Production Medusa compute on AWS Lightsail 4 GB in Singapore.
 - Production Postgres on Neon in Singapore.
 - Production Redis on Upstash in Singapore, pay-as-you-go initially.
+- Production deploys are manual workflow dispatch for v1.
+- Production migrations require explicit approval.
 - Razorpay live keys.
 - Resend production domain.
 
@@ -340,19 +368,29 @@ Required:
 - No secrets, raw payment tokens, or sensitive customer data in logs.
 - Neon backup/restore posture verified before launch.
 - Least-privilege R2/S3 tokens.
+- Conservative Cloudflare WAF/security baseline for proxied API/admin records.
 
 Preferred if simple:
 
-- Cloudflare Turnstile on public forms if spam appears or protection is needed.
+- Additional Cloudflare WAF/rate-limit rules only after they are tested against checkout, webhooks, API, and admin flows.
 
 Required for production admin:
 
 - Cloudflare Access in front of `admin.brand.com`.
+- Cloudflare Access email OTP with approved admin email allowlist for v1.
 - Medusa Admin authentication remains enabled behind Cloudflare Access.
+- Terraform manages the Cloudflare Access app and admin access policies.
+
+Required for public forms:
+
+- Cloudflare Turnstile on contact/newsletter/support forms and future unauthenticated public write actions.
+- Server-side Turnstile token verification before accepting submissions.
+- Terraform-managed Turnstile widgets where provider support is stable.
 
 Avoid:
 
 - IP allowlists/VPN for v1 unless the business explicitly wants that friction.
+- Global Bot Fight Mode or aggressive Cloudflare blocking at launch unless tested against checkout, webhooks, API, and admin flows.
 
 ## Cost Guardrails
 

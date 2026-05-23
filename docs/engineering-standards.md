@@ -47,7 +47,7 @@ Rules:
 - Use Corepack-managed pnpm through the root `packageManager` field.
 - Pin the exact pnpm version selected during setup.
 - Avoid global installs unless required by a platform or official scaffold command.
-- For Railway deploys that point to `apps/medusa`, place pnpm trust policy (`minimumReleaseAge`, `allowBuilds`) in `apps/medusa/pnpm-workspace.yaml` so build-script approval is applied in that install context.
+- For Medusa container builds that point to `apps/medusa`, keep pnpm trust policy (`minimumReleaseAge`, `allowBuilds`) available in that install context so build-script approval is applied consistently.
 - Keep workspace-level `pnpm-workspace.yaml` for monorepo package graph policy and `minimumReleaseAge` consistency.
 
 ## Scaffolding
@@ -310,7 +310,7 @@ Required:
 Preferred:
 
 - Cloudflare Access for admin if simple.
-- Cloudflare Turnstile for public forms if needed.
+- Cloudflare Turnstile for public forms.
 
 ## Backend Customization
 

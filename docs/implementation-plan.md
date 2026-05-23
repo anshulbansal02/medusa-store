@@ -21,7 +21,7 @@ Use four buckets:
 - Product detail pages with size chart.
 - Product image lightbox/zoom.
 - Collection/listing pages.
-- Search.
+- Search with a modular provider boundary.
 - Bag drawer and bag page.
 - Mobile sticky add-to-bag.
 - Related products / "you may also like".
@@ -49,7 +49,7 @@ Use four buckets:
 - Simple Track Order page.
 - Newsletter email capture.
 - Lightweight custom admin widgets/views.
-- Cloudflare Turnstile for public forms if needed.
+- Cloudflare Turnstile for public forms.
 - Cloudflare Access for admin if setup is simple.
 - Fit notes/model measurements/product measurements.
 
@@ -65,7 +65,7 @@ Use four buckets:
 - Marketing email platform.
 - Automated WhatsApp/SMS.
 - AI-assisted admin/search/helper features.
-- Dedicated search engine such as Meilisearch/Typesense/Algolia.
+- Dedicated search engine such as Algolia, Meilisearch, or Typesense.
 - Cloudflare Images.
 - GoatCounter/Umami/PostHog only if Cloudflare Web Analytics becomes insufficient.
 
@@ -144,7 +144,7 @@ Goal: let customers browse real catalog data.
 - Home page.
 - Collection/listing pages.
 - Product detail pages.
-- Search.
+- Search with a modular provider boundary; dedicated search infrastructure is deferred.
 - Product cards.
 - Image handling.
 - Related products.

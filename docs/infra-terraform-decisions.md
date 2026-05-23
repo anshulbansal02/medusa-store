@@ -3,7 +3,7 @@
 Status: discussion draft
 Last reviewed: 2026-05-23
 
-This document tracks the infrastructure and Terraform decisions before changing the canonical architecture docs or adding infrastructure code.
+This document tracks the infrastructure and Terraform decisions before adding infrastructure code.
 
 Do not treat open items in this file as implementation approval. Each decision below must be agreed explicitly before it is moved into `docs/architecture.md`, `docs/secrets-and-config.md`, `docs/operations.md`, `docs/cost-model.md`, or Terraform code.
 
@@ -19,11 +19,14 @@ The original canonical docs said:
 - Analytics: Cloudflare Web Analytics.
 - QA from `dev`, production from `main`.
 
-The first accepted change is:
+Accepted replacement direction:
 
 - Production Medusa compute moves to AWS Lightsail 4 GB in Singapore.
 - Durable state must remain external to the app host.
-- Production database, Redis, email, and Terraform scope are still undecided.
+- Production database is Neon Postgres in Singapore.
+- Production Redis is Upstash Redis in Singapore, pay-as-you-go initially.
+- Email remains Resend for v1.
+- Terraform manages broad durable infrastructure; deployments remain in GitHub Actions.
 
 ## Raw Research Proposal
 
@@ -94,7 +97,7 @@ Options:
 | --- | --- | --- | --- | --- |
 | Keep Railway for Medusa | Continue with the original canonical baseline. | Lowest migration from original docs, easier deploy experience, fewer server-admin tasks. | Railway database templates and production data posture need careful review; cost and HA assumptions must be verified. | Rejected for production compute |
 | AWS Lightsail single instance | Run Dockerized Medusa on one Lightsail VM behind Caddy. | Predictable cost, direct control, easy AWS migration path, external data services keep state portable. | Single app host is a SPOF; we own OS patching, Docker, reverse proxy, deploy safety, monitoring, and SSH hardening. | Accepted |
-| Render Singapore | Managed app host for Medusa while keeping data external. | Better deploy ergonomics and less VM maintenance than Lightsail. | Higher baseline cost; still needs external DB/cache decision. | Open |
+| Render Singapore | Managed app host for Medusa while keeping data external. | Better deploy ergonomics and less VM maintenance than Lightsail. | Higher baseline cost; chosen only if Lightsail ops becomes unacceptable later. | Rejected for v1 |
 
 Decision:
 
@@ -109,7 +112,7 @@ Reason:
 - Lightsail best matches the current cost/control tradeoff if durable state is external.
 - Render is the cleaner low-ops alternative, but its cost is materially higher.
 - Fly.io is technically strong, but its multi-region strengths are not the first problem for this Medusa backend.
-- Railway remains credible for app hosting, but production compute is now intentionally moving away from Railway.
+- Railway/Render remain possible future app-hosting alternatives, but production compute is intentionally Lightsail for v1.
 
 ### Decision 2: Production Database
 
@@ -144,6 +147,13 @@ Terraform note:
 - Before implementation, verify current Neon API/provider support, region IDs, backup/restore behavior, pooled connection output, and import behavior.
 - If provider support is not reliable enough, manage the Neon project manually at first and keep Terraform limited to documented outputs and dependent infrastructure.
 
+Backup posture:
+
+- Rely on Neon built-in backup/restore/time-travel recovery for v1.
+- Verify a restore workflow before production launch.
+- Do not add external `pg_dump` backups to R2/S3 for v1.
+- Revisit external encrypted database dumps if business risk, compliance, or Neon recovery limits require it.
+
 ### Decision 3: Production Redis
 
 Question: where should Medusa production Redis live?
@@ -153,8 +163,8 @@ Options:
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
 | Upstash Redis | External managed Redis-compatible service in Singapore. | Low operational burden, colocates with Medusa compute, portable Redis URL, pay-as-you-go start. | Command pricing and Medusa workload behavior need monitoring. | Accepted |
-| Railway Redis | Use Railway only as an external Redis provider. | Familiar from the original plan. | Less clean now that compute is no longer on Railway; production responsibility, backups, and HA posture need verification. | Open but weak |
-| Self-hosted Redis | Run Redis on the app VM. | Cheapest and simple for one host. | Coupled failure with app host; not ideal for workflow/event reliability. | Open but weak |
+| Railway Redis | Use Railway only as an external Redis provider. | Familiar from the original plan. | Less clean now that compute is no longer on Railway; production responsibility, backups, and HA posture need verification. | Rejected for v1 |
+| Self-hosted Redis | Run Redis on the app VM. | Cheapest and simple for one host. | Coupled failure with app host; not ideal for workflow/event reliability. | Rejected for v1 |
 
 Decision:
 
@@ -174,6 +184,13 @@ Review trigger:
 
 - Review after QA smoke testing and again after early production traffic.
 - Switch to Fixed 250 MB if pay-as-you-go spend approaches the fixed plan cost, command volume is noisy, or predictable billing becomes preferred.
+
+Backup posture:
+
+- Treat Redis as non-source-of-truth infrastructure for v1.
+- Do not add a separate Redis backup/export plan.
+- Rely on Upstash managed service behavior.
+- If Redis loss disrupts in-flight workflows, recover operationally from Medusa/Postgres state.
 
 ### Decision 4: Email Provider
 
@@ -223,6 +240,12 @@ Reason:
 - Product images can create unpredictable read bandwidth, and R2 avoids egress bandwidth charges.
 - R2 is S3-compatible, so migration to S3 + CloudFront remains possible later.
 - R2 fits the existing Cloudflare direction for DNS, Web Analytics, optional Access, and optional Turnstile.
+
+Backup posture:
+
+- Do not add a separate cross-provider R2 media backup for v1.
+- Keep original product media files organized outside the app as practical source backups.
+- Revisit separate media replication/backups if catalog/media volume or business risk grows.
 
 ### Decision 6: DNS Provider
 
@@ -291,6 +314,9 @@ Decision:
 - Run Medusa on Lightsail with Docker Compose.
 - Build one production Medusa image.
 - Run separate services for `medusa-server` and `medusa-worker`.
+- Use Docker `restart: unless-stopped` for production Medusa services.
+- Do not configure QA services to auto-start by default.
+- Defer hard container memory limits until after QA usage establishes real Medusa server/worker memory behavior.
 - Keep production Postgres, Redis, and media external; containers remain stateless.
 - Treat deployment mechanics, registry choice, and image tagging as separate CI/CD decisions.
 
@@ -508,6 +534,7 @@ Decision:
 - Use a separate bootstrap script/runbook committed under `infra/`.
 - Terraform creates Lightsail infrastructure; bootstrap configures the host.
 - Bootstrap should install Docker, Docker Compose plugin, Caddy, deployment directories, basic permissions, and any approved host-level hardening.
+- Bootstrap should configure a 2 GB swap file with low swappiness.
 - Keep live secrets out of bootstrap scripts.
 - Keep app deployments in GitHub Actions, not bootstrap.
 
@@ -516,6 +543,13 @@ Reason:
 - Server bootstrap needs to be repeatable and debuggable.
 - Cloud-init is useful, but too opaque for this first VPS setup.
 - Separating Terraform provisioning, host bootstrap, and app deployment keeps responsibilities clear.
+
+Swap:
+
+- Configure a 2 GB swap file on the 4 GB Lightsail instance.
+- Set low swappiness, such as `10`.
+- Treat swap as an emergency cushion for deploy/runtime spikes, not normal operating memory.
+- If swap is used regularly, tune containers or scale the instance instead of relying on swap.
 
 ### Decision 17: Observability And Alerts
 
@@ -534,23 +568,72 @@ Decision:
 
 - Use Better Stack for uptime checks, alerts, and optional lightweight log collection.
 - Use Sentry for storefront and Medusa application error tracking.
-- Keep Docker and Caddy logs available locally on Lightsail for operational investigation.
+- Ship Docker/Caddy/app logs to Better Stack via Vector from day one.
+- Keep local Docker/Caddy logs available on Lightsail as a fallback.
 - Do not set up Prometheus, Grafana, Loki, Datadog, or a self-hosted observability stack for v1.
 - Verify Better Stack and Sentry current free-tier/commercial-use limits before production launch.
+- Manage Better Stack and Sentry resources through Terraform where provider support is stable.
 
 Initial checks:
 
 - Storefront availability.
-- Medusa API health endpoint.
+- Medusa API health endpoint at `/health`.
 - Admin/API hostname availability.
 - SSL/domain expiry alerts where available.
-- Optional worker heartbeat once a reliable heartbeat endpoint/job exists.
+- Worker heartbeat is deferred until a reliable worker-emitted signal exists.
 
 Reason:
 
 - Uptime alerts and app exception tracking solve the immediate v1 operational need.
 - Sentry answers "what code broke"; Better Stack answers "is the service reachable".
 - Full metrics/log pipelines can be added later if incidents or traffic justify them.
+
+Terraform scope:
+
+- Terraform manages Better Stack uptime monitors.
+- Terraform manages Better Stack Telemetry/log sources where provider support is stable.
+- Terraform manages Better Stack heartbeats/status page only if needed.
+- Terraform manages Sentry frontend and backend projects.
+- Terraform manages basic Sentry alert rules.
+- Better Stack and Sentry account signup, billing/free-tier setup, and initial API tokens are manual bootstrap steps.
+- Better Stack/Sentry provider credentials must not be committed.
+
+Logging:
+
+- Use Vector on Lightsail to ship Docker/Caddy/app logs to Better Stack.
+- Configure Vector during Lightsail bootstrap.
+- Store Better Stack source tokens in SSM.
+- Configure Docker log rotation locally so logs cannot fill the instance disk.
+- Do not log secrets, payment tokens, raw request bodies, or customer-sensitive data.
+
+Alert channels:
+
+- Use Better Stack email alerts and mobile app push notifications for v1.
+- Do not configure Slack alerts for v1.
+- Do not build custom WhatsApp/Telegram/Signal alert bridges for v1.
+- Paid SMS/phone alerts can be revisited if missed downtime alerts become a real risk.
+
+Health endpoint:
+
+- Add a dedicated unauthenticated Medusa `/health` endpoint for shallow liveness.
+- Add a dedicated unauthenticated Medusa `/ready` endpoint for readiness/dependency checks.
+- `/health` must be cheap, read-only, and safe for frequent liveness checks.
+- `/ready` may check app readiness plus Postgres and Redis connectivity.
+- Use `/health` for process liveness and simple deploy checks.
+- Use `/ready` for deeper dependency-aware monitoring after tuning alert behavior.
+
+Worker heartbeat:
+
+- Do not add a Better Stack worker heartbeat at launch.
+- Add a heartbeat only when the Medusa worker can emit a real periodic signal.
+- Do not fake worker health from the API server.
+- Use worker logs, Sentry backend errors, and Docker restart status initially.
+
+Status page:
+
+- Do not create a public Better Stack status page for v1.
+- Keep Better Stack as internal monitoring/alerting.
+- Revisit a public status page only if customer expectations or operational maturity require it.
 
 ### Decision 18: Lightsail Snapshots
 
@@ -578,7 +661,40 @@ Reason:
 - Snapshots still reduce recovery time if the VM itself is corrupted or misconfigured.
 - The expected initial cost should be low, but it is not zero.
 
-### Decision 19: Production Admin Protection
+### Decision 19: Billing And Usage Alerts
+
+Question: should provider billing/usage alerts be configured?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Configure low v1 billing/usage alerts | Add cost/usage alerts where providers support them. | Catches surprise usage from snapshots, Redis commands, DB usage, logs, image traffic, or platform overages. | Some providers may require manual dashboard setup or paid-plan support. | Accepted |
+| No billing alerts initially | Review invoices manually. | Less setup. | Higher risk of surprise usage/cost. | Rejected |
+
+Decision:
+
+- Configure billing/usage alerts where each provider supports them.
+- Use low v1 thresholds close to expected usage.
+- Prefer Terraform-managed alerts where provider support is reliable; otherwise configure manually and document.
+- Review alerts after first production month.
+
+Initial alert areas:
+
+- AWS Lightsail and snapshot storage.
+- Neon compute/storage/branch usage.
+- Upstash Redis command spend approaching Fixed 250 MB cost.
+- Vercel usage/overage.
+- Cloudflare R2 storage/operations.
+- Better Stack log volume and monitor limits.
+- Sentry event volume.
+
+Reason:
+
+- The chosen stack is low-cost, but several services are usage-based.
+- Early alerts are cheaper than discovering runaway usage in an invoice.
+
+### Decision 20: Production Admin Protection
 
 Question: should production Medusa Admin be protected by Cloudflare Access?
 
@@ -593,6 +709,7 @@ Options:
 Decision:
 
 - Use Cloudflare Access in front of production Medusa Admin.
+- Use Cloudflare Access email OTP with an allowlist of approved admin email addresses for v1.
 - Keep Medusa Admin authentication enabled behind Cloudflare Access.
 - Do not rely on Caddy basic auth unless Cloudflare Access is not ready.
 - Use separate admin user accounts; no shared Medusa admin passwords.
@@ -601,9 +718,10 @@ Reason:
 
 - Admin is a high-risk production surface.
 - Cloudflare Access gives a clean outer identity gate without managing a shared proxy password.
+- Email OTP is the simplest identity method while there is only one operator.
 - The project already uses Cloudflare DNS, so Access fits the chosen platform boundary.
 
-### Decision 20: Cloudflare Proxy For API/Admin
+### Decision 21: Cloudflare Proxy For API/Admin
 
 Question: should API/admin hostnames be proxied through Cloudflare?
 
@@ -628,7 +746,7 @@ Reason:
 - Dynamic API responses still reach the origin, so performance is not the main reason; security and operational controls are.
 - Proxying now keeps the path open for future WAF/rate-limit rules without changing DNS architecture.
 
-### Decision 21: Lightsail Origin Firewall For HTTP/HTTPS
+### Decision 22: Lightsail Origin Firewall For HTTP/HTTPS
 
 Question: should Lightsail `80/443` be open publicly or restricted to Cloudflare IP ranges?
 
@@ -652,7 +770,7 @@ Reason:
 - Cloudflare-only origin firewalling is stronger, but first-launch DNS/TLS/debugging is simpler with public `80/443`.
 - This is a phased hardening step, not a rejection of origin restriction.
 
-### Decision 22: SSH And Deploy Access To Lightsail
+### Decision 23: SSH And Deploy Access To Lightsail
 
 Question: how should human SSH and GitHub Actions deploy access reach the Lightsail host?
 
@@ -680,7 +798,7 @@ Reason:
 - Tailscale avoids depending on changing personal IPs or broad GitHub Actions runner IP ranges.
 - Public SSH does not need to remain exposed for v1.
 
-### Decision 23: Lightsail Host OS
+### Decision 24: Lightsail Host OS
 
 Question: which host operating system should the Lightsail VM use?
 
@@ -706,7 +824,7 @@ Reason:
 - Node 24 is a container-runtime requirement, not a host-OS requirement.
 - Ubuntu 22.04 LTS is mature, well documented, and good enough for a 4 GB production VPS.
 
-### Decision 24: Medusa Docker Base Image
+### Decision 25: Medusa Docker Base Image
 
 Question: which Node base image should Medusa use in production Docker builds?
 
@@ -731,7 +849,7 @@ Reason:
 - Debian slim is the safer production default for Medusa and Node native dependencies.
 - Image size is less important than predictable installs/builds and simpler debugging.
 
-### Decision 25: Vercel Terraform Management
+### Decision 26: Vercel Terraform Management
 
 Question: should Terraform manage the Vercel storefront project and configuration?
 
@@ -764,7 +882,7 @@ Reason:
 - Avoiding custom Vercel secret-sync scripts keeps the setup simpler.
 - Deployments are release operations and remain better handled by GitHub Actions.
 
-### Decision 26: Neon Terraform Management
+### Decision 27: Neon Terraform Management
 
 Question: should Terraform manage Neon project, branches, roles, and databases?
 
@@ -791,7 +909,61 @@ Reason:
 
 ## Round 1: Terraform Setup
 
-### Decision 27: IaC Tool
+### Decision Summary: Terraform Provider Set
+
+This summarizes provider scope already decided above.
+
+Terraform-managed provider/resource areas:
+
+```txt
+aws
+  Lightsail
+  S3 backend bucket
+  DynamoDB lock table
+  SSM Parameter Store
+  IAM as needed
+
+cloudflare
+  DNS records
+  R2 bucket/domain resources
+  Access app/policies
+  WAF/security baseline
+  Turnstile widgets
+
+upstash
+  Production Redis
+  QA Redis
+
+vercel
+  Storefront project
+  Domains
+  Environment variables where provider behavior is acceptable
+
+betterstack
+  Uptime monitors
+  Log/telemetry sources where stable
+
+sentry
+  Frontend/backend projects
+  Basic alert rules
+
+neon
+  Project, branches, roles, and databases after provider audit passes
+```
+
+Explicitly not Terraform-managed for v1:
+
+```txt
+GitHub repository settings/environments/secrets
+Razorpay dashboard/account/webhook setup
+R2 S3 access key/secret generation
+Application deploys
+Medusa database migrations
+Docker image releases
+Lightsail host bootstrap execution
+```
+
+### Decision 28: IaC Tool
 
 Question: should the project use Terraform or OpenTofu?
 
@@ -813,7 +985,7 @@ Reason:
 - Vendor docs and examples for AWS, Cloudflare, Vercel, Upstash, and community Neon providers are easiest to follow as Terraform.
 - Consistency matters more than tool neutrality for this initial setup.
 
-### Decision 28: Terraform Scope
+### Decision 29: Terraform Scope
 
 Question: what should Terraform own in v1?
 
@@ -821,7 +993,7 @@ Options:
 
 | Scope | Owns | Does not own | Status |
 | --- | --- | --- | --- |
-| Minimal IaC | DNS records, R2 bucket, provider scaffolding, non-secret variables. | App server bootstrap, secrets, deployments. | Open |
+| Minimal IaC | DNS records, R2 bucket, provider scaffolding, non-secret variables. | App server bootstrap, secrets, deployments. | Rejected as too narrow |
 | Infra IaC | DNS, R2, Lightsail instance/static IP/firewall, basic IAM/users where supported. | Runtime app deploys, generated secrets, database schema migrations. | Rejected as too narrow |
 | Broad IaC | Durable infrastructure across Cloudflare, AWS, Upstash, Vercel, and Neon where provider support is reliable. | App releases, migrations, runtime secret values, emergency operations. | Accepted |
 
@@ -861,7 +1033,7 @@ Reason:
 - Keeping deployments out of Terraform avoids turning infrastructure state into application release state.
 - Keeping live secret values out of Terraform/Git reduces accidental exposure risk.
 
-### Decision 29: Terraform Directory Layout
+### Decision 30: Terraform Directory Layout
 
 Question: where should Terraform live?
 
@@ -870,7 +1042,7 @@ Options:
 | Option | Shape | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
 | Root `infra/terraform` | `infra/terraform/{environments,modules}` | Clear separation from apps; common pattern; leaves room for infra scripts/runbooks later. | More structure upfront. | Accepted |
-| Root `terraform/` | `terraform/{envs,modules}` | Short path and obvious. | Slightly less aligned with broader infra docs if we later add scripts/runbooks. | Open |
+| Root `terraform/` | `terraform/{envs,modules}` | Short path and obvious. | Slightly less aligned with broader infra docs if we later add scripts/runbooks. | Rejected |
 | Separate repo | Dedicated infrastructure repo. | Strong separation of duties. | Too heavy for current project. | Not preferred for v1 |
 
 Decision:
@@ -901,7 +1073,7 @@ Reason:
 - `infra/terraform` keeps infrastructure code separate from application code without requiring a separate repo.
 - The `infra/` parent leaves room for future runbooks, bootstrap scripts, or non-Terraform operational files.
 
-### Decision 30: Terraform State Backend
+### Decision 31: Terraform State Backend
 
 Question: where should Terraform state live?
 
@@ -933,7 +1105,7 @@ Reason:
 - We already use AWS for Lightsail, so S3/DynamoDB avoids adding another state platform.
 - S3 remote state with DynamoDB locking is a standard, durable Terraform backend pattern.
 
-### Decision 31: Terraform Execution
+### Decision 32: Terraform Execution
 
 Question: should Terraform apply run locally or from GitHub Actions?
 
@@ -960,7 +1132,7 @@ Reason:
 - Keeping broad provider credentials out of CI is simpler and safer for v1.
 - Remote state and locking provide the important safety properties even with local execution.
 
-### Decision 32: Terraform State Bootstrap
+### Decision 33: Terraform State Bootstrap
 
 Question: how should the S3 state bucket and DynamoDB lock table be created?
 
@@ -986,7 +1158,7 @@ Reason:
 - A tiny bootstrap config is more repeatable than manual console setup.
 - Local state is acceptable only for this initial backend bootstrap boundary.
 
-### Decision 33: Terraform And Provider Version Pinning
+### Decision 34: Terraform And Provider Version Pinning
 
 Question: should Terraform CLI and provider versions be pinned?
 
@@ -1010,7 +1182,7 @@ Reason:
 - Provider behavior changes can affect production infrastructure.
 - Pinning versions is normal production Terraform practice.
 
-### Decision 34: Terraform Variable Files
+### Decision 35: Terraform Variable Files
 
 Question: should environment `tfvars` files be committed?
 
@@ -1035,7 +1207,7 @@ Reason:
 - Non-secret config belongs in version control for review and reproducibility.
 - Git history is not an acceptable place for secrets.
 
-### Decision 35: Terraform Formatting And Validation
+### Decision 36: Terraform Formatting And Validation
 
 Question: should Terraform formatting and validation be required?
 
@@ -1058,7 +1230,7 @@ Reason:
 - Formatting and validation are standard Terraform quality gates.
 - They catch low-cost mistakes before touching infrastructure.
 
-### Decision 36: Domain Layout
+### Decision 37: Domain Layout
 
 Question: what hostname layout should production and QA use?
 
@@ -1092,7 +1264,267 @@ Reason:
 - `media.brand.com` can follow R2/CDN behavior without API cache risk.
 - API/admin can move away from Lightsail later without changing storefront/media hostnames.
 
-### Decision 37: Environments
+### Decision 38: Web Analytics
+
+Question: what web analytics should v1 use?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Cloudflare Web Analytics | Use Cloudflare's lightweight web analytics for v1 traffic/performance visibility. | Free/lightweight, fits Cloudflare stack, tracks visits/page views/performance/referrers/devices/countries/browsers/OS. | Not full product analytics, funnels, revenue attribution, or identity analytics. | Accepted |
+| Umami Cloud later | Add Umami if custom events/funnels become necessary. | Lightweight and has a free tier for small usage. | Extra script/tool; not needed for launch. | Later option |
+| Plausible | Paid privacy-first web analytics. | Strong simple dashboards. | Paid and unnecessary for v1. | Rejected for v1 |
+| GA4 | Google Analytics. | Powerful and free. | More complexity/noise; current project avoids Google Analytics. | Rejected |
+| PostHog/heavy product analytics | Full product analytics. | Powerful funnels/events/replays. | Too heavy for v1. | Rejected |
+
+Decision:
+
+- Use Cloudflare Web Analytics as the only web analytics tool for v1.
+- Use Medusa Admin, Razorpay, Resend, Better Stack, and Sentry for commerce/payment/email/uptime/error visibility.
+- Do not add GA4, Meta pixels, PostHog, Plausible, or Umami for launch.
+- Revisit Umami Cloud if custom events or lightweight funnel visibility becomes necessary.
+
+Reason:
+
+- Cloudflare Web Analytics gives enough launch-level website visibility with minimal setup.
+- It covers visits, page views, page load time, Core Web Vitals, referrers, countries, device type, browser, and OS.
+- Ecommerce truth should remain in Medusa/Razorpay rather than a heavy web analytics system.
+
+### Decision 39: Search Infrastructure
+
+Question: should v1 infrastructure include a dedicated search provider?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Defer dedicated search infrastructure | Do not provision Algolia/Typesense/Meilisearch in the initial infra build; keep search integration modular. | No launch cost, avoids adding another provider immediately, keeps v1 infra smaller. | Search quality is limited until a dedicated provider is added. | Accepted |
+| Algolia now | Add Algolia from the start using free/included tier and guardrails. | Best hosted ecommerce search quality with no fixed cost initially. | Usage overage risk and another provider during launch. | Later option |
+| Self-host Typesense/Meilisearch now | Run open-source search on existing infrastructure. | Strong search without SaaS fee. | Adds another production service to operate. | Rejected for v1 |
+| Typesense/Meilisearch Cloud now | Managed search cluster. | Strong search and low ops. | Adds fixed/likely monthly cost. | Rejected for v1 |
+
+Decision:
+
+- Do not provision dedicated search infrastructure in the initial infra build.
+- Keep search code modular so Algolia can be added later without scattering search provider calls through UI components.
+- Prefer Algolia later if best-in-class search is still desired and free/included usage guardrails are acceptable.
+- Keep Postgres/Medusa-native search as the launch fallback.
+
+Reason:
+
+- Best-in-class search is desirable, but not required for the first infra setup.
+- Deferring avoids provider/cost surface while the rest of the production stack is being established.
+- A modular search boundary keeps the later Algolia addition clean.
+
+### Decision 40: Razorpay Terraform Scope
+
+Question: should Razorpay setup be managed by Terraform?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Manual Razorpay dashboard setup | Configure Razorpay keys, webhook URLs, capture settings, and live/test mode in Razorpay Dashboard; store app references/secrets in SSM/Vercel config. | Matches payment-provider operational model, avoids brittle IaC around payments, keeps human verification explicit. | Manual checklist discipline required. | Accepted |
+| Terraform-managed Razorpay | Try to manage Razorpay configuration through Terraform/provider/API. | More IaC coverage if provider is mature. | Not worth the risk/complexity for payment operations in v1. | Rejected |
+
+Decision:
+
+- Keep Razorpay account/dashboard setup outside Terraform.
+- Manage Razorpay app config values and secrets through approved runtime config stores.
+- Keep QA/test and production/live Razorpay keys and webhook secrets separate.
+- Verify webhook URLs and automatic capture manually before launch.
+
+Reason:
+
+- Payment configuration is high-risk and benefits from explicit dashboard verification.
+- The app needs Razorpay config values, but Terraform does not need to own Razorpay operational setup.
+
+### Decision 41: R2 Terraform Scope
+
+Question: should Terraform manage R2 credentials as well as R2 bucket/domain resources?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Terraform bucket/domain, manual R2 S3 credentials | Terraform manages R2 bucket/settings/DNS/custom domain where supported; R2 S3 access key/secret are created manually and stored in SSM. | Automates stable infra while avoiding brittle credential generation; keeps access secrets in central secret store. | One manual credential-creation step and rotation runbook needed. | Accepted |
+| Terraform everything including R2 credentials | Attempt to create all R2 credentials/tokens via Terraform. | More complete automation. | R2 S3 credential creation is less cleanly first-class; secret values and API-token permissions add fragility. | Rejected for v1 |
+| Manual R2 entirely | Create bucket/domain/credentials in dashboard. | Simple once. | More drift and less IaC coverage than needed. | Rejected |
+
+Decision:
+
+- Terraform manages the Cloudflare R2 bucket and supported bucket settings.
+- Terraform manages media DNS/custom-domain records where provider support is reliable.
+- R2 S3 access credentials are created manually in Cloudflare and stored in AWS SSM Parameter Store as `SecureString`.
+- Document R2 credential rotation.
+
+Reason:
+
+- R2 bucket and DNS are durable infrastructure and fit Terraform well.
+- R2 S3 access credentials are security-sensitive and less cleanly Terraformable than the bucket itself.
+- A one-time manual credential step is acceptable when the resulting values are centrally stored in SSM.
+
+### Decision 42: Cloudflare Access Terraform Scope
+
+Question: should Terraform manage Cloudflare Access for production admin?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Terraform-managed Cloudflare Access | Manage the Access app and policies for `admin.brand.com` through Terraform. | Durable security policy in IaC, reviewable changes, consistent with Cloudflare DNS/proxy Terraform scope. | Requires correct Cloudflare Zero Trust account/team configuration and careful policy review. | Accepted |
+| Manual Cloudflare Access setup | Configure Access in the dashboard. | Fast initial setup. | Security policy drift and less reviewability. | Rejected |
+
+Decision:
+
+- Terraform manages the Cloudflare Access application for `admin.brand.com`.
+- Terraform manages the Access policies for allowed admin identities.
+- Medusa Admin auth remains enabled behind Cloudflare Access.
+- Review Access policy changes before apply.
+
+Reason:
+
+- Admin access policy is durable security infrastructure.
+- Managing Access in Terraform reduces dashboard drift.
+- Cloudflare is already the DNS/proxy/security boundary for admin.
+
+### Decision 43: Cloudflare WAF And Rate Limiting
+
+Question: should launch include Cloudflare WAF/rate-limit rules?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Conservative Cloudflare security baseline | Enable free/baseline managed protections and only safe custom/rate-limit rules; observe before aggressive blocking. | Free/low-cost protection without likely checkout/API breakage. | Less aggressive against abuse at launch. | Accepted |
+| Aggressive WAF/rate limits/Bot Fight Mode at launch | Turn on broad bot fighting and strong API limits immediately. | More immediate protection. | Can challenge or block checkout, payment callbacks, admin, or Store API traffic. | Rejected for launch |
+| No custom security beyond proxy | Rely only on proxy/DDoS baseline. | Least risk of false positives. | Misses low-cost protection available in Cloudflare. | Rejected |
+
+Decision:
+
+- Enable Cloudflare Free Managed Ruleset / baseline WAF protections where available.
+- Manage safe Cloudflare security rules through Terraform where provider support is reliable.
+- Add conservative API rate limiting only if the free plan supports it cleanly.
+- Prefer log/simulate mode first when available.
+- Do not enable Bot Fight Mode globally at launch.
+- Do not add aggressive country blocks or broad API challenges at launch.
+- Revisit stronger rules after observing traffic or abuse.
+
+Reason:
+
+- Cloudflare has useful free/low-cost WAF/DDoS/security features.
+- Checkout, payment webhooks, Store API, and admin flows are sensitive to false positives.
+- Conservative launch security gives protection without risking customer/payment breakage.
+
+### Decision 44: Cloudflare Turnstile For Public Forms
+
+Question: should public forms use CAPTCHA/spam protection?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Cloudflare Turnstile | Use Turnstile widgets on public forms and verify tokens server-side. | Free/low-cost, fits Cloudflare stack, avoids Google reCAPTCHA, Terraform support. | Requires app integration and server-side verification. | Accepted |
+| Google reCAPTCHA | Use Google's CAPTCHA product. | Widely known. | Not aligned with privacy/lightweight direction; more Google surface. | Rejected |
+| No CAPTCHA initially | Add protection only after spam appears. | Less implementation work. | Public forms are exposed to spam from launch. | Rejected |
+
+Decision:
+
+- Use Cloudflare Turnstile for public forms.
+- Manage Turnstile widgets through Terraform where provider support is stable.
+- Use Managed mode by default.
+- Verify Turnstile tokens server-side before accepting form submissions.
+- Use separate QA and production Turnstile config.
+
+Applies to:
+
+- Contact form.
+- Newsletter form if enabled.
+- Any support/request form.
+- Any future unauthenticated write action exposed to the public.
+
+Reason:
+
+- The storefront will have public forms.
+- Turnstile is the cleanest fit with the existing Cloudflare stack.
+- Server-side verification is required; client widget rendering alone is not protection.
+
+### Decision 45: GitHub Repository Terraform Scope
+
+Question: should Terraform manage GitHub repository settings, environments, and secrets?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Manual GitHub repo setup | Configure GitHub repo settings, branch protection, environments, and Actions secrets manually. | Simple for one engineer, avoids Terraform managing its own execution context. | Requires checklist discipline. | Accepted |
+| Terraform-managed GitHub repo settings | Use GitHub provider for repo settings/environments/secrets. | More IaC coverage. | Awkward for bootstrapping CI/secrets and not needed for v1. | Rejected |
+
+Decision:
+
+- Keep GitHub repository settings manual for v1.
+- Keep GitHub Actions environments and secrets manual for v1.
+- Document required repo settings/secrets in launch/deploy docs.
+- Revisit Terraform-managed GitHub only if team/process grows.
+
+Reason:
+
+- There is one engineer/operator.
+- GitHub configuration changes should be infrequent.
+- Avoiding Terraform for GitHub reduces bootstrap complexity.
+
+### Decision 46: Deployment Triggers
+
+Question: how should QA and production deploys be triggered?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| QA auto from `dev`, production manual dispatch | `dev` pushes can deploy QA; production deploys from `main` require manual workflow dispatch/approval. | Fast QA feedback, controlled production releases. | Production release is one manual step. | Accepted |
+| Production auto on `main` push | Every push/merge to `main` deploys production. | Fully automated. | Too risky for checkout/order/payment backend in v1. | Rejected |
+| Fully manual QA and prod | No automatic deploys. | Maximum control. | Slower QA feedback. | Rejected |
+
+Decision:
+
+- QA deploys may run automatically from `dev`.
+- Production deploys are manual workflow dispatch for v1.
+- Production migrations keep their explicit approval gate.
+- Revisit automatic production deploy only after production stability and rollback confidence improve.
+
+Reason:
+
+- Production Medusa deploys affect checkout, orders, payment callbacks, and admin operations.
+- Manual dispatch is the right control point for one-operator v1 production.
+
+### Decision 47: CI Checks Before Deploy
+
+Question: what checks should run before deploy?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Lean required checks | Run only lint/format, typecheck, and production builds that are practical for changed apps before deploy. | Catches real breakage without overbuilding CI. | Less coverage than a full test/security matrix. | Accepted |
+| Heavy CI suite | Add broad security scans, dependency audits, E2E suites, and many matrix jobs immediately. | More coverage. | Slower, noisier, and likely overkill for v1. | Rejected |
+| Minimal/no checks | Deploy with little automated validation. | Fastest. | Too risky for checkout/order/payment app. | Rejected |
+
+Decision:
+
+- Require lean CI checks before deploy.
+- Run formatting/linting where configured.
+- Run typecheck for changed apps/packages where practical.
+- Run production build for storefront and Medusa before their deploys.
+- Add Terraform `fmt`/`validate` when Terraform code exists.
+- Do not add heavy/fancy checks unless they catch a real current risk.
+
+Reason:
+
+- The goal is useful confidence, not pipeline complexity.
+- Checkout/order/payment paths need basic build/type safety before deploy.
+
+### Decision 48: Environments
 
 Question: should Terraform model QA and production separately?
 
