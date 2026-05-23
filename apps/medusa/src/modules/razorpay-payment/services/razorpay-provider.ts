@@ -205,6 +205,14 @@ function getWebhookAmount(event: RazorpayWebhookEvent) {
   return fromSmallestUnit(amount, currency);
 }
 
+function getWebhookOrderId(event: RazorpayWebhookEvent) {
+  return (
+    event.payload?.order?.entity?.id ??
+    event.payload?.payment?.entity?.order_id ??
+    ""
+  );
+}
+
 function getPaymentSessionStatus({
   order,
   payments,
@@ -492,8 +500,31 @@ export default class RazorpayPaymentProviderService extends AbstractPaymentProvi
     }
 
     const event = payload.data as RazorpayWebhookEvent;
-    const sessionId = getWebhookSessionId(event);
-    const amount = getWebhookAmount(event);
+    let sessionId = getWebhookSessionId(event);
+    let amount = getWebhookAmount(event);
+
+    if (!sessionId || amount === null) {
+      const orderId = getWebhookOrderId(event);
+
+      if (orderId) {
+        try {
+          const order = (await this.razorpay_.orders.fetch(
+            orderId,
+          )) as RazorpayOrder;
+
+          event.payload = {
+            ...event.payload,
+            order: {
+              entity: order,
+            },
+          };
+          sessionId = getWebhookSessionId(event);
+          amount = getWebhookAmount(event);
+        } catch {
+          return { action: PaymentActions.NOT_SUPPORTED };
+        }
+      }
+    }
 
     if (!sessionId || amount === null) {
       return { action: PaymentActions.NOT_SUPPORTED };

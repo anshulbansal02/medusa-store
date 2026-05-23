@@ -5,12 +5,13 @@ import { PaymentActions, PaymentSessionStatus } from "@medusajs/framework/utils"
 import RazorpayPaymentProviderService from "../services/razorpay-provider";
 
 const createMock = jest.fn();
+const fetchOrderMock = jest.fn();
 
 jest.mock("razorpay", () =>
   jest.fn().mockImplementation(() => ({
     orders: {
       create: createMock,
-      fetch: jest.fn(),
+      fetch: fetchOrderMock,
       fetchPayments: jest.fn(),
     },
     payments: {
@@ -60,6 +61,7 @@ function createSignedWebhookPayload({
 describe("RazorpayPaymentProviderService", () => {
   beforeEach(() => {
     createMock.mockReset();
+    fetchOrderMock.mockReset();
   });
 
   it("creates Razorpay orders with server-owned amount, currency, receipt, and notes", async () => {
@@ -175,6 +177,49 @@ describe("RazorpayPaymentProviderService", () => {
       action: PaymentActions.AUTHORIZED,
       data: {
         session_id: "payses_123",
+        amount: 500,
+      },
+    });
+  });
+
+  it("resolves payment webhooks through the Razorpay order when webhook notes are missing", async () => {
+    fetchOrderMock.mockResolvedValue({
+      id: "order_test",
+      amount: 50000,
+      amount_paid: 50000,
+      currency: "INR",
+      status: "paid",
+      notes: {
+        session_id: "payses_from_order",
+      },
+    });
+
+    const provider = createProvider();
+    const result = await provider.getWebhookActionAndData(
+      createSignedWebhookPayload({
+        body: {
+          event: "payment.captured",
+          payload: {
+            payment: {
+              entity: {
+                id: "pay_test",
+                order_id: "order_test",
+                amount: 50000,
+                currency: "INR",
+                status: "captured",
+                captured: true,
+              },
+            },
+          },
+        },
+      }),
+    );
+
+    expect(fetchOrderMock).toHaveBeenCalledWith("order_test");
+    expect(result).toEqual({
+      action: PaymentActions.SUCCESSFUL,
+      data: {
+        session_id: "payses_from_order",
         amount: 500,
       },
     });
