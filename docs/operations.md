@@ -55,7 +55,7 @@ When tracking is used:
 
 - Use separate admin accounts.
 - Do not share admin passwords.
-- Keep production admin behind strong credentials; add Cloudflare Access later if setup stays simple.
+- Keep production admin behind Cloudflare Access plus Medusa Admin authentication.
 - Remove access immediately when a user no longer needs it.
 
 ## References

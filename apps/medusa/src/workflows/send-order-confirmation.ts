@@ -9,6 +9,7 @@ import {
 } from "@medusajs/framework/workflows-sdk";
 
 import { getEmailConfig } from "../config/env";
+import { transactionalEmailTemplates } from "../email/template-ids";
 
 type WorkflowInput = {
   id: string;
@@ -65,7 +66,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
                   email_idempotency_key: `order-placed-customer-${order.id}`,
                 },
                 to: order.email,
-                template: "order-placed",
+                template: transactionalEmailTemplates.orderPlaced,
                 idempotency_key: `order-placed-customer-${order.id}`,
               },
             ]
@@ -79,7 +80,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
                   email_idempotency_key: `order-placed-owner-${order.id}`,
                 },
                 to: ownerEmail,
-                template: "owner-order-placed",
+                template: transactionalEmailTemplates.ownerOrderPlaced,
                 idempotency_key: `order-placed-owner-${order.id}`,
               },
             ]

@@ -7,7 +7,7 @@ import { absoluteUrl } from "@/lib/config/site";
 const page = policyPages.returns;
 
 export const metadata: Metadata = {
-  title: "Returns | The Label",
+  title: page.metadataTitle,
   description: page.description,
   alternates: {
     canonical: absoluteUrl("/returns"),

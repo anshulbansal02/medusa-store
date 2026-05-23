@@ -3,9 +3,11 @@
 import { Heart } from "lucide-react";
 import Link from "next/link";
 
+import { siteContent } from "@/content/site-content";
 import { useWishlistStore } from "@/features/wishlist/wishlist-store";
 
 export function WishlistLink() {
+  const content = siteContent.wishlist;
   const count = useWishlistStore((state) => state.productIds.length);
   const hasHydrated = useWishlistStore((state) => state.hasHydrated);
 
@@ -13,7 +15,7 @@ export function WishlistLink() {
     <Link
       href="/wishlist"
       prefetch={false}
-      aria-label="Open wishlist"
+      aria-label={content.openLabel}
       className="relative grid size-9 cursor-pointer place-items-center transition hover:bg-muted"
     >
       <Heart className="size-4 stroke-[1.6]" aria-hidden="true" />

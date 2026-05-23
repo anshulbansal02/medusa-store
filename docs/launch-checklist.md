@@ -19,10 +19,11 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - `main` is reserved for future production release only.
 - GitHub Actions CI runs on `dev` and `main` for lint/typecheck/build checks.
 - CI/CD deploy mapping:
-  - `push` to `dev` deploys to Railway `qa` and Vercel QA preview.
-  - `main` deploy is deliberately not configured yet (phase 1: QA only).
-- Confirm Railway Medusa deploy shows a successful build step without `ERR_PNPM_IGNORED_BUILDS` before smoke testing API endpoints.
-- Confirm Railway Medusa QA deploy is enabled by adding the GitHub `qa` environment secret `RAILWAY_TOKEN`.
+  - `push` to `dev` deploys the Vercel QA preview.
+  - Medusa QA/staging deploy mapping is pending the infrastructure decision.
+  - Production Medusa compute target is AWS Lightsail 4 GB, but `main` production deploy is deliberately not configured yet.
+- Confirm the Medusa deploy target shows a successful build step before smoke testing API endpoints.
+- Confirm Medusa QA deploy credentials only after the QA/staging host is decided.
 - Confirm Vercel storefront QA deploy is enabled through the GitHub `qa` environment secret `VERCEL_TOKEN`.
 - Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL` and, when ready, `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`.
 - Confirm the QA preview URL loads after Vercel SSO authentication.
@@ -144,16 +145,37 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 ## Security
 
 - HTTPS configured for all public domains.
-- Railway/Vercel deploy secrets are stored only in platform secret stores and injected at runtime.
-- Use Railway-provided domains for QA until custom domains are connected.
+- Caddy is running on Lightsail and routing API/admin hostnames to Medusa.
+- Docker Compose is running separate Medusa server and worker services.
+- Lightsail bootstrap script/runbook has been run and is committed under `infra/`.
+- Production Lightsail automatic snapshots are enabled and understood as host recovery only.
+- Medusa production image is stored privately in GHCR.
+- Production deploy uses an immutable image tag, not only `latest`.
+- Medusa server health check exists before automated production deploys.
+- Production rollback by previous immutable image tag is documented.
+- Production Medusa database migrations require explicit approval before running.
+- Cloudflare Tunnel is not required for v1 public ingress.
+- Vercel, Lightsail/deploy, and any remaining platform deploy secrets are stored only in approved secret stores and injected at runtime.
+- GitHub Actions writes Lightsail runtime env files from GitHub environment secrets during deploy.
+- Generated Lightsail env files have restrictive permissions.
+- QA backend domains are pending the QA/staging infrastructure decision.
+- QA Medusa containers are stopped by default if sharing the production Lightsail instance.
+- QA uses separate Neon branch/database, Redis, secrets, and Razorpay test credentials.
 - Medusa Admin has strong credentials.
+- Cloudflare Access protects production `admin.brand.com`.
 - No shared admin passwords.
 - CORS restricted to known origins.
-- Production secrets are only in Vercel/Railway secret stores.
+- Production secrets are only in approved Vercel and Medusa runtime secret stores.
 - QA/prod secrets are separate.
 - No secrets in logs.
 - R2 tokens are least-privilege.
-- Postgres backups enabled.
+- Neon Postgres production project is in the selected Singapore region.
+- Neon backup/restore behavior is verified before launch.
+- Neon pooled and direct connection strings are understood and stored only in approved secret stores.
+- QA Neon branch exists with separate credentials and reset/refresh rules.
+- Upstash Redis production database is in Singapore.
+- Upstash Redis starts on pay-as-you-go and usage monitoring/review is planned.
+- QA Upstash Redis is separate from production and also in Singapore.
 - Restore process understood at a basic level.
 - Cloudflare Access for admin added if simple.
 - Cloudflare Turnstile added only if public form protection is needed.
@@ -161,10 +183,13 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 ## Analytics And Visibility
 
 - Cloudflare Web Analytics enabled.
+- Better Stack uptime checks and alerts configured for storefront and Medusa API.
+- Sentry error tracking configured for storefront and Medusa backend if included before launch.
 - No Google Analytics.
 - No Meta/ads pixels.
 - No customer/payment/order data sent to analytics.
-- Railway/Vercel logs accessible.
+- Vercel and Medusa runtime logs accessible.
+- Caddy and Docker logs accessible on Lightsail.
 - Razorpay dashboard accessible.
 - Resend dashboard accessible.
 - Medusa Admin order visibility confirmed.
@@ -172,6 +197,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 ## Production Cutover
 
 - Domain DNS records configured (can be added later).
+- Cloudflare is authoritative DNS before production cutover.
 - `www` points to production storefront.
 - Apex/root redirects to `www`.
 - Admin/API subdomains configured if used.

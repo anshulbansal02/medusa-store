@@ -6,14 +6,12 @@ import {
 } from "@medusajs/framework/utils";
 import {
   createApiKeysWorkflow,
-  createCollectionsWorkflow,
   createInventoryLevelsWorkflow,
   createProductCategoriesWorkflow,
   createProductsWorkflow,
   createRegionsWorkflow,
   createSalesChannelsWorkflow,
   createShippingOptionsWorkflow,
-  createShippingProfilesWorkflow,
   createStockLocationsWorkflow,
   createStoresWorkflow,
   createTaxRegionsWorkflow,
@@ -22,7 +20,14 @@ import {
 } from "@medusajs/medusa/core-flows";
 
 import { getRazorpayConfig } from "../config/env";
-import { createSeedProducts } from "../seed/catalog";
+import { createSeedProducts } from "../seed/products";
+import {
+  createSeedShippingOptions,
+  seedCountryCodes,
+  seedCurrencyCode,
+  seedInventoryQuantity,
+  seedProductCategoryNames,
+} from "../seed/storefront";
 
 export default async function initial_data_seed({
   container,
@@ -36,7 +41,6 @@ export default async function initial_data_seed({
     ModuleRegistrationName.FULFILLMENT
   );
 
-  const countries = ["in"];
   const paymentProviders = getRazorpayConfig().isConfigured
     ? ["pp_system_default", "pp_razorpay_razorpay"]
     : ["pp_system_default"];
@@ -49,7 +53,7 @@ export default async function initial_data_seed({
       salesChannelsData: [
         {
           name: "Default Sales Channel",
-          description: "Created by Medusa",
+          description: "Primary online storefront sales channel.",
         },
       ],
     },
@@ -61,7 +65,7 @@ export default async function initial_data_seed({
     input: {
       api_keys: [
         {
-          title: "Default Publishable API Key",
+          title: "Storefront Publishable API Key",
           type: "publishable",
           created_by: "",
         },
@@ -76,16 +80,14 @@ export default async function initial_data_seed({
     },
   });
 
-  const {
-    result: [store],
-  } = await createStoresWorkflow(container).run({
+  await createStoresWorkflow(container).run({
     input: {
       stores: [
         {
           name: "Default Store",
           supported_currencies: [
             {
-              currency_code: "inr",
+              currency_code: seedCurrencyCode,
               is_default: true,
             },
           ],
@@ -101,8 +103,8 @@ export default async function initial_data_seed({
       regions: [
         {
           name: "India",
-          currency_code: "inr",
-          countries,
+          currency_code: seedCurrencyCode,
+          countries: seedCountryCodes,
           payment_providers: paymentProviders,
         },
       ],
@@ -113,7 +115,7 @@ export default async function initial_data_seed({
 
   logger.info("Seeding tax regions...");
   await createTaxRegionsWorkflow(container).run({
-    input: countries.map((country_code) => ({
+    input: seedCountryCodes.map((country_code) => ({
       country_code,
       provider_id: "tp_system",
     })),
@@ -182,76 +184,11 @@ export default async function initial_data_seed({
   });
 
   await createShippingOptionsWorkflow(container).run({
-    input: [
-      {
-        name: "Standard Shipping",
-        price_type: "flat",
-        provider_id: "manual_manual",
-        service_zone_id: fulfillmentSet.service_zones[0].id,
-        shipping_profile_id: shippingProfile.id,
-        type: {
-          label: "Standard",
-          description: "Ship in 2-3 days.",
-          code: "standard",
-        },
-        prices: [
-          {
-            currency_code: "inr",
-            amount: 149,
-          },
-          {
-            region_id: region.id,
-            amount: 149,
-          },
-        ],
-        rules: [
-          {
-            attribute: "enabled_in_store",
-            value: "true",
-            operator: "eq",
-          },
-          {
-            attribute: "is_return",
-            value: "false",
-            operator: "eq",
-          },
-        ],
-      },
-      {
-        name: "Express Shipping",
-        price_type: "flat",
-        provider_id: "manual_manual",
-        service_zone_id: fulfillmentSet.service_zones[0].id,
-        shipping_profile_id: shippingProfile.id,
-        type: {
-          label: "Express",
-          description: "Ship in 24 hours.",
-          code: "express",
-        },
-        prices: [
-          {
-            currency_code: "inr",
-            amount: 299,
-          },
-          {
-            region_id: region.id,
-            amount: 299,
-          },
-        ],
-        rules: [
-          {
-            attribute: "enabled_in_store",
-            value: "true",
-            operator: "eq",
-          },
-          {
-            attribute: "is_return",
-            value: "false",
-            operator: "eq",
-          },
-        ],
-      },
-    ],
+    input: createSeedShippingOptions({
+      regionId: region.id,
+      serviceZoneId: fulfillmentSet.service_zones[0].id,
+      shippingProfileId: shippingProfile.id,
+    }),
   });
   logger.info("Finished seeding fulfillment data.");
 
@@ -269,24 +206,10 @@ export default async function initial_data_seed({
     container
   ).run({
     input: {
-      product_categories: [
-        {
-          name: "Dresses",
-          is_active: true,
-        },
-        {
-          name: "Co-ords",
-          is_active: true,
-        },
-        {
-          name: "Tops",
-          is_active: true,
-        },
-        {
-          name: "Occasion Edit",
-          is_active: true,
-        },
-      ],
+      product_categories: seedProductCategoryNames.map((name) => ({
+        name,
+        is_active: true,
+      })),
     },
   });
 
@@ -315,7 +238,7 @@ export default async function initial_data_seed({
     input: {
       inventory_levels: inventoryItems.map((item) => ({
         location_id: stockLocation.id,
-        stocked_quantity: 1000000,
+        stocked_quantity: seedInventoryQuantity,
         inventory_item_id: item.id,
       })),
     },

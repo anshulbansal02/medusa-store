@@ -7,7 +7,7 @@ import { absoluteUrl } from "@/lib/config/site";
 const page = policyPages.faq;
 
 export const metadata: Metadata = {
-  title: "FAQ | The Label",
+  title: page.metadataTitle,
   description: page.description,
   alternates: {
     canonical: absoluteUrl("/faq"),

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getCategoryByHandle } from "@/lib/medusa/categories";
 import { medusaFetch } from "@/lib/medusa/client";
 import {

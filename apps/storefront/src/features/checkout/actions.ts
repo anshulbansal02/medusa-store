@@ -1,7 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
+
+import { siteContent } from "@/content/site-content";
+import {
+  clearRazorpayCheckoutSession,
+  getRazorpayCheckoutSession,
+  saveRazorpayCheckoutSession,
+} from "@/features/checkout/razorpay-checkout-session";
 import {
   type CheckoutAddressInput,
   checkoutAddressSchema,
@@ -53,50 +59,11 @@ type CompletePaymentActionResult =
       message: string;
     };
 
-const razorpayCheckoutCookieName = "the_label_razorpay_checkout";
+const content = siteContent.checkout;
 
 function revalidateCheckoutViews() {
   revalidatePath("/checkout");
   revalidatePath("/bag");
-}
-
-function getRazorpayCheckoutCookieOptions() {
-  return {
-    httpOnly: true,
-    maxAge: 60 * 15,
-    path: "/",
-    sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
-  };
-}
-
-function serializeRazorpayCheckout(cartId: string, orderId: string) {
-  return JSON.stringify({ cartId, orderId });
-}
-
-function parseRazorpayCheckout(value: string | undefined) {
-  if (!value) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(value) as unknown;
-
-    if (
-      typeof parsed === "object" &&
-      parsed !== null &&
-      "cartId" in parsed &&
-      "orderId" in parsed &&
-      typeof parsed.cartId === "string" &&
-      typeof parsed.orderId === "string"
-    ) {
-      return parsed;
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
 }
 
 export async function saveCheckoutAddressAction(
@@ -107,7 +74,7 @@ export async function saveCheckoutAddressAction(
   if (!result.success) {
     return {
       ok: false,
-      message: "Check the highlighted fields and try again.",
+      message: content.addressFormMessages.validationError,
     };
   }
 
@@ -117,12 +84,12 @@ export async function saveCheckoutAddressAction(
 
     return {
       ok: true,
-      message: "Address saved.",
+      message: content.addressFormMessages.saved,
     };
   } catch {
     return {
       ok: false,
-      message: "Address could not be saved. Try again.",
+      message: content.addressFormMessages.error,
     };
   }
 }
@@ -133,26 +100,24 @@ export async function startRazorpayPaymentAction(): Promise<RazorpayPaymentActio
   if (!cart || cart.items.length === 0) {
     return {
       ok: false,
-      message: "Your bag is empty.",
+      message: content.payment.emptyBag,
     };
   }
 
   if (!cart.shippingAddress || !cart.selectedShippingOptionId) {
     return {
       ok: false,
-      message: "Add the address and choose shipping before payment.",
+      message: content.payment.detailsMissing,
     };
   }
 
   try {
     const payment = await createRazorpayPaymentSession(cart.id);
-    const cookieStore = await cookies();
 
-    cookieStore.set(
-      razorpayCheckoutCookieName,
-      serializeRazorpayCheckout(cart.id, payment.orderId),
-      getRazorpayCheckoutCookieOptions(),
-    );
+    await saveRazorpayCheckoutSession({
+      cartId: cart.id,
+      orderId: payment.orderId,
+    });
 
     return {
       ok: true,
@@ -172,7 +137,7 @@ export async function startRazorpayPaymentAction(): Promise<RazorpayPaymentActio
   } catch {
     return {
       ok: false,
-      message: "Payment could not be started. Try again.",
+      message: content.payment.startError,
     };
   }
 }
@@ -185,15 +150,12 @@ export async function verifyAndCompleteRazorpayPaymentAction(
   if (!cart) {
     return {
       ok: false,
-      message: "Your bag session has expired.",
+      message: content.payment.expiredSession,
     };
   }
 
   try {
-    const cookieStore = await cookies();
-    const expectedCheckout = parseRazorpayCheckout(
-      cookieStore.get(razorpayCheckoutCookieName)?.value,
-    );
+    const expectedCheckout = await getRazorpayCheckoutSession();
 
     if (
       !expectedCheckout ||
@@ -202,14 +164,14 @@ export async function verifyAndCompleteRazorpayPaymentAction(
     ) {
       return {
         ok: false,
-        message: "Payment verification did not match this checkout session.",
+        message: content.payment.sessionMismatch,
       };
     }
 
     await verifyRazorpayPayment(payload);
     const orderId = await completeCartPayment(cart.id);
 
-    cookieStore.delete(razorpayCheckoutCookieName);
+    await clearRazorpayCheckoutSession();
     await clearCurrentCart();
     revalidateCheckoutViews();
 
@@ -220,7 +182,7 @@ export async function verifyAndCompleteRazorpayPaymentAction(
   } catch {
     return {
       ok: false,
-      message: "Payment was received but the order could not be confirmed.",
+      message: content.payment.confirmationError,
     };
   }
 }
@@ -234,7 +196,7 @@ export async function selectShippingMethodAction(
   if (typeof optionId !== "string" || optionId.length === 0) {
     return {
       ok: false,
-      message: "Choose a shipping method.",
+      message: content.shippingForm.chooseMethodMessage,
     } satisfies CheckoutActionResult;
   }
 
@@ -244,12 +206,12 @@ export async function selectShippingMethodAction(
 
     return {
       ok: true,
-      message: "Shipping method saved.",
+      message: content.shippingForm.savedMessage,
     } satisfies CheckoutActionResult;
   } catch {
     return {
       ok: false,
-      message: "Shipping method could not be saved. Try again.",
+      message: content.shippingForm.errorMessage,
     } satisfies CheckoutActionResult;
   }
 }

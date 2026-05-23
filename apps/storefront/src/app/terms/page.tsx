@@ -7,7 +7,7 @@ import { absoluteUrl } from "@/lib/config/site";
 const page = policyPages.terms;
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions | The Label",
+  title: page.metadataTitle,
   description: page.description,
   alternates: {
     canonical: absoluteUrl("/terms"),

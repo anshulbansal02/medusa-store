@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { siteContent } from "@/content/site-content";
 import { cn } from "@/lib/utils";
 
 type ProductGalleryProps = {
@@ -20,6 +21,7 @@ type ProductGalleryProps = {
 };
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
+  const content = siteContent.product.gallery;
   const [activeIndex, setActiveIndex] = useState(0);
   const activeImage = images[activeIndex] ?? images[0];
   const hasThumbnails = images.length > 1;
@@ -43,7 +45,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               type="button"
               variant="ghost"
               size="icon"
-              aria-label={`View ${productName} image ${index + 1}`}
+              aria-label={`${content.thumbnailLabel} ${index + 1}`}
               aria-pressed={activeIndex === index}
               onClick={() => setActiveIndex(index)}
               className={cn(
@@ -78,13 +80,13 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                   ? "lg:order-2 lg:aspect-[5/6]"
                   : "lg:aspect-[4/5]",
               )}
-              aria-label={`Open ${productName} image viewer`}
+              aria-label={`${content.openViewerLabel}: ${productName}`}
             />
           }
         >
           <Image
             src={activeImage}
-            alt={`${productName} view ${activeIndex + 1}`}
+            alt={`${productName} ${content.imageAltSuffix} ${activeIndex + 1}`}
             fill
             loading="eager"
             fetchPriority="high"
@@ -100,9 +102,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           showCloseButton={false}
           className="h-[calc(100svh-1.5rem)] max-w-5xl rounded-none bg-transparent p-0 ring-0 sm:max-w-5xl"
         >
-          <DialogTitle className="sr-only">{productName} images</DialogTitle>
+          <DialogTitle className="sr-only">
+            {productName} {content.dialogTitleSuffix}
+          </DialogTitle>
           <DialogClose
-            aria-label="Close image viewer"
+            aria-label={content.closeViewerLabel}
             render={
               <Button
                 variant="ghost"
@@ -123,7 +127,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 <div className="relative h-full w-full">
                   <Image
                     src={image}
-                    alt={index === 0 ? `${productName} full image` : ""}
+                    alt={
+                      index === 0
+                        ? `${productName} ${content.fullImageAltSuffix}`
+                        : ""
+                    }
                     fill
                     loading="lazy"
                     sizes="100vw"

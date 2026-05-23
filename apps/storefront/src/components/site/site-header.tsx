@@ -28,7 +28,7 @@ export async function SiteHeader() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-30 border-border/70 border-b bg-background/92 backdrop-blur-sm">
-      <div className="border-border/70 border-b px-4 py-2 text-micro uppercase tracking-[0.08em] text-muted-foreground sm:px-6 sm:tracking-[0.12em] lg:px-8">
+      <div className="border-border/70 border-b px-4 py-2 text-micro uppercase tracking-label text-muted-foreground sm:px-6 sm:tracking-label-wide lg:px-8">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
           {siteContent.header.announcementItems.map((item) => (
             <span key={item}>{item}</span>
@@ -42,7 +42,7 @@ export async function SiteHeader() {
 
         <nav
           className="hidden items-center gap-7 text-sm text-muted-foreground lg:flex"
-          aria-label="Primary navigation"
+          aria-label={siteContent.header.primaryNavigationLabel}
         >
           {navItems.map((item) => (
             <Link

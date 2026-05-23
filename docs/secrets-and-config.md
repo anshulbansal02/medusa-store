@@ -40,14 +40,31 @@ Use two hosted environments:
 Rules:
 
 - Vercel stores storefront QA/prod environment variables.
-- Railway stores Medusa QA/prod environment variables.
+- Production Medusa runtime variables are stored in GitHub environment secrets and written to the approved Lightsail deployment path by GitHub Actions during deploy.
+- QA Medusa runtime variables are stored in GitHub environment secrets and written to the approved Lightsail deployment path by GitHub Actions during QA deploy/start.
 - QA and production use separate Razorpay keys, webhook secrets, database URLs, admin credentials, JWT secrets, cookie secrets, and object storage credentials.
 - QA must not write to production data stores.
 - Local uses portless for UI app URLs, direct fixed nonstandard API ports, Docker Compose Postgres/Redis, and local app env files.
 
-## Railway Auth And Access Controls (Phase 1)
+## Medusa Runtime Access Controls
 
-Use Railway’s built-in access controls instead of custom auth:
+Production Medusa compute runs on AWS Lightsail. GitHub Actions writes runtime env files from GitHub environment secrets during deploy.
+
+Rules:
+
+- Do not commit production `.env` files.
+- Do not paste production secrets into docs, chat, issue trackers, or Terraform variables committed to Git.
+- Keep the Lightsail SSH surface narrow and key-based.
+- Keep production runtime secrets readable only by the deployment user/process.
+- Keep QA and production runtime variables separate.
+- Terraform may manage non-secret infrastructure settings, but must not commit live runtime secret values.
+- Use GitHub environment protection/approval for production secrets and deploys.
+
+## Railway Auth And Access Controls (Historical Phase 1 Notes)
+
+These notes applied to the original Railway-based phase 1 plan. Keep them only as historical reference until QA/staging is re-decided.
+
+Use Railway’s built-in access controls instead of custom auth if Railway remains in use for QA:
 
 - Keep the workspace/project membership tight:
   - Workspace roles: Admin, Member, Deployer.
@@ -97,6 +114,26 @@ Expected secret/config groups:
 - Cloudflare Access configuration if enabled.
 - Cloudflare Web Analytics site token for the storefront.
 
+Database:
+
+- Production `DATABASE_URL` points to Neon Postgres in Singapore.
+- Prefer Neon pooled runtime connection strings unless Medusa or Neon guidance requires direct connections for a specific command.
+- QA/staging must use a separate Neon branch with separate credentials and must not write to production data.
+
+Redis:
+
+- Production `REDIS_URL` points to Upstash Redis in Singapore.
+- Start production Redis on Upstash pay-as-you-go pricing.
+- QA/staging `REDIS_URL` points to a separate Upstash Redis database in Singapore.
+- Start QA/staging Redis on Upstash pay-as-you-go pricing.
+- QA/staging must not share production Redis.
+
+QA/staging compute:
+
+- QA Medusa may run on the production Lightsail instance only during active test windows.
+- QA containers must stay stopped by default.
+- QA must use separate secrets from production even when sharing compute.
+
 ## Rotation
 
 Rotate secrets when:
@@ -115,6 +152,7 @@ Rules:
 
 ## Railway Operational Security Notes
 
+- These notes apply only if Railway remains in use for QA/staging.
 - Use Project Tokens in GitHub Actions for Railway deploys instead of account/workspace tokens.
 - For the QA Medusa service, use Railway reference variables for database access, such as `DATABASE_URL=${{Postgres.DATABASE_URL}}`, instead of copying rendered database credentials.
 - Keep `NODE_ENV=production`, `MEDUSA_WORKER_MODE=shared`, `JWT_SECRET`, `COOKIE_SECRET`, `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, and `MEDUSA_BACKEND_URL` configured on the Railway QA Medusa service.

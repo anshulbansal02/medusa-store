@@ -1,0 +1,86 @@
+export const checkoutContent = {
+  checkout: {
+    metadata: {
+      title: "Checkout | The Label",
+      description: "Add delivery details and choose shipping for your order.",
+    },
+    emptyTitle: "Your bag is empty.",
+    emptyDescription: "Add a style before entering delivery details.",
+    emptyAction: "Shop new arrivals",
+    eyebrow: "Checkout",
+    title: "Delivery details",
+    addressTitle: "Address",
+    addressDescription:
+      "India-only delivery for this launch. Billing uses the same address.",
+    shippingTitle: "Shipping",
+    shippingDescription:
+      "Save the address first, then choose a delivery method.",
+    noShippingTitle: "No shipping options available.",
+    noShippingDescription:
+      "Please review the delivery address or contact the store team for help.",
+    addressRequiredTitle: "Address needed first.",
+    addressRequiredDescription:
+      "Shipping options appear after the delivery address is saved.",
+    summaryTitle: "Order summary",
+    itemSummaryLabel: "Items",
+    shippingPendingLabel: "Choose method",
+    totalLabel: "Total",
+    quantityPrefix: "Qty",
+    addressForm: {
+      emailLabel: "Email",
+      firstNameLabel: "First name",
+      lastNameLabel: "Last name",
+      phoneLabel: "Phone",
+      address1Label: "Address",
+      address2Label: "Apartment, floor, landmark",
+      cityLabel: "City",
+      provinceLabel: "State",
+      postalCodeLabel: "PIN code",
+      savingLabel: "Saving address",
+      submitLabel: "Save and show shipping",
+      validation: {
+        email: "Enter a valid email.",
+        firstName: "Enter a first name.",
+        lastName: "Enter a last name.",
+        phone: "Enter a valid phone number.",
+        address1: "Enter an address.",
+        city: "Enter a city.",
+        province: "Enter a state.",
+        postalCode: "Enter a valid Indian PIN code.",
+      },
+    },
+    shippingForm: {
+      savingLabel: "Saving...",
+      submitLabel: "Save shipping method",
+      chooseMethodMessage: "Choose a shipping method.",
+      savedMessage: "Shipping method saved.",
+      errorMessage: "Shipping method could not be saved. Try again.",
+    },
+    payment: {
+      storeName: "The Label",
+      processingLabel: "Processing...",
+      buttonLabel: "Pay securely",
+      unavailable:
+        "Payment is temporarily unavailable. Please contact support.",
+      detailsRequired: "Add address and shipping before payment.",
+      preparing: "Preparing secure payment.",
+      ready: "Secure prepaid checkout powered by Razorpay.",
+      scriptNotReady: "Payment is not ready yet.",
+      startError: "Payment could not be started. Try again.",
+      loadError: "Payment could not be loaded. Try again.",
+      dismissed: "Payment was not completed.",
+      emptyBag: "Your bag is empty.",
+      detailsMissing: "Add the address and choose shipping before payment.",
+      expiredSession: "Your bag session has expired.",
+      sessionMismatch:
+        "Payment verification did not match this checkout session.",
+      confirmationError:
+        "Payment was received but the order could not be confirmed.",
+    },
+    addressFormMessages: {
+      validationError: "Check the highlighted fields and try again.",
+      saved: "Address saved.",
+      error: "Address could not be saved. Try again.",
+    },
+  },
+} as const;

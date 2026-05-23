@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { siteContent } from "@/content/site-content";
 import {
   type OrderLookupInput,
   orderLookupSchema,
@@ -37,6 +38,7 @@ function getOrderIdFromReference(reference: string) {
 }
 
 export function TrackOrderForm() {
+  const content = siteContent.trackOrder.form;
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
@@ -61,7 +63,7 @@ export function TrackOrderForm() {
       const issue = result.error.issues[0];
 
       setError("orderReference", {
-        message: issue?.message ?? "Enter an order ID or order link.",
+        message: issue?.message ?? content.invalidInput,
       });
       return;
     }
@@ -70,14 +72,13 @@ export function TrackOrderForm() {
 
     if (!orderId) {
       setError("orderReference", {
-        message:
-          "Use the order ID that starts with order_ or paste the confirmation link.",
+        message: content.invalidReference,
       });
       return;
     }
 
     startTransition(() => {
-      setMessage("Opening order details...");
+      setMessage(content.pendingMessage);
       router.push(`/order-confirmation/${encodeURIComponent(orderId)}`);
     });
   }
@@ -85,13 +86,13 @@ export function TrackOrderForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
       <div className="grid gap-2">
-        <Label htmlFor="orderReference">Order ID or confirmation link</Label>
+        <Label htmlFor="orderReference">{content.label}</Label>
         <Input
           id="orderReference"
           autoComplete="off"
           spellCheck={false}
           aria-invalid={Boolean(errors.orderReference)}
-          placeholder="order_..."
+          placeholder={content.placeholder}
           className="h-12 rounded-none border-border bg-background px-3"
           {...register("orderReference")}
         />
@@ -109,7 +110,7 @@ export function TrackOrderForm() {
           size="lg"
           className="h-12 rounded-none px-6"
         >
-          {isPending ? "Opening..." : "View order"}
+          {isPending ? content.pendingButton : content.submitButton}
           <ArrowRight className="size-4 stroke-[1.6]" aria-hidden="true" />
         </Button>
         {message ? (

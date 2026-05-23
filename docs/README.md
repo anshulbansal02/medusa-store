@@ -36,6 +36,6 @@ Payments: Razorpay prepaid
 Email: Resend
 Media: Cloudflare R2
 Analytics: Cloudflare Web Analytics
-Hosting: Vercel Pro + Railway Pro
-Database/cache: Railway Postgres + Railway Redis
+Hosting: Vercel Pro + AWS Lightsail 4 GB for production Medusa compute
+Database/cache: Neon Postgres Singapore + Upstash Redis Singapore pay-as-you-go
 ```

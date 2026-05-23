@@ -1,3 +1,5 @@
+import "server-only";
+
 import { formatStorePrice, medusaFetch } from "@/lib/medusa/client";
 
 type MedusaOrderItem = {

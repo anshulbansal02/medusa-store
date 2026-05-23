@@ -28,8 +28,9 @@ export default async function ShopPage() {
     getProducts({ limit: 24 }),
     getProductCategories(12),
   ]);
+  const content = siteContent.shop;
   const categoryLinks = [
-    { href: "/shop", label: siteContent.shop.allCategoryLabel },
+    { href: "/shop", label: content.allCategoryLabel },
     ...categories.map((category) => ({
       href: `/shop/${category.handle}`,
       label: category.name,
@@ -45,20 +46,20 @@ export default async function ShopPage() {
           <div className="grid gap-8 border-border border-b pb-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                {siteContent.shop.eyebrow}
+                {content.eyebrow}
               </p>
               <h1 className="mt-3 max-w-3xl font-heading text-6xl leading-none sm:text-8xl">
-                {siteContent.shop.title}
+                {content.title}
               </h1>
             </div>
             <p className="max-w-2xl text-muted-foreground lg:justify-self-end">
-              {siteContent.shop.description}
+              {content.description}
             </p>
           </div>
 
           <div className="flex flex-col gap-5 py-6 md:flex-row md:items-center md:justify-between">
             <nav
-              aria-label="Shop categories"
+              aria-label={content.categoryNavigationLabel}
               className="-mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0"
             >
               {categoryLinks.map((item) => (
@@ -73,7 +74,7 @@ export default async function ShopPage() {
               ))}
             </nav>
             <p className="text-muted-foreground text-sm">
-              {products.length} {siteContent.shop.countLabel}
+              {products.length} {content.countLabel}
             </p>
           </div>
 
@@ -89,11 +90,9 @@ export default async function ShopPage() {
             </div>
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
-              <h2 className="text-base font-medium">
-                {siteContent.shop.emptyTitle}
-              </h2>
+              <h2 className="text-base font-medium">{content.emptyTitle}</h2>
               <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                {siteContent.shop.emptyDescription}
+                {content.emptyDescription}
               </p>
             </div>
           )}
@@ -102,7 +101,7 @@ export default async function ShopPage() {
 
       <section className="border-border border-y px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[1440px] gap-5 text-sm md:grid-cols-3">
-          {siteContent.shop.valueStrip.map((item) => (
+          {content.valueStrip.map((item) => (
             <p key={item.title}>
               <span className="font-medium">{item.title}</span> {item.text}
             </p>

@@ -32,6 +32,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         ),
       )
     : products;
+  const content = siteContent.search;
 
   return (
     <main className="min-h-screen">
@@ -40,11 +41,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
         <div className="mx-auto max-w-[1440px]">
           <div className="border-border border-b pb-7">
-            <p className="text-muted-foreground text-sm">
-              {siteContent.search.eyebrow}
-            </p>
+            <p className="text-muted-foreground text-sm">{content.eyebrow}</p>
             <h1 className="mt-3 font-heading text-6xl leading-none sm:text-8xl">
-              {siteContent.search.title}
+              {content.title}
             </h1>
           </div>
 
@@ -53,11 +52,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               type="search"
               name="q"
               defaultValue={query}
-              placeholder={siteContent.search.placeholder}
+              placeholder={content.placeholder}
               className="h-12 min-w-0 flex-1 rounded-none border-border bg-background px-4"
             />
             <Button type="submit" size="lg" className="h-12 rounded-none px-6">
-              {siteContent.search.action}
+              {content.action}
             </Button>
           </form>
 
@@ -66,10 +65,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               {query
                 ? `${results.length} ${
                     results.length === 1
-                      ? siteContent.search.resultSingular
-                      : siteContent.search.resultPlural
+                      ? content.resultSingular
+                      : content.resultPlural
                   }`
-                : siteContent.search.latestLabel}
+                : content.latestLabel}
             </p>
             {query ? (
               <Link
@@ -77,7 +76,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 prefetch={false}
                 className="underline-offset-4 hover:underline"
               >
-                {siteContent.search.clearAction}
+                {content.clearAction}
               </Link>
             ) : null}
           </div>
@@ -94,16 +93,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </div>
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
-              <h2 className="font-medium">{siteContent.search.emptyTitle}</h2>
+              <h2 className="font-medium">{content.emptyTitle}</h2>
               <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                {siteContent.search.emptyDescription}
+                {content.emptyDescription}
               </p>
               <Link
                 href="/shop"
                 prefetch={false}
                 className="mt-5 inline-flex text-sm underline-offset-4 hover:underline"
               >
-                {siteContent.search.browseAction}
+                {content.browseAction}
               </Link>
             </div>
           )}

@@ -15,9 +15,9 @@ Last reviewed: 2026-05-15
 ```txt
 Customer
   -> Next.js storefront on Vercel
-  -> Medusa Store API on Railway
+  -> Medusa Store API on AWS Lightsail
   -> Medusa backend/admin
-  -> Railway Postgres + Railway Redis
+  -> Neon Postgres + Upstash Redis
 
 Integrations:
   Razorpay prepaid payments
@@ -84,21 +84,68 @@ Vercel Pro:
   QA storefront from dev branch
   Production storefront from main branch (not deployed in phase 1)
 
-Railway Pro:
-  QA Medusa backend/admin
-  QA Postgres
-  QA Redis only when needed for production-like QA flows
-  Production Medusa/Postgres/Redis configured, production deploy disabled in phase 1
+AWS Lightsail:
+  Production Medusa backend/admin compute
+  Single 4 GB instance in Singapore
+  Docker Compose Medusa server and worker containers
+  Caddy reverse proxy and HTTPS termination
+
+External managed data services:
+  Neon Postgres in Singapore
+  Upstash Redis in Singapore, pay-as-you-go initially
 
 Cloudflare:
-  DNS after transfer from Shopify-managed domain
+  Authoritative DNS after cutover from Shopify-managed DNS
+  Optional proxy/security layer in front of the Lightsail origin
   R2 media storage
   Web Analytics
   Optional Turnstile
   Optional Access for admin
 ```
 
-Use Railway Postgres for Medusa because Medusa runs on Railway. Do not use Supabase only as a remote Postgres database unless a clear Supabase-specific need appears.
+Core backend services run in Singapore for v1:
+
+- Medusa compute: AWS Lightsail Singapore.
+- Postgres: Neon AWS Asia Pacific Singapore (`aws-ap-southeast-1`).
+- Redis: Upstash Singapore, pay-as-you-go initially.
+
+Do not split Medusa compute, Postgres, and Redis across India and Singapore for v1. Mixed regions would add repeated cross-region calls during cart, checkout, order, admin, and workflow operations. Revisit an all-India backend only if measured production latency requires it or if Neon adds a suitable India region.
+
+Production Medusa compute runs on AWS Lightsail, but durable state must not live on the Lightsail instance. Keep production Postgres, Redis, and media external so the app host can be replaced without moving order, catalog, customer, payment, workflow, or media data.
+
+Use Caddy on the Lightsail instance as the origin reverse proxy and HTTPS manager. Cloudflare DNS/proxy may sit in front, but Cloudflare Tunnel is not the primary public ingress for v1.
+
+Run Medusa with Docker Compose using one production image and separate `medusa-server` and `medusa-worker` services. Keep deployment mechanics, registry choice, and image tagging as CI/CD decisions.
+
+Use GitHub Container Registry for v1 Medusa production images. Keep images private and deploy immutable version tags so rollback does not depend on `latest`.
+
+Production deploys start as controlled Docker Compose updates from GitHub Actions: pull an immutable GHCR image tag, run migrations intentionally, restart services, run a health check, and rollback by redeploying the previous tag. Add `docker-rollout` later for near-zero-downtime `medusa-server` updates after the baseline deploy path is stable. Worker updates can use normal Compose restart semantics.
+
+Production Medusa database migrations require an explicit manual approval gate in the deployment workflow. Use expand-migrate-contract for schema changes and do not combine destructive schema cleanup with the same-minute production app cutover.
+
+Use Terraform, not OpenTofu, for v1 infrastructure as code. Terraform owns durable infrastructure, not application releases. Use Terraform for AWS Lightsail, Cloudflare DNS/R2, Upstash Redis, Vercel non-secret project/domain configuration, and Neon resources where provider support is reliable. Use GitHub Actions for image builds, GHCR pushes, deploys, migrations, health checks, and rollback. Do not commit live secret values through Terraform.
+
+Terraform code lives under `infra/terraform` with environment directories and shared modules.
+
+Terraform remote state uses an AWS S3 backend with DynamoDB locking. Use a small bootstrap step/configuration for the state bucket and lock table before regular environment applies.
+
+Terraform uses separate environment directories for `prod` and `qa`, with separate state and shared modules. Do not use Terraform workspaces for v1 environment separation.
+
+GitHub Actions writes Medusa runtime env files to Lightsail from GitHub environment secrets during deploy. Production uses GitHub environment protection/approval. Terraform must not manage live runtime secret values.
+
+Lightsail host bootstrap is a separate committed script/runbook under `infra/`. Terraform creates the VM and network resources; bootstrap installs Docker, Docker Compose plugin, Caddy, deployment directories, permissions, and approved host-level hardening. App deployments remain in GitHub Actions.
+
+Use Better Stack for uptime checks/alerts and Sentry for storefront and Medusa application error tracking. Keep local Docker and Caddy logs available on Lightsail for server investigation. Do not self-host the observability stack on the production VM for v1.
+
+Enable automatic Lightsail snapshots for the production instance as host recovery convenience. Treat snapshots as separate from data backups; durable data remains in Neon, Upstash, R2, GHCR, Terraform, and bootstrap/deploy automation. Review snapshot storage cost after the first month.
+
+QA/staging Medusa may share the production Lightsail instance, but QA containers stay stopped by default and run only during active test windows. QA must use separate Neon branch/database, separate Redis, separate secrets, and Razorpay test credentials. Move QA to separate compute if it starts affecting production resources or if always-on QA becomes necessary.
+
+QA/staging Redis uses a separate Upstash Redis database in Singapore on pay-as-you-go pricing. QA must never share production Redis.
+
+QA/staging Postgres uses a Neon branch with separate QA/staging credentials. QA must never write to the production Neon branch/database. Document branch reset/refresh rules before launch.
+
+Use Neon Postgres in Singapore for production Medusa. Use pooled application connection strings unless Medusa or Neon guidance requires direct connections for a specific operation. Use Upstash Redis in Singapore for production Redis, starting on pay-as-you-go pricing. Do not provision production database or cache on the Lightsail disk.
 
 ## Redis
 
@@ -218,6 +265,8 @@ qa-api.brand.com     QA API, only if hosted QA backend exists
 qa-admin.brand.com   QA Admin, only if hosted QA backend exists
 ```
 
+Manage production DNS in Cloudflare after a planned cutover from the current Shopify-managed DNS setup. This does not require transferring registrar ownership unless the business intentionally chooses to do that later.
+
 Do not mount Medusa Admin/API under storefront paths unless there is a specific future reason.
 
 ## Environments
@@ -243,7 +292,9 @@ QA:
 Production:
 
 - Production storefront from `main`.
-- Production Medusa/Postgres/Redis on Railway.
+- Production Medusa compute on AWS Lightsail 4 GB in Singapore.
+- Production Postgres on Neon in Singapore.
+- Production Redis on Upstash in Singapore, pay-as-you-go initially.
 - Razorpay live keys.
 - Resend production domain.
 
@@ -254,19 +305,23 @@ Required:
 - HTTPS everywhere.
 - Strong Medusa Admin credentials.
 - Separate admin accounts; no shared passwords.
-- Secrets only in Vercel/Railway secret stores.
+- Secrets only in approved runtime/platform secret stores.
 - Separate QA/prod secrets.
 - CORS restricted to known storefront/admin origins.
 - Razorpay signature verification.
 - Webhook signature verification where available.
 - No secrets, raw payment tokens, or sensitive customer data in logs.
-- Postgres backups enabled.
+- Neon backup/restore posture verified before launch.
 - Least-privilege R2/S3 tokens.
 
 Preferred if simple:
 
-- Cloudflare Access in front of `admin.brand.com`.
 - Cloudflare Turnstile on public forms if spam appears or protection is needed.
+
+Required for production admin:
+
+- Cloudflare Access in front of `admin.brand.com`.
+- Medusa Admin authentication remains enabled behind Cloudflare Access.
 
 Avoid:
 
@@ -277,14 +332,16 @@ Avoid:
 Expected recurring services:
 
 - Vercel Pro: already acceptable.
-- Railway Pro: already acceptable; keep usage within included credit where practical.
+- AWS Lightsail 4 GB for production Medusa compute.
+- Neon Postgres in Singapore.
+- Upstash Redis in Singapore, pay-as-you-go initially.
 - Resend Free initially.
 - Cloudflare R2: low usage expected.
 - Cloudflare Web Analytics: free.
 
 Avoid adding:
 
-- Supabase unless Railway is not used for backend/database or a Supabase-specific feature is required.
+- Supabase unless it is explicitly selected as the Postgres provider or a Supabase-specific feature is required.
 - Heavy analytics infrastructure.
 - Separate CMS.
 - Extra queues/databases/search services before real need.

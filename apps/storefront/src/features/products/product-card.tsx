@@ -48,7 +48,7 @@ export function ProductCard({
         <div className="mt-3 flex items-start justify-between gap-4">
           <div>
             {categoryName ? (
-              <p className="mb-1 text-micro uppercase tracking-[0.12em] text-muted-foreground">
+              <p className="mb-1 text-micro uppercase tracking-label-wide text-muted-foreground">
                 {categoryName}
               </p>
             ) : null}

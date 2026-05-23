@@ -6,9 +6,11 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
+import { siteContent } from "@/content/site-content";
 import { useBagStore } from "@/features/cart/bag-store";
 
 export function BagToast() {
+  const content = siteContent.bag;
   const addedItem = useBagStore((state) => state.addedItem);
   const dismissAddedItem = useBagStore((state) => state.dismissAddedItem);
   const openBag = useBagStore((state) => state.openBag);
@@ -52,18 +54,19 @@ export function BagToast() {
         <div className="min-w-0 py-0.5">
           <p className="flex items-center gap-1.5 text-muted-foreground text-xs uppercase">
             <ShoppingBag className="size-3.5 stroke-[1.6]" aria-hidden="true" />
-            Added to bag
+            {content.addedToastLabel}
           </p>
           <p className="mt-1 truncate font-medium text-sm">{addedItem.name}</p>
           <p className="mt-1 truncate text-muted-foreground text-xs">
-            {addedItem.variant} · Qty {addedItem.quantity} · {addedItem.total}
+            {addedItem.variant} · {content.quantityPrefix} {addedItem.quantity}{" "}
+            · {addedItem.total}
           </p>
         </div>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          aria-label="Dismiss add to bag message"
+          aria-label={content.dismissAddedToastLabel}
           onClick={dismissAddedItem}
           className="size-8 rounded-none text-muted-foreground hover:bg-transparent hover:text-foreground"
         >
@@ -77,7 +80,7 @@ export function BagToast() {
           onClick={openBag}
           className="h-10 rounded-none hover:border-foreground"
         >
-          View bag
+          {content.viewFullAction}
         </Button>
         <Link
           href="/checkout"
@@ -85,7 +88,7 @@ export function BagToast() {
           onClick={dismissAddedItem}
           className="inline-flex h-10 items-center justify-center bg-primary px-4 text-primary-foreground text-sm transition hover:bg-primary/90"
         >
-          Checkout
+          {content.checkoutAction}
         </Link>
       </div>
     </div>

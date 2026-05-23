@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
+import { siteContent } from "@/content/site-content";
 import { ProductCard } from "@/features/products/product-card";
 import { useWishlistStore } from "@/features/wishlist/wishlist-store";
 import type { StorefrontProduct } from "@/lib/medusa/products";
@@ -20,6 +21,7 @@ const skeletonIds = [
 ];
 
 export function WishlistPageContent({ products }: WishlistPageContentProps) {
+  const content = siteContent.wishlist;
   const productIds = useWishlistStore((state) => state.productIds);
   const hasHydrated = useWishlistStore((state) => state.hasHydrated);
   const savedProducts = products.filter((product) =>
@@ -43,10 +45,9 @@ export function WishlistPageContent({ products }: WishlistPageContentProps) {
   if (savedProducts.length === 0) {
     return (
       <div className="border border-border px-5 py-8 sm:px-8">
-        <h2 className="text-base font-medium">No saved styles yet.</h2>
+        <h2 className="text-base font-medium">{content.emptyTitle}</h2>
         <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-          Save styles from product cards and return here when comparing your
-          shortlist.
+          {content.emptyDescription}
         </p>
         <Link
           href="/shop"
@@ -56,7 +57,7 @@ export function WishlistPageContent({ products }: WishlistPageContentProps) {
             "mt-6 h-11 rounded-none px-6",
           )}
         >
-          Browse shop
+          {content.browseAction}
         </Link>
       </div>
     );

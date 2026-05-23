@@ -1,5 +1,3 @@
-import crypto from "node:crypto";
-
 import type {
   AuthorizePaymentInput,
   AuthorizePaymentOutput,
@@ -44,10 +42,10 @@ import type {
 } from "./types";
 import {
   getHeader,
-  getRawWebhookBody,
   getWebhookAmount,
   getWebhookOrderId,
   getWebhookSessionId,
+  isWebhookSignatureValid,
 } from "./webhook";
 
 type InjectedDependencies = {
@@ -303,16 +301,12 @@ export default class RazorpayPaymentProviderService extends AbstractPaymentProvi
       return { action: PaymentActions.NOT_SUPPORTED };
     }
 
-    const expectedSignature = crypto
-      .createHmac("sha256", this.options_.webhook_secret)
-      .update(getRawWebhookBody(payload.rawData))
-      .digest("hex");
-    const expectedBuffer = Buffer.from(expectedSignature);
-    const signatureBuffer = Buffer.from(signature);
-
     if (
-      expectedBuffer.length !== signatureBuffer.length ||
-      !crypto.timingSafeEqual(expectedBuffer, signatureBuffer)
+      !isWebhookSignatureValid({
+        rawData: payload.rawData,
+        secret: this.options_.webhook_secret,
+        signature,
+      })
     ) {
       return { action: PaymentActions.NOT_SUPPORTED };
     }

@@ -1,5 +1,6 @@
 export const policyPages = {
   about: {
+    metadataTitle: "About | The Label",
     eyebrow: "About",
     title: "The store.",
     description: "About The Label and the launch collection.",
@@ -16,11 +17,12 @@ export const policyPages = {
       },
       {
         title: "Operations",
-        body: "Orders, fulfillment, and customer support will be handled by the store team through the commerce admin and connected payment, email, and shipping workflows.",
+        body: "Orders, fulfillment, and customer support are handled by the store team, with clear updates from checkout through dispatch.",
       },
     ],
   },
   returns: {
+    metadataTitle: "Returns | The Label",
     eyebrow: "Help",
     title: "Returns.",
     description: "Returns and exchanges policy for The Label.",
@@ -42,11 +44,12 @@ export const policyPages = {
     ],
   },
   refundCancellation: {
+    metadataTitle: "Refunds and Cancellations | The Label",
     eyebrow: "Policy",
     title: "Refunds.",
     description: "Refund and cancellation policy for The Label.",
     intro:
-      "Refund and cancellation rules are kept explicit here so checkout support can stay clear once payments are enabled.",
+      "Refund and cancellation rules are kept explicit so order support stays clear after payment.",
     sections: [
       {
         title: "Cancellations",
@@ -63,6 +66,7 @@ export const policyPages = {
     ],
   },
   terms: {
+    metadataTitle: "Terms and Conditions | The Label",
     eyebrow: "Legal",
     title: "Terms.",
     description: "Terms and conditions for using The Label storefront.",
@@ -75,7 +79,7 @@ export const policyPages = {
       },
       {
         title: "Product information",
-        body: "Product imagery, colors, fabric notes, prices, and availability are managed through the commerce backend. Small differences can occur due to photography, screen settings, and fabric behavior.",
+        body: "Product imagery, colors, fabric notes, prices, and availability are maintained by the store team. Small differences can occur due to photography, screen settings, and fabric behavior.",
       },
       {
         title: "Orders",
@@ -84,6 +88,7 @@ export const policyPages = {
     ],
   },
   privacy: {
+    metadataTitle: "Privacy Policy | The Label",
     eyebrow: "Legal",
     title: "Privacy.",
     description: "Privacy policy for The Label storefront.",
@@ -100,24 +105,24 @@ export const policyPages = {
       },
       {
         title: "Analytics",
-        body: "V1 analytics should remain lightweight and privacy-conscious. The storefront uses basic website analytics and must not send customer payment or order data to analytics tools.",
+        body: "The storefront uses basic website analytics to understand browsing behavior. Payment details and order contents are not used for analytics reporting.",
       },
     ],
   },
   faq: {
+    metadataTitle: "FAQ | The Label",
     eyebrow: "Help",
     title: "FAQ.",
     description: "Common questions about shopping from The Label.",
-    intro:
-      "A compact help page for common pre-purchase questions. The store team can expand this after launch patterns are clear.",
+    intro: "A compact help page for common pre-purchase questions.",
     sections: [
       {
         title: "Where do you ship?",
-        body: "The v1 storefront is India only. International shipping and currency are not part of the launch scope.",
+        body: "The store currently ships prepaid orders within India.",
       },
       {
         title: "Is cash on delivery available?",
-        body: "No. The v1 checkout is prepaid only through Razorpay-supported payment methods.",
+        body: "No. Checkout is prepaid through supported Razorpay payment methods.",
       },
       {
         title: "How should I choose a size?",

@@ -7,6 +7,7 @@ import {
   type OrderPlacedEmailData,
   OwnerOrderPlacedEmail,
 } from "./templates/order-placed";
+import { transactionalEmailTemplates } from "./template-ids";
 import { getEmailConfig } from "../config/env";
 
 export type TransactionalEmailContent = {
@@ -27,9 +28,6 @@ type TransactionalEmailTag = {
   name: string;
   value: string;
 };
-
-const orderPlacedTemplate = "order-placed";
-const ownerOrderPlacedTemplate = "owner-order-placed";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -137,7 +135,7 @@ async function buildOrderPlacedEmail(
     ...createOrderMetadata({
       order,
       audience: "customer",
-      template: orderPlacedTemplate,
+      template: transactionalEmailTemplates.orderPlaced,
     }),
   };
 }
@@ -164,7 +162,7 @@ async function buildOwnerOrderPlacedEmail(
     ...createOrderMetadata({
       order,
       audience: "owner",
-      template: ownerOrderPlacedTemplate,
+      template: transactionalEmailTemplates.ownerOrderPlaced,
     }),
   };
 }
@@ -179,11 +177,11 @@ export async function renderTransactionalEmail({
     return null;
   }
 
-  if (template === ownerOrderPlacedTemplate) {
+  if (template === transactionalEmailTemplates.ownerOrderPlaced) {
     return buildOwnerOrderPlacedEmail(order);
   }
 
-  if (template === orderPlacedTemplate) {
+  if (template === transactionalEmailTemplates.orderPlaced) {
     return buildOrderPlacedEmail(order);
   }
 

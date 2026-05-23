@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { siteContent } from "@/content/site-content";
 import { selectShippingMethodAction } from "@/features/checkout/actions";
 import type { StorefrontShippingOption } from "@/lib/medusa/cart";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ export function ShippingMethodForm({
   options,
   selectedShippingOptionId,
 }: ShippingMethodFormProps) {
+  const content = siteContent.checkout.shippingForm;
   const [state, formAction, isPending] = useActionState(
     selectShippingMethodAction,
     initialState,
@@ -76,7 +78,7 @@ export function ShippingMethodForm({
         size="lg"
         className="h-11 rounded-none px-6 sm:justify-self-start"
       >
-        {isPending ? "Saving..." : "Save shipping method"}
+        {isPending ? content.savingLabel : content.submitLabel}
       </Button>
     </form>
   );

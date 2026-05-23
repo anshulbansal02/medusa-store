@@ -2,11 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import {
+  type FieldErrors,
+  type FieldPath,
+  type UseFormRegister,
+  useForm,
+} from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { siteContent } from "@/content/site-content";
 import { saveCheckoutAddressAction } from "@/features/checkout/actions";
 import {
   type CheckoutAddressInput,
@@ -20,9 +26,51 @@ type CheckoutAddressFormProps = {
 const fieldClassName = "h-11 rounded-none border-border bg-background px-3";
 const errorClassName = "mt-1 text-destructive text-xs";
 
+type AddressFieldConfig = {
+  autoComplete?: string;
+  inputMode?: "numeric";
+  label: string;
+  name: FieldPath<CheckoutAddressInput>;
+  type?: "email" | "tel" | "text";
+};
+
+type AddressFieldProps = AddressFieldConfig & {
+  errors: FieldErrors<CheckoutAddressInput>;
+  register: UseFormRegister<CheckoutAddressInput>;
+};
+
+function AddressField({
+  autoComplete,
+  errors,
+  inputMode,
+  label,
+  name,
+  register,
+  type = "text",
+}: AddressFieldProps) {
+  const error = errors[name];
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={name}>{label}</Label>
+      <Input
+        id={name}
+        type={type}
+        inputMode={inputMode}
+        autoComplete={autoComplete}
+        aria-invalid={Boolean(error)}
+        className={fieldClassName}
+        {...register(name)}
+      />
+      {error ? <p className={errorClassName}>{error.message}</p> : null}
+    </div>
+  );
+}
+
 export function CheckoutAddressForm({
   defaultValues,
 }: CheckoutAddressFormProps) {
+  const content = siteContent.checkout.addressForm;
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
@@ -35,6 +83,62 @@ export function CheckoutAddressForm({
   } = useForm<CheckoutAddressInput>({
     defaultValues,
   });
+  const contactFields = [
+    {
+      name: "email",
+      label: content.emailLabel,
+      type: "email",
+      autoComplete: "email",
+    },
+    {
+      name: "phone",
+      label: content.phoneLabel,
+      type: "tel",
+      autoComplete: "tel",
+    },
+  ] satisfies AddressFieldConfig[];
+  const nameFields = [
+    {
+      name: "firstName",
+      label: content.firstNameLabel,
+      autoComplete: "given-name",
+    },
+    {
+      name: "lastName",
+      label: content.lastNameLabel,
+      autoComplete: "family-name",
+    },
+  ] satisfies AddressFieldConfig[];
+  const addressFields = [
+    {
+      name: "address1",
+      label: content.address1Label,
+      autoComplete: "address-line1",
+    },
+    {
+      name: "address2",
+      label: content.address2Label,
+      autoComplete: "address-line2",
+    },
+  ] satisfies AddressFieldConfig[];
+  const localityFields = [
+    {
+      name: "city",
+      label: content.cityLabel,
+      autoComplete: "address-level2",
+    },
+    {
+      name: "province",
+      label: content.provinceLabel,
+      autoComplete: "address-level1",
+    },
+    {
+      name: "postalCode",
+      label: content.postalCodeLabel,
+      inputMode: "numeric",
+      autoComplete: "postal-code",
+    },
+  ] satisfies AddressFieldConfig[];
 
   function onSubmit(values: CheckoutAddressInput) {
     setMessage("");
@@ -67,130 +171,39 @@ export function CheckoutAddressForm({
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)} className="grid gap-5">
-      <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          aria-invalid={Boolean(errors.email)}
-          className={fieldClassName}
-          {...register("email")}
-        />
-        {errors.email ? (
-          <p className={errorClassName}>{errors.email.message}</p>
-        ) : null}
-      </div>
+      <AddressField {...contactFields[0]} errors={errors} register={register} />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-2">
-          <Label htmlFor="firstName">First name</Label>
-          <Input
-            id="firstName"
-            autoComplete="given-name"
-            aria-invalid={Boolean(errors.firstName)}
-            className={fieldClassName}
-            {...register("firstName")}
+        {nameFields.map((field) => (
+          <AddressField
+            key={field.name}
+            {...field}
+            errors={errors}
+            register={register}
           />
-          {errors.firstName ? (
-            <p className={errorClassName}>{errors.firstName.message}</p>
-          ) : null}
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="lastName">Last name</Label>
-          <Input
-            id="lastName"
-            autoComplete="family-name"
-            aria-invalid={Boolean(errors.lastName)}
-            className={fieldClassName}
-            {...register("lastName")}
-          />
-          {errors.lastName ? (
-            <p className={errorClassName}>{errors.lastName.message}</p>
-          ) : null}
-        </div>
+        ))}
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="phone">Phone</Label>
-        <Input
-          id="phone"
-          type="tel"
-          autoComplete="tel"
-          aria-invalid={Boolean(errors.phone)}
-          className={fieldClassName}
-          {...register("phone")}
-        />
-        {errors.phone ? (
-          <p className={errorClassName}>{errors.phone.message}</p>
-        ) : null}
-      </div>
+      <AddressField {...contactFields[1]} errors={errors} register={register} />
 
-      <div className="grid gap-2">
-        <Label htmlFor="address1">Address</Label>
-        <Input
-          id="address1"
-          autoComplete="address-line1"
-          aria-invalid={Boolean(errors.address1)}
-          className={fieldClassName}
-          {...register("address1")}
+      {addressFields.map((field) => (
+        <AddressField
+          key={field.name}
+          {...field}
+          errors={errors}
+          register={register}
         />
-        {errors.address1 ? (
-          <p className={errorClassName}>{errors.address1.message}</p>
-        ) : null}
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="address2">Apartment, floor, landmark</Label>
-        <Input
-          id="address2"
-          autoComplete="address-line2"
-          className={fieldClassName}
-          {...register("address2")}
-        />
-      </div>
+      ))}
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="grid gap-2">
-          <Label htmlFor="city">City</Label>
-          <Input
-            id="city"
-            autoComplete="address-level2"
-            aria-invalid={Boolean(errors.city)}
-            className={fieldClassName}
-            {...register("city")}
+        {localityFields.map((field) => (
+          <AddressField
+            key={field.name}
+            {...field}
+            errors={errors}
+            register={register}
           />
-          {errors.city ? (
-            <p className={errorClassName}>{errors.city.message}</p>
-          ) : null}
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="province">State</Label>
-          <Input
-            id="province"
-            autoComplete="address-level1"
-            aria-invalid={Boolean(errors.province)}
-            className={fieldClassName}
-            {...register("province")}
-          />
-          {errors.province ? (
-            <p className={errorClassName}>{errors.province.message}</p>
-          ) : null}
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="postalCode">PIN code</Label>
-          <Input
-            id="postalCode"
-            inputMode="numeric"
-            autoComplete="postal-code"
-            aria-invalid={Boolean(errors.postalCode)}
-            className={fieldClassName}
-            {...register("postalCode")}
-          />
-          {errors.postalCode ? (
-            <p className={errorClassName}>{errors.postalCode.message}</p>
-          ) : null}
-        </div>
+        ))}
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -200,7 +213,7 @@ export function CheckoutAddressForm({
           size="lg"
           className="h-11 rounded-none px-6"
         >
-          {isPending ? "Saving address" : "Save and show shipping"}
+          {isPending ? content.savingLabel : content.submitLabel}
         </Button>
         {message ? (
           <output className="text-muted-foreground text-sm">{message}</output>

@@ -1,4 +1,5 @@
 import type { ProviderWebhookPayload } from "@medusajs/framework/types";
+import crypto from "node:crypto";
 
 import { fromSmallestUnit } from "./money";
 import type {
@@ -21,6 +22,28 @@ export function getRawWebhookBody(
   rawData: ProviderWebhookPayload["payload"]["rawData"],
 ) {
   return Buffer.isBuffer(rawData) ? rawData : Buffer.from(rawData);
+}
+
+export function isWebhookSignatureValid({
+  rawData,
+  secret,
+  signature,
+}: {
+  rawData: ProviderWebhookPayload["payload"]["rawData"];
+  secret: string;
+  signature: string;
+}) {
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(getRawWebhookBody(rawData))
+    .digest("hex");
+  const expectedBuffer = Buffer.from(expectedSignature);
+  const signatureBuffer = Buffer.from(signature);
+
+  return (
+    expectedBuffer.length === signatureBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, signatureBuffer)
+  );
 }
 
 function getWebhookEntityNotes(

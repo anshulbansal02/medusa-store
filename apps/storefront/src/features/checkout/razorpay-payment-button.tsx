@@ -49,8 +49,35 @@ type RazorpayPaymentButtonProps = {
   isReadyForPayment: boolean;
 };
 
+type PaymentStatusMessageInput = {
+  content: typeof siteContent.checkout.payment;
+  isPaymentConfigured: boolean;
+  isReadyForPayment: boolean;
+  scriptReady: boolean;
+};
+
+const razorpayCheckoutScriptSrc =
+  "https://checkout.razorpay.com/v1/checkout.js";
+
 function isConfigured(value: string | null) {
   return typeof value === "string" && !value.includes("replace_me");
+}
+
+function getPaymentStatusMessage({
+  content,
+  isPaymentConfigured,
+  isReadyForPayment,
+  scriptReady,
+}: PaymentStatusMessageInput) {
+  if (!isPaymentConfigured) {
+    return content.unavailable;
+  }
+
+  if (!isReadyForPayment) {
+    return content.detailsRequired;
+  }
+
+  return scriptReady ? content.ready : content.preparing;
 }
 
 export function RazorpayPaymentButton({
@@ -65,10 +92,16 @@ export function RazorpayPaymentButton({
   const isPaymentConfigured = isConfigured(publicKey);
   const disabled =
     !isReadyForPayment || !isPaymentConfigured || !scriptReady || isPending;
+  const statusMessage = getPaymentStatusMessage({
+    content,
+    isPaymentConfigured,
+    isReadyForPayment,
+    scriptReady,
+  });
 
   function handlePayment() {
     if (!publicKey || !window.Razorpay) {
-      setMessage("Payment is not ready yet.");
+      setMessage(content.scriptNotReady);
       return;
     }
 
@@ -83,11 +116,11 @@ export function RazorpayPaymentButton({
         return;
       }
 
-      const checkout = new RazorpayCheckout({
+      const checkoutOptions: RazorpayConstructorOptions = {
         key: publicKey,
         amount: result.payment.amount,
         currency: result.payment.currency,
-        name: "The Label",
+        name: content.storeName,
         order_id: result.payment.orderId,
         prefill: {
           name: result.customer.name,
@@ -111,9 +144,10 @@ export function RazorpayPaymentButton({
           });
         },
         modal: {
-          ondismiss: () => setMessage("Payment was not completed."),
+          ondismiss: () => setMessage(content.dismissed),
         },
-      });
+      };
+      const checkout = new RazorpayCheckout(checkoutOptions);
 
       checkout.open();
     });
@@ -123,10 +157,10 @@ export function RazorpayPaymentButton({
     <>
       {isPaymentConfigured ? (
         <Script
-          src="https://checkout.razorpay.com/v1/checkout.js"
+          src={razorpayCheckoutScriptSrc}
           strategy="afterInteractive"
           onLoad={() => setScriptReady(true)}
-          onError={() => setMessage("Payment could not be loaded. Try again.")}
+          onError={() => setMessage(content.loadError)}
         />
       ) : null}
       <Button
@@ -138,15 +172,7 @@ export function RazorpayPaymentButton({
       >
         {isPending ? content.processingLabel : content.buttonLabel}
       </Button>
-      <p className="mt-4 text-muted-foreground text-sm">
-        {!isPaymentConfigured
-          ? content.unavailable
-          : !isReadyForPayment
-            ? content.detailsRequired
-            : !scriptReady
-              ? content.preparing
-              : content.ready}
-      </p>
+      <p className="mt-4 text-muted-foreground text-sm">{statusMessage}</p>
       {message ? (
         <p className="mt-3 border border-destructive/30 px-3 py-2 text-destructive text-sm">
           {message}

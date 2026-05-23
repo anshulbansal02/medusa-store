@@ -7,7 +7,7 @@ import { absoluteUrl } from "@/lib/config/site";
 const page = policyPages.privacy;
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | The Label",
+  title: page.metadataTitle,
   description: page.description,
   alternates: {
     canonical: absoluteUrl("/privacy"),

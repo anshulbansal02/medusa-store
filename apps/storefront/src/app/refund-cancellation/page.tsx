@@ -7,7 +7,7 @@ import { absoluteUrl } from "@/lib/config/site";
 const page = policyPages.refundCancellation;
 
 export const metadata: Metadata = {
-  title: "Refunds and Cancellations | The Label",
+  title: page.metadataTitle,
   description: page.description,
   alternates: {
     canonical: absoluteUrl("/refund-cancellation"),

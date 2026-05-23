@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getDefaultRegionId } from "@/lib/medusa/regions";
 
 import { medusaFetch, medusaPostJson } from "./client";

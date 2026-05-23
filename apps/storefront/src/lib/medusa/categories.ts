@@ -1,3 +1,5 @@
+import "server-only";
+
 import { medusaFetch } from "@/lib/medusa/client";
 
 export type MedusaProductCategory = {

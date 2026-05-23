@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { siteContent } from "@/content/site-content";
 import {
   addVariantToCart,
   removeCartLineItem,
@@ -33,6 +34,7 @@ export type AddToCartActionState = {
 export async function addToCartAction(
   formData: FormData,
 ): Promise<AddToCartActionState> {
+  const messages = siteContent.addToBag.messages;
   const variantId = formData.get("variant_id");
   const variantTitle = formData.get("variant_title");
   const quantityValue = formData.get("quantity");
@@ -40,7 +42,7 @@ export async function addToCartAction(
   if (typeof variantId !== "string" || variantId.length === 0) {
     return {
       status: "error",
-      message: "Select a size before adding this item.",
+      message: messages.missingSize,
       cart: null,
       addedItem: null,
     };
@@ -52,7 +54,7 @@ export async function addToCartAction(
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 9) {
     return {
       status: "error",
-      message: "Choose a quantity between 1 and 9.",
+      message: messages.invalidQuantity,
       cart: null,
       addedItem: null,
     };
@@ -71,7 +73,7 @@ export async function addToCartAction(
 
     return {
       status: "success",
-      message: "Added to bag.",
+      message: messages.added,
       cart,
       addedItem: addedItem
         ? {
@@ -87,7 +89,7 @@ export async function addToCartAction(
   } catch {
     return {
       status: "error",
-      message: "This item could not be added. Try again.",
+      message: messages.error,
       cart: null,
       addedItem: null,
     };

@@ -51,6 +51,9 @@
   --text-hero--line-height: 0.86;
   --text-hero-lg: clamp(4.75rem, 9vw, 8.5rem);
   --text-hero-lg--line-height: 0.86;
+  --tracking-label: 0.08em;
+  --tracking-label-wide: 0.12em;
+  --tracking-label-wider: 0.14em;
 }
 
 :root {

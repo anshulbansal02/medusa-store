@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
+import { siteContent } from "@/content/site-content";
 import { getOrderById } from "@/lib/medusa/orders";
 import { cn } from "@/lib/utils";
 
@@ -23,8 +24,8 @@ export async function generateMetadata({
   const { id } = await params;
 
   return {
-    title: "Order Confirmation | The Label",
-    description: `Order confirmation for ${id}.`,
+    title: siteContent.orderConfirmation.metadata.title,
+    description: `${siteContent.orderConfirmation.metadata.descriptionPrefix} ${id}.`,
     robots: {
       index: false,
       follow: false,
@@ -42,6 +43,8 @@ export default async function OrderConfirmationPage({
     notFound();
   }
 
+  const content = siteContent.orderConfirmation;
+
   return (
     <main className="min-h-screen">
       <SiteHeader />
@@ -54,14 +57,14 @@ export default async function OrderConfirmationPage({
                 Order {order.displayId}
               </p>
               <h1 className="mt-3 font-heading text-6xl leading-none sm:text-8xl">
-                Order placed.
+                {content.title}
               </h1>
             </div>
             <div className="max-w-2xl text-muted-foreground">
               <p>
-                We have received the order. A confirmation email should reach{" "}
-                <span className="text-foreground">{order.email}</span> once
-                transactional email is enabled.
+                {content.emailLead}{" "}
+                <span className="text-foreground">{order.email}</span>{" "}
+                {content.emailSuffix}
               </p>
               <div className="mt-5 flex flex-wrap gap-3 text-sm">
                 <span className="border border-border px-3 py-2">
@@ -78,7 +81,7 @@ export default async function OrderConfirmationPage({
 
           <div className="grid gap-10 py-8 lg:grid-cols-[1fr_360px] lg:items-start">
             <div>
-              <h2 className="text-xl font-medium">Items</h2>
+              <h2 className="text-xl font-medium">{content.itemsTitle}</h2>
               <div className="mt-5 divide-y divide-border border-y border-border">
                 {order.items.map((item, index) => (
                   <div
@@ -111,11 +114,11 @@ export default async function OrderConfirmationPage({
                           {item.title}
                         </Link>
                         <p className="mt-1 text-muted-foreground">
-                          {item.variant ? `${item.variant} · ` : ""}Qty{" "}
-                          {item.quantity}
+                          {item.variant ? `${item.variant} · ` : ""}
+                          {content.quantityLabel} {item.quantity}
                         </p>
                         <p className="mt-2 text-muted-foreground">
-                          {item.unitPrice} each
+                          {item.unitPrice} {content.unitPriceSuffix}
                         </p>
                       </div>
                       <p className="font-medium">{item.total}</p>
@@ -126,36 +129,46 @@ export default async function OrderConfirmationPage({
             </div>
 
             <aside className="border border-border p-5 sm:p-6 lg:sticky lg:top-24">
-              <h2 className="font-medium">Summary</h2>
+              <h2 className="font-medium">{content.summaryTitle}</h2>
               <div className="mt-5 grid gap-3 border-border border-b pb-5 text-sm">
                 <div className="flex justify-between gap-4">
-                  <span className="text-muted-foreground">Items</span>
+                  <span className="text-muted-foreground">
+                    {content.subtotalLabel}
+                  </span>
                   <span>{order.subtotal}</span>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="text-muted-foreground">
+                    {content.shippingLabel}
+                  </span>
                   <span>{order.shippingTotal}</span>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span className="text-muted-foreground">Tax</span>
+                  <span className="text-muted-foreground">
+                    {content.taxLabel}
+                  </span>
                   <span>{order.taxTotal}</span>
                 </div>
                 {order.discountAmount > 0 ? (
                   <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">Discount</span>
+                    <span className="text-muted-foreground">
+                      {content.discountLabel}
+                    </span>
                     <span>{order.discountTotal}</span>
                   </div>
                 ) : null}
               </div>
 
               <div className="mt-5 flex justify-between gap-4 font-medium">
-                <span>Total</span>
+                <span>{content.totalLabel}</span>
                 <span>{order.total}</span>
               </div>
 
               {order.shippingAddress ? (
                 <div className="mt-6 border-border border-t pt-5 text-sm">
-                  <h3 className="font-medium">Delivery address</h3>
+                  <h3 className="font-medium">
+                    {content.deliveryAddressTitle}
+                  </h3>
                   <div className="mt-2 text-muted-foreground">
                     {order.shippingAddress.name ? (
                       <p>{order.shippingAddress.name}</p>
@@ -178,7 +191,7 @@ export default async function OrderConfirmationPage({
                   "mt-6 h-12 w-full rounded-none px-6",
                 )}
               >
-                Continue shopping
+                {content.continueShoppingAction}
               </Link>
             </aside>
           </div>
