@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 
+import { EmptyAction } from "@/components/content/empty-action";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { buttonVariants } from "@/components/ui/button";
 import { CheckoutAddressForm } from "@/features/checkout/checkout-address-form";
 import { RazorpayPaymentButton } from "@/features/checkout/razorpay-payment-button";
 import type { CheckoutAddressInput } from "@/features/checkout/schema";
 import { ShippingMethodForm } from "@/features/checkout/shipping-method-form";
 import { getCurrentCart, getCurrentShippingOptions } from "@/lib/medusa/cart";
-import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -47,25 +45,15 @@ export default async function CheckoutPage() {
       <main className="min-h-screen">
         <SiteHeader />
         <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 lg:px-8">
-          <div className="mx-auto max-w-[900px] border-border border-b pb-10">
-            <p className="text-muted-foreground text-sm">Checkout</p>
-            <h1 className="mt-3 font-heading text-6xl leading-none sm:text-8xl">
-              Your bag is empty.
-            </h1>
-            <p className="mt-5 max-w-xl text-muted-foreground">
-              Add a style before entering delivery details.
-            </p>
-            <Link
-              href="/shop"
-              prefetch={false}
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "mt-7 h-11 rounded-none px-6",
-              )}
-            >
-              Shop new arrivals
-            </Link>
-          </div>
+          <EmptyAction
+            eyebrow="Checkout"
+            title="Your bag is empty."
+            description="Add a style before entering delivery details."
+            actionHref="/shop"
+            actionLabel="Shop new arrivals"
+            className="mx-auto max-w-[900px] border-border border-b pb-10"
+            titleAs="h1"
+          />
         </section>
         <SiteFooter />
       </main>

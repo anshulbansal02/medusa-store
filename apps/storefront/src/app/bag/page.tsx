@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { EmptyAction } from "@/components/content/empty-action";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
@@ -121,22 +122,13 @@ export default async function BagPage() {
               </aside>
             </div>
           ) : (
-            <div className="py-12">
-              <h2 className="text-xl font-medium">Your bag is empty.</h2>
-              <p className="mt-2 max-w-md text-muted-foreground">
-                Start with the latest dresses, co-ords, and occasion pieces.
-              </p>
-              <Link
-                href="/shop"
-                prefetch={false}
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "mt-7 h-11 rounded-none px-6",
-                )}
-              >
-                Shop new arrivals
-              </Link>
-            </div>
+            <EmptyAction
+              title="Your bag is empty."
+              description="Start with the latest dresses, co-ords, and occasion pieces."
+              actionHref="/shop"
+              actionLabel="Shop new arrivals"
+              titleClassName="mt-0 font-sans text-xl leading-snug sm:text-xl"
+            />
           )}
         </div>
       </section>

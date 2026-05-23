@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { BaseSyntheticEvent } from "react";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
@@ -37,26 +36,10 @@ export function CheckoutAddressForm({
     defaultValues,
   });
 
-  function onSubmit(_values: CheckoutAddressInput, event?: BaseSyntheticEvent) {
+  function onSubmit(values: CheckoutAddressInput) {
     setMessage("");
     clearErrors();
-    const form = event?.target instanceof HTMLFormElement ? event.target : null;
-    const formData = form ? new FormData(form) : null;
-    const result = checkoutAddressSchema.safeParse(
-      formData
-        ? {
-            email: formData.get("email"),
-            firstName: formData.get("firstName"),
-            lastName: formData.get("lastName"),
-            phone: formData.get("phone"),
-            address1: formData.get("address1"),
-            address2: formData.get("address2"),
-            city: formData.get("city"),
-            province: formData.get("province"),
-            postalCode: formData.get("postalCode"),
-          }
-        : _values,
-    );
+    const result = checkoutAddressSchema.safeParse(values);
 
     if (!result.success) {
       for (const issue of result.error.issues) {

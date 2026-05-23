@@ -1,6 +1,6 @@
 import { getDefaultRegionId } from "@/lib/medusa/regions";
 
-import { medusaFetch } from "./client";
+import { medusaFetch, medusaPostJson } from "./client";
 
 type MedusaPaymentProvider = {
   id: string;
@@ -114,36 +114,23 @@ export async function createRazorpayPaymentSession(cartId: string) {
     throw new Error("Razorpay is not available for this region.");
   }
 
-  const collectionResponse = await medusaFetch<MedusaPaymentCollectionResponse>(
-    "/store/payment-collections",
-    {
-      method: "POST",
-      body: JSON.stringify({ cart_id: cartId }),
-      cache: "no-store",
-      headers: {
-        "content-type": "application/json",
-      },
-    },
-  );
+  const collectionResponse =
+    await medusaPostJson<MedusaPaymentCollectionResponse>(
+      "/store/payment-collections",
+      { cart_id: cartId },
+    );
   const collection = collectionResponse?.payment_collection;
 
   if (!collection?.id) {
     throw new Error("Payment collection could not be created.");
   }
 
-  const sessionResponse = await medusaFetch<MedusaPaymentCollectionResponse>(
+  const sessionResponse = await medusaPostJson<MedusaPaymentCollectionResponse>(
     `/store/payment-collections/${collection.id}/payment-sessions`,
     {
-      method: "POST",
-      body: JSON.stringify({
-        provider_id: providerId,
-        data: {
-          cart_id: cartId,
-        },
-      }),
-      cache: "no-store",
-      headers: {
-        "content-type": "application/json",
+      provider_id: providerId,
+      data: {
+        cart_id: cartId,
       },
     },
   );
@@ -165,16 +152,9 @@ export async function createRazorpayPaymentSession(cartId: string) {
 export async function verifyRazorpayPayment(
   payload: RazorpayVerificationPayload,
 ) {
-  const data = await medusaFetch<RazorpayVerifyResponse>(
+  const data = await medusaPostJson<RazorpayVerifyResponse>(
     "/store/razorpay/verify",
-    {
-      method: "POST",
-      body: JSON.stringify(payload),
-      cache: "no-store",
-      headers: {
-        "content-type": "application/json",
-      },
-    },
+    payload,
   );
 
   if (!data?.verified) {
@@ -183,12 +163,8 @@ export async function verifyRazorpayPayment(
 }
 
 export async function completeCartPayment(cartId: string) {
-  const data = await medusaFetch<MedusaCompleteCartResponse>(
+  const data = await medusaPostJson<MedusaCompleteCartResponse>(
     `/store/carts/${cartId}/complete`,
-    {
-      method: "POST",
-      cache: "no-store",
-    },
   );
 
   if (data?.type === "order" && data.order?.id) {

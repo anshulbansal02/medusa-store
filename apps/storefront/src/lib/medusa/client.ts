@@ -50,6 +50,31 @@ export async function medusaFetch<T>(
   return (await response.json()) as T;
 }
 
+export async function medusaPostJson<T>(
+  path: string,
+  body?: unknown,
+  init: RequestInit = {},
+) {
+  const headers = new Headers(init.headers);
+  headers.set("content-type", "application/json");
+
+  return medusaFetch<T>(path, {
+    ...init,
+    method: "POST",
+    body: body === undefined ? undefined : JSON.stringify(body),
+    cache: init.cache ?? "no-store",
+    headers,
+  });
+}
+
+export async function medusaDelete<T>(path: string, init: RequestInit = {}) {
+  return medusaFetch<T>(path, {
+    ...init,
+    method: "DELETE",
+    cache: init.cache ?? "no-store",
+  });
+}
+
 export function formatStorePrice(amount?: number, currencyCode?: string) {
   if (typeof amount !== "number" || !currencyCode) {
     return null;

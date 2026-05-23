@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 
-import { formatStorePrice, medusaFetch } from "@/lib/medusa/client";
+import {
+  formatStorePrice,
+  medusaDelete,
+  medusaFetch,
+  medusaPostJson,
+} from "@/lib/medusa/client";
 import { getDefaultRegionId } from "@/lib/medusa/regions";
 
 const cartCookieName = "the_label_cart_id";
@@ -215,13 +220,8 @@ async function createCart() {
     throw new Error("Medusa region is not available.");
   }
 
-  const data = await medusaFetch<MedusaCartResponse>("/store/carts", {
-    method: "POST",
-    body: JSON.stringify({ region_id: regionId }),
-    cache: "no-store",
-    headers: {
-      "content-type": "application/json",
-    },
+  const data = await medusaPostJson<MedusaCartResponse>("/store/carts", {
+    region_id: regionId,
   });
 
   if (!data?.cart) {
@@ -316,19 +316,12 @@ export async function updateCartAddress(address: CheckoutAddressPayload) {
     country_code: "in",
     phone: address.phone,
   };
-  const data = await medusaFetch<MedusaCartResponse>(
+  const data = await medusaPostJson<MedusaCartResponse>(
     `/store/carts/${cart.id}`,
     {
-      method: "POST",
-      body: JSON.stringify({
-        email: address.email,
-        shipping_address: medusaAddress,
-        billing_address: medusaAddress,
-      }),
-      cache: "no-store",
-      headers: {
-        "content-type": "application/json",
-      },
+      email: address.email,
+      shipping_address: medusaAddress,
+      billing_address: medusaAddress,
     },
   );
 
@@ -341,16 +334,9 @@ export async function updateCartAddress(address: CheckoutAddressPayload) {
 
 export async function setCartShippingMethod(optionId: string) {
   const cart = await requireCurrentCart("Cart is not available.");
-  const data = await medusaFetch<MedusaCartResponse>(
+  const data = await medusaPostJson<MedusaCartResponse>(
     `/store/carts/${cart.id}/shipping-methods`,
-    {
-      method: "POST",
-      body: JSON.stringify({ option_id: optionId }),
-      cache: "no-store",
-      headers: {
-        "content-type": "application/json",
-      },
-    },
+    { option_id: optionId },
   );
 
   if (!data?.cart) {
@@ -362,16 +348,9 @@ export async function setCartShippingMethod(optionId: string) {
 
 export async function addVariantToCart(variantId: string, quantity = 1) {
   const cart = await getOrCreateCart();
-  const data = await medusaFetch<MedusaCartResponse>(
+  const data = await medusaPostJson<MedusaCartResponse>(
     `/store/carts/${cart.id}/line-items`,
-    {
-      method: "POST",
-      body: JSON.stringify({ variant_id: variantId, quantity }),
-      cache: "no-store",
-      headers: {
-        "content-type": "application/json",
-      },
-    },
+    { variant_id: variantId, quantity },
   );
 
   if (!data?.cart) {
@@ -383,16 +362,9 @@ export async function addVariantToCart(variantId: string, quantity = 1) {
 
 export async function updateCartLineItem(lineItemId: string, quantity: number) {
   const cart = await requireCurrentCart("Cart is not available.");
-  const data = await medusaFetch<MedusaCartResponse>(
+  const data = await medusaPostJson<MedusaCartResponse>(
     `/store/carts/${cart.id}/line-items/${lineItemId}`,
-    {
-      method: "POST",
-      body: JSON.stringify({ quantity }),
-      cache: "no-store",
-      headers: {
-        "content-type": "application/json",
-      },
-    },
+    { quantity },
   );
 
   if (!data?.cart) {
@@ -404,12 +376,8 @@ export async function updateCartLineItem(lineItemId: string, quantity: number) {
 
 export async function removeCartLineItem(lineItemId: string) {
   const cart = await requireCurrentCart("Cart is not available.");
-  const data = await medusaFetch<MedusaCartParentResponse>(
+  const data = await medusaDelete<MedusaCartParentResponse>(
     `/store/carts/${cart.id}/line-items/${lineItemId}`,
-    {
-      method: "DELETE",
-      cache: "no-store",
-    },
   );
 
   if (!data?.parent) {

@@ -60,6 +60,33 @@ type MedusaProductsResponse = {
   products?: MedusaProduct[];
 };
 
+const productListFields = [
+  "*variants.calculated_price",
+  "id",
+  "title",
+  "handle",
+  "description",
+  "thumbnail",
+  "*images",
+  "*categories",
+  "*variants",
+].join(",");
+
+const productDetailFields = [
+  "*variants.calculated_price",
+  "id",
+  "title",
+  "handle",
+  "description",
+  "metadata",
+  "thumbnail",
+  "*options",
+  "*images",
+  "*categories",
+  "*variants",
+  "*variants.options",
+].join(",");
+
 export type StorefrontProduct = {
   id: string;
   name: string;
@@ -166,6 +193,10 @@ function getProductImages(product: MedusaProduct) {
   ].filter((image): image is string => Boolean(image));
 
   return Array.from(new Set(images));
+}
+
+function buildProductsPath(searchParams: URLSearchParams) {
+  return `/store/products?${searchParams.toString()}`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -420,23 +451,10 @@ export async function getProducts({
   if (categoryId) {
     searchParams.set("category_id", categoryId);
   }
-  searchParams.set(
-    "fields",
-    [
-      "*variants.calculated_price",
-      "id",
-      "title",
-      "handle",
-      "description",
-      "thumbnail",
-      "*images",
-      "*categories",
-      "*variants",
-    ].join(","),
-  );
+  searchParams.set("fields", productListFields);
 
   const data = await medusaFetch<MedusaProductsResponse>(
-    `/store/products?${searchParams.toString()}`,
+    buildProductsPath(searchParams),
     { cache: "no-store" },
   );
   const products =
@@ -489,26 +507,10 @@ export async function getProductByHandle(
     limit: "1",
     region_id: regionId,
   });
-  searchParams.set(
-    "fields",
-    [
-      "*variants.calculated_price",
-      "id",
-      "title",
-      "handle",
-      "description",
-      "metadata",
-      "thumbnail",
-      "*options",
-      "*images",
-      "*categories",
-      "*variants",
-      "*variants.options",
-    ].join(","),
-  );
+  searchParams.set("fields", productDetailFields);
 
   const data = await medusaFetch<MedusaProductsResponse>(
-    `/store/products?${searchParams.toString()}`,
+    buildProductsPath(searchParams),
     { cache: "no-store" },
   );
   const product = data?.products?.[0];
