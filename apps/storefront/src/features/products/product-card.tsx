@@ -48,11 +48,11 @@ export function ProductCard({
         <div className="mt-3 flex items-start justify-between gap-4">
           <div>
             {categoryName ? (
-              <p className="mb-1 text-[0.7rem] uppercase tracking-[0.12em] text-muted-foreground">
+              <p className="mb-1 text-micro uppercase tracking-[0.12em] text-muted-foreground">
                 {categoryName}
               </p>
             ) : null}
-            <h3 className="text-[0.95rem] font-medium leading-snug">
+            <h3 className="text-base font-medium leading-snug">
               {product.name}
             </h3>
             {product.note ? (

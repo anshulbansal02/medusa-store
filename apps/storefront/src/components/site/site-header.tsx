@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { MobileMenu } from "@/components/site/mobile-menu";
+import { siteContent } from "@/content/site-content";
 import { BagDrawer } from "@/features/cart/bag-drawer";
 import { BagHydrator } from "@/features/cart/bag-hydrator";
 import { BagToast } from "@/features/cart/bag-toast";
@@ -18,7 +19,7 @@ export async function SiteHeader() {
   ]);
   const cartItemCount = cart?.itemCount ?? 0;
   const navItems = [
-    { href: "/shop", label: "New Arrivals" },
+    { href: "/shop", label: siteContent.header.primaryShopLabel },
     ...categories.map((category) => ({
       href: `/shop/${category.handle}`,
       label: category.name,
@@ -27,11 +28,11 @@ export async function SiteHeader() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-30 border-border/70 border-b bg-background/92 backdrop-blur-sm">
-      <div className="border-border/70 border-b px-4 py-2 text-[0.68rem] uppercase tracking-[0.08em] text-muted-foreground sm:px-6 sm:text-[0.72rem] sm:tracking-[0.12em] lg:px-8">
+      <div className="border-border/70 border-b px-4 py-2 text-micro uppercase tracking-[0.08em] text-muted-foreground sm:px-6 sm:tracking-[0.12em] lg:px-8">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
-          <span>India shipping</span>
-          <span>Prepaid checkout</span>
-          <span>Size support</span>
+          {siteContent.header.announcementItems.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
         </div>
       </div>
       <div className="mx-auto grid h-16 max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 lg:px-8">
@@ -59,7 +60,7 @@ export async function SiteHeader() {
           href="/"
           className="font-heading text-2xl leading-none tracking-normal"
         >
-          The Label
+          {siteContent.brand.name}
         </Link>
 
         <div className="flex items-center justify-end gap-1.5">

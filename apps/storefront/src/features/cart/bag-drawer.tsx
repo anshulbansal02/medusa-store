@@ -86,7 +86,7 @@ export function BagDrawer({ initialCart, initialItemCount }: BagDrawerProps) {
         >
           <ShoppingBag className="size-4 stroke-[1.6]" aria-hidden="true" />
           {itemCount > 0 ? (
-            <span className="-right-0.5 -top-0.5 absolute flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground leading-none">
+            <span className="-right-0.5 -top-0.5 absolute flex size-4 items-center justify-center rounded-full bg-primary text-primary-foreground text-tiny leading-none">
               {itemCount}
             </span>
           ) : null}

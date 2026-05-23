@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { siteContent } from "@/content/site-content";
 import { AddToCartForm } from "@/features/cart/add-to-cart-form";
 import { ProductCard } from "@/features/products/product-card";
 import { ProductGallery } from "@/features/products/product-gallery";
@@ -38,6 +39,7 @@ export function ProductDetailView({
   const primaryCategory = product.categories[0];
   const productJsonLd = createProductJsonLd(product);
   const productNameWords = splitProductName(product.name);
+  const content = siteContent.product;
 
   return (
     <main className="min-h-screen">
@@ -71,9 +73,11 @@ export function ProductDetailView({
             </nav>
 
             <div className="border-border border-b pb-6">
-              <p className="text-muted-foreground text-sm">New arrival</p>
+              <p className="text-muted-foreground text-sm">
+                {content.statusLabel}
+              </p>
               <div className="mt-3 flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-6">
-                <h1 className="font-heading text-5xl leading-[0.95] sm:text-6xl">
+                <h1 className="font-heading text-5xl leading-none sm:text-6xl">
                   {productNameWords.map((part, index) => (
                     <span key={part.key} className="whitespace-nowrap">
                       {part.word}
@@ -106,9 +110,9 @@ export function ProductDetailView({
                   aria-hidden="true"
                 />
                 <div>
-                  <h2 className="font-medium">Delivery</h2>
+                  <h2 className="font-medium">{content.deliveryTitle}</h2>
                   <p className="mt-1 text-muted-foreground">
-                    India shipping with prepaid Razorpay checkout.
+                    {content.deliveryText}
                   </p>
                 </div>
               </div>
@@ -118,10 +122,9 @@ export function ProductDetailView({
                   aria-hidden="true"
                 />
                 <div>
-                  <h2 className="font-medium">Returns</h2>
+                  <h2 className="font-medium">{content.returnsTitle}</h2>
                   <p className="mt-1 text-muted-foreground">
-                    Final return rules should be confirmed before production
-                    launch.
+                    {content.returnsText}
                   </p>
                 </div>
               </div>
@@ -157,10 +160,10 @@ export function ProductDetailView({
             <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
                 <p className="text-muted-foreground text-sm">
-                  {primaryCategory?.name ?? "Keep browsing"}
+                  {primaryCategory?.name ?? content.relatedEyebrowFallback}
                 </p>
                 <h2 className="mt-2 font-heading text-5xl leading-none sm:text-6xl">
-                  More from this edit
+                  {content.relatedTitle}
                 </h2>
               </div>
               {primaryCategory ? (
@@ -169,7 +172,7 @@ export function ProductDetailView({
                   prefetch={false}
                   className="text-sm font-medium underline-offset-4 hover:underline"
                 >
-                  View edit
+                  {content.relatedAction}
                 </Link>
               ) : null}
             </div>

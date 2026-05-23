@@ -1,17 +1,16 @@
 import Link from "next/link";
 
+import { siteContent } from "@/content/site-content";
+
 export function SiteFooter() {
   return (
     <footer className="px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-8 text-sm text-muted-foreground md:flex-row">
         <div>
           <Link href="/" className="font-heading text-3xl text-foreground">
-            The Label
+            {siteContent.brand.name}
           </Link>
-          <p className="mt-3 max-w-sm">
-            Premium western occasion wear for India, built around newness,
-            visual appeal, and a low-friction shopping flow.
-          </p>
+          <p className="mt-3 max-w-sm">{siteContent.brand.footerDescription}</p>
         </div>
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
           <div>

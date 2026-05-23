@@ -16,6 +16,7 @@ const checkedExtensions = new Set([".css", ".ts", ".tsx"]);
 const rawColorPattern = /#[0-9a-fA-F]{3,8}|rgba?\(|hsla?\(|oklch\(/g;
 const arbitraryColorClassPattern =
   /\b(?:bg|text|border|ring|outline|from|via|to|shadow)-\[(?:#|rgb|hsl|oklch)/g;
+const arbitraryTextSizeClassPattern = /\b(?:\w+:)*text-\[[^\]]+\]/g;
 const gradientClassPattern = /\bbg-gradient[^\s"`']*/g;
 
 async function listFiles(dir) {
@@ -65,6 +66,14 @@ for (const file of await listFiles(sourceDir)) {
       file: relativePath,
       line: getLineNumber(source, match.index ?? 0),
       message: `arbitrary color utility "${match[0]}" should use a token`,
+    });
+  }
+
+  for (const match of source.matchAll(arbitraryTextSizeClassPattern)) {
+    violations.push({
+      file: relativePath,
+      line: getLineNumber(source, match.index ?? 0),
+      message: `arbitrary text-size utility "${match[0]}" should use a text token`,
     });
   }
 

@@ -126,8 +126,9 @@ Rules:
 - Do not add custom CSS classes unless a CSS feature cannot be expressed cleanly with Tailwind utilities or tokens.
 - Prefer semantic design tokens over one-off literal values.
 - Do not use raw color values or arbitrary color utilities in components. Raw colors belong in token files or metadata/icon generation files.
-- Arbitrary values are acceptable for exact layout constraints, aspect ratios, and typography clamps when they are clearer than adding a token.
-- Run `pnpm --dir apps/storefront lint:tailwind` to block raw colors, arbitrary color utilities, and gradient utilities outside explicit token/metadata files.
+- Arbitrary values are acceptable for exact layout constraints, aspect ratios, and CSS functions only.
+- Do not use arbitrary text-size utilities. Add a named Tailwind v4 text token in `globals.css` instead.
+- Run `pnpm --dir apps/storefront lint:tailwind` to block raw colors, arbitrary color utilities, arbitrary text sizes, and gradient utilities outside explicit token/metadata files.
 - Keep theming configurable in the same spirit as shadcn-style CSS variables.
 - Do not add dark mode tokens for v1.
 - Use proper SVG/icon-library icons; do not use emoji as UI icons or placeholders unless explicitly requested.
@@ -135,6 +136,13 @@ Rules:
 - Use outline icons that inherit `currentColor`, with consistent stroke width around `1.5` to `1.75`.
 - Do not import the whole icon library namespace or use dynamic icon imports.
 - Use official SVG assets for brand, payment, and social logos instead of UI icon libraries.
+
+## Storefront Content
+
+- Keep editable brand, page, empty-state, and support copy in `apps/storefront/src/content/*`.
+- Keep page structure, routing, and data orchestration in App Router files and feature views.
+- Do not show setup, backend, environment, launch-draft, or implementation wording to customers.
+- Model content as typed objects so a future CMS adapter can replace the source without rewriting page components.
 
 ## Preferred Libraries
 

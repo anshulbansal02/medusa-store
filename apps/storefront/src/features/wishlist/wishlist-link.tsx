@@ -18,7 +18,7 @@ export function WishlistLink() {
     >
       <Heart className="size-4 stroke-[1.6]" aria-hidden="true" />
       {hasHydrated && count > 0 ? (
-        <span className="-top-1 -right-1 absolute grid size-4 place-items-center bg-primary text-[0.62rem] text-primary-foreground leading-none">
+        <span className="-top-1 -right-1 absolute grid size-4 place-items-center bg-primary text-primary-foreground text-tiny leading-none">
           {count}
         </span>
       ) : null}

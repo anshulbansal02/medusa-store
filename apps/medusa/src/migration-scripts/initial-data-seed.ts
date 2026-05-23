@@ -22,7 +22,7 @@ import {
 } from "@medusajs/medusa/core-flows";
 
 import { getRazorpayConfig } from "../config/env";
-import { createSeedProducts } from "./seed-catalog";
+import { createSeedProducts } from "../seed/catalog";
 
 export default async function initial_data_seed({
   container,

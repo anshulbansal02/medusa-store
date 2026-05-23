@@ -5,6 +5,7 @@ import Script from "next/script";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
+import { siteContent } from "@/content/site-content";
 import {
   startRazorpayPaymentAction,
   verifyAndCompleteRazorpayPaymentAction,
@@ -56,6 +57,7 @@ export function RazorpayPaymentButton({
   publicKey,
   isReadyForPayment,
 }: RazorpayPaymentButtonProps) {
+  const content = siteContent.checkout.payment;
   const router = useRouter();
   const [scriptReady, setScriptReady] = useState(false);
   const [message, setMessage] = useState("");
@@ -134,16 +136,16 @@ export function RazorpayPaymentButton({
         className="mt-6 h-12 w-full rounded-none"
         onClick={handlePayment}
       >
-        {isPending ? "Processing..." : "Pay securely"}
+        {isPending ? content.processingLabel : content.buttonLabel}
       </Button>
       <p className="mt-4 text-muted-foreground text-sm">
         {!isPaymentConfigured
-          ? "Razorpay is not configured for this environment."
+          ? content.unavailable
           : !isReadyForPayment
-            ? "Add address and shipping before payment."
+            ? content.detailsRequired
             : !scriptReady
-              ? "Preparing secure payment."
-              : "Secure prepaid checkout powered by Razorpay."}
+              ? content.preparing
+              : content.ready}
       </p>
       {message ? (
         <p className="mt-3 border border-destructive/30 px-3 py-2 text-destructive text-sm">

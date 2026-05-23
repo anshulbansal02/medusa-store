@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
+import { siteContent } from "@/content/site-content";
 import { ProductCard } from "@/features/products/product-card";
 import type { StorefrontProduct } from "@/lib/medusa/products";
 import { cn } from "@/lib/utils";
@@ -13,25 +14,22 @@ type HomeViewProps = {
   products: StorefrontProduct[];
 };
 
-const trustItems = [
-  {
-    icon: ShieldCheck,
-    title: "Secure prepaid checkout",
-    text: "Razorpay-powered payment after address and shipping.",
-  },
-  {
-    icon: Truck,
-    title: "India shipping",
-    text: "Simple dispatch updates from the store team.",
-  },
-  {
-    icon: Ruler,
-    title: "Size support",
-    text: "Fit notes and a clear size chart on every product.",
-  },
-];
+const trustIcons = {
+  ruler: Ruler,
+  shield: ShieldCheck,
+  truck: Truck,
+} as const;
+
+type TrustIconKey = keyof typeof trustIcons;
+
+function TrustIcon({ icon }: { icon: TrustIconKey }) {
+  const Icon = trustIcons[icon];
+
+  return <Icon className="mt-0.5 size-5 shrink-0 stroke-[1.6] text-primary" />;
+}
 
 export function HomeView({ products }: HomeViewProps) {
+  const content = siteContent.home;
   const primaryHeroProduct = products[0];
   const fitSupportProduct = products.at(-1) ?? primaryHeroProduct;
   const heroProducts = primaryHeroProduct
@@ -74,8 +72,8 @@ export function HomeView({ products }: HomeViewProps) {
                       className="object-cover transition duration-500 ease-out group-hover:scale-[1.025]"
                     />
                     <div className="absolute inset-x-0 bottom-0 p-4 text-background sm:p-6">
-                      <p className="text-[0.7rem] uppercase tracking-[0.14em]">
-                        Featured style
+                      <p className="text-micro uppercase tracking-[0.14em]">
+                        {content.hero.productEyebrow}
                       </p>
                       <div className="mt-2 flex items-end justify-between gap-5">
                         <h2 className="max-w-[72%] font-heading text-3xl leading-none sm:max-w-md sm:text-5xl">
@@ -92,14 +90,13 @@ export function HomeView({ products }: HomeViewProps) {
 
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  The first edit
+                  {content.hero.eyebrow}
                 </p>
-                <h1 className="mt-4 font-heading text-[clamp(3.35rem,14vw,5rem)] leading-[0.86] tracking-normal sm:text-[clamp(4.75rem,9vw,8.5rem)]">
-                  Designed to be noticed.
+                <h1 className="mt-4 font-heading text-hero tracking-normal sm:text-hero-lg">
+                  {content.hero.title}
                 </h1>
                 <p className="mt-6 max-w-xl text-muted-foreground">
-                  Limited-run western occasion pieces for dinners, wedding
-                  functions, launches, and dressed-up weekends.
+                  {content.hero.description}
                 </p>
 
                 <div className="mt-7 grid grid-cols-2 gap-3 sm:flex sm:flex-row">
@@ -111,7 +108,7 @@ export function HomeView({ products }: HomeViewProps) {
                       "h-11 rounded-none px-4 sm:px-6",
                     )}
                   >
-                    Shop new arrivals
+                    {content.hero.primaryAction}
                   </Link>
                   <Link
                     href="/size-guide"
@@ -121,7 +118,7 @@ export function HomeView({ products }: HomeViewProps) {
                       "h-11 rounded-none px-4 sm:px-6",
                     )}
                   >
-                    Find your size
+                    {content.hero.secondaryAction}
                   </Link>
                 </div>
 
@@ -161,31 +158,21 @@ export function HomeView({ products }: HomeViewProps) {
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
               <h2 className="text-base font-medium">
-                The first edit is waiting for products.
+                {content.hero.emptyTitle}
               </h2>
               <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                Publish products in Medusa to turn the homepage into a
-                product-led storefront.
+                {content.hero.emptyDescription}
               </p>
             </div>
           )}
 
           <div className="mt-10 border-border border-y py-4">
             <div className="grid gap-4 text-sm sm:grid-cols-3">
-              <p>
-                <span className="font-medium">
-                  Small catalog, sharper edit.
-                </span>{" "}
-                About 20-25 pieces at launch.
-              </p>
-              <p>
-                <span className="font-medium">Premium price confidence.</span>{" "}
-                Fit notes and size support stay close to purchase decisions.
-              </p>
-              <p>
-                <span className="font-medium">India-first checkout.</span>{" "}
-                Prepaid flow with clear shipping details before payment.
-              </p>
+              {content.valueStrip.map((item) => (
+                <p key={item.title}>
+                  <span className="font-medium">{item.title}</span> {item.text}
+                </p>
+              ))}
             </div>
           </div>
         </div>
@@ -196,11 +183,10 @@ export function HomeView({ products }: HomeViewProps) {
           <div className="mb-8 flex flex-col justify-between gap-5 border-border border-b pb-6 md:flex-row md:items-end">
             <div>
               <h2 className="font-heading text-5xl leading-none sm:text-6xl">
-                New arrivals
+                {content.newArrivals.title}
               </h2>
               <p className="mt-3 max-w-xl text-muted-foreground">
-                Dresses, co-ords, and statement tops selected for dinners,
-                wedding functions, and dressed-up weekends.
+                {content.newArrivals.description}
               </p>
             </div>
             <Link
@@ -208,7 +194,7 @@ export function HomeView({ products }: HomeViewProps) {
               prefetch={false}
               className="text-sm font-medium underline-offset-4 hover:underline"
             >
-              View all products
+              {content.newArrivals.action}
             </Link>
           </div>
 
@@ -221,11 +207,10 @@ export function HomeView({ products }: HomeViewProps) {
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
               <h3 className="text-base font-medium">
-                New arrivals are not connected yet.
+                {content.newArrivals.emptyTitle}
               </h3>
               <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                Start Medusa with a publishable key and published products to
-                populate this section.
+                {content.newArrivals.emptyDescription}
               </p>
             </div>
           )}
@@ -237,18 +222,17 @@ export function HomeView({ products }: HomeViewProps) {
           <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
               <h2 className="font-heading text-5xl leading-none sm:text-7xl">
-                Occasion edit
+                {content.occasionEdit.title}
               </h2>
               <p className="mt-5 max-w-md text-muted-foreground">
-                Shop by plan, not by trend. This edit pulls from the live Medusa
-                catalog.
+                {content.occasionEdit.description}
               </p>
               <Link
                 href="/shop/occasion-edit"
                 prefetch={false}
                 className="mt-7 inline-flex text-sm font-medium underline-offset-4 hover:underline"
               >
-                View the edit
+                {content.occasionEdit.action}
               </Link>
             </div>
 
@@ -279,15 +263,13 @@ export function HomeView({ products }: HomeViewProps) {
             </Link>
             <div className="lg:pl-10">
               <p className="text-sm font-medium text-muted-foreground">
-                Size and fit first
+                {content.fitSupport.eyebrow}
               </p>
               <h2 className="mt-3 font-heading text-5xl leading-none sm:text-7xl">
-                Dressy should still feel easy.
+                {content.fitSupport.title}
               </h2>
               <p className="mt-5 max-w-xl text-muted-foreground">
-                Product pages will keep measurements, fabric, care, and fit
-                notes close to the add-to-bag flow, so customers can decide
-                without searching through policy text.
+                {content.fitSupport.description}
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
@@ -298,7 +280,7 @@ export function HomeView({ products }: HomeViewProps) {
                     "h-11 rounded-none px-6",
                   )}
                 >
-                  Size guide
+                  {content.fitSupport.primaryAction}
                 </Link>
                 <Link
                   href="/shop"
@@ -308,7 +290,7 @@ export function HomeView({ products }: HomeViewProps) {
                     "h-11 rounded-none px-6",
                   )}
                 >
-                  Shop new arrivals
+                  {content.fitSupport.secondaryAction}
                 </Link>
               </div>
             </div>
@@ -318,9 +300,9 @@ export function HomeView({ products }: HomeViewProps) {
 
       <section className="border-border border-y px-4 py-9 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[1440px] gap-6 md:grid-cols-3">
-          {trustItems.map((item) => (
+          {content.trustItems.map((item) => (
             <div key={item.title} className="flex gap-4">
-              <item.icon className="mt-0.5 size-5 shrink-0 stroke-[1.6] text-primary" />
+              <TrustIcon icon={item.icon} />
               <div>
                 <h2 className="text-sm font-medium">{item.title}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">

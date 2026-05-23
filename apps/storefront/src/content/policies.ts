@@ -25,7 +25,7 @@ export const policyPages = {
     title: "Returns.",
     description: "Returns and exchanges policy for The Label.",
     intro:
-      "This policy is a launch draft. Final return windows and eligibility rules must be confirmed before production checkout is enabled.",
+      "Return and exchange requests are reviewed with the order details, item condition, and delivery status in mind.",
     sections: [
       {
         title: "Eligibility",
@@ -33,7 +33,7 @@ export const policyPages = {
       },
       {
         title: "Size support",
-        body: "Product pages include size guidance so customers can choose carefully before purchase. Size exchange rules will be finalized by the business team before launch.",
+        body: "Product pages include size guidance so customers can choose carefully before purchase. If a size exchange is needed, contact the store team with the order details and preferred size.",
       },
       {
         title: "Inspection",
@@ -67,7 +67,7 @@ export const policyPages = {
     title: "Terms.",
     description: "Terms and conditions for using The Label storefront.",
     intro:
-      "These terms describe expected use of the storefront. Final legal review should happen before production launch.",
+      "These terms describe expected use of the storefront and how orders are handled.",
     sections: [
       {
         title: "Store use",

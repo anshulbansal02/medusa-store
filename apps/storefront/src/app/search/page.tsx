@@ -5,12 +5,13 @@ import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { siteContent } from "@/content/site-content";
 import { ProductCard } from "@/features/products/product-card";
 import { getProducts } from "@/lib/medusa/products";
 
 export const metadata: Metadata = {
-  title: "Search | The Label",
-  description: "Search dresses, co-ords, tops, and occasion wear.",
+  title: siteContent.search.metadata.title,
+  description: siteContent.search.metadata.description,
 };
 
 type SearchPageProps = {
@@ -39,9 +40,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
         <div className="mx-auto max-w-[1440px]">
           <div className="border-border border-b pb-7">
-            <p className="text-muted-foreground text-sm">Search</p>
+            <p className="text-muted-foreground text-sm">
+              {siteContent.search.eyebrow}
+            </p>
             <h1 className="mt-3 font-heading text-6xl leading-none sm:text-8xl">
-              Find a style.
+              {siteContent.search.title}
             </h1>
           </div>
 
@@ -50,19 +53,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               type="search"
               name="q"
               defaultValue={query}
-              placeholder="Search dresses, co-ords, tops"
+              placeholder={siteContent.search.placeholder}
               className="h-12 min-w-0 flex-1 rounded-none border-border bg-background px-4"
             />
             <Button type="submit" size="lg" className="h-12 rounded-none px-6">
-              Search
+              {siteContent.search.action}
             </Button>
           </form>
 
           <div className="mb-6 flex items-center justify-between gap-4 text-sm">
             <p className="text-muted-foreground">
               {query
-                ? `${results.length} result${results.length === 1 ? "" : "s"}`
-                : "Latest styles"}
+                ? `${results.length} ${
+                    results.length === 1
+                      ? siteContent.search.resultSingular
+                      : siteContent.search.resultPlural
+                  }`
+                : siteContent.search.latestLabel}
             </p>
             {query ? (
               <Link
@@ -70,7 +77,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 prefetch={false}
                 className="underline-offset-4 hover:underline"
               >
-                Clear
+                {siteContent.search.clearAction}
               </Link>
             ) : null}
           </div>
@@ -87,16 +94,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </div>
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
-              <h2 className="font-medium">No styles found.</h2>
+              <h2 className="font-medium">{siteContent.search.emptyTitle}</h2>
               <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                Try a broader search, or browse the current edit.
+                {siteContent.search.emptyDescription}
               </p>
               <Link
                 href="/shop"
                 prefetch={false}
                 className="mt-5 inline-flex text-sm underline-offset-4 hover:underline"
               >
-                Browse shop
+                {siteContent.search.browseAction}
               </Link>
             </div>
           )}

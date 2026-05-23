@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { siteContent } from "@/content/site-content";
 import { ProductCard } from "@/features/products/product-card";
 import type { StorefrontProductCategory } from "@/lib/medusa/categories";
 import type { StorefrontProduct } from "@/lib/medusa/products";
@@ -12,6 +13,8 @@ type CollectionViewProps = {
 };
 
 export function CollectionView({ category, products }: CollectionViewProps) {
+  const content = siteContent.collection;
+
   return (
     <main className="min-h-screen">
       <SiteHeader />
@@ -26,21 +29,20 @@ export function CollectionView({ category, products }: CollectionViewProps) {
               </h1>
             </div>
             <p className="max-w-2xl text-muted-foreground lg:justify-self-end">
-              {category.description ||
-                "Browse this live Medusa category from the current catalog."}
+              {category.description || content.fallbackDescription}
             </p>
           </div>
 
           <div className="flex items-center justify-between gap-4 py-6">
             <p className="text-muted-foreground text-sm">
-              {products.length} styles
+              {products.length} {content.countLabel}
             </p>
             <Link
               href="/shop"
               prefetch={false}
               className="text-sm underline-offset-4 hover:underline"
             >
-              View all
+              {content.allProductsAction}
             </Link>
           </div>
 
@@ -56,12 +58,9 @@ export function CollectionView({ category, products }: CollectionViewProps) {
             </div>
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
-              <h2 className="text-base font-medium">
-                Products are not available yet.
-              </h2>
+              <h2 className="text-base font-medium">{content.emptyTitle}</h2>
               <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                Start Medusa with a publishable key and published products to
-                populate this collection.
+                {content.emptyDescription}
               </p>
             </div>
           )}

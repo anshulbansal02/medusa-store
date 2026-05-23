@@ -3,6 +3,7 @@ import Image from "next/image";
 import { EmptyAction } from "@/components/content/empty-action";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { siteContent } from "@/content/site-content";
 import { CheckoutAddressForm } from "@/features/checkout/checkout-address-form";
 import { RazorpayPaymentButton } from "@/features/checkout/razorpay-payment-button";
 import type { CheckoutAddressInput } from "@/features/checkout/schema";
@@ -39,17 +40,19 @@ export function CheckoutPageView({
   shippingOptions,
   razorpayPublicKey,
 }: CheckoutPageViewProps) {
+  const content = siteContent.checkout;
+
   if (!cart || cart.items.length === 0) {
     return (
       <main className="min-h-screen">
         <SiteHeader />
         <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 lg:px-8">
           <EmptyAction
-            eyebrow="Checkout"
-            title="Your bag is empty."
-            description="Add a style before entering delivery details."
+            eyebrow={content.eyebrow}
+            title={content.emptyTitle}
+            description={content.emptyDescription}
             actionHref="/shop"
-            actionLabel="Shop new arrivals"
+            actionLabel={content.emptyAction}
             className="mx-auto max-w-[900px] border-border border-b pb-10"
             titleAs="h1"
           />
@@ -66,9 +69,9 @@ export function CheckoutPageView({
       <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
         <div className="mx-auto max-w-[1200px]">
           <div className="border-border border-b pb-7">
-            <p className="text-muted-foreground text-sm">Checkout</p>
+            <p className="text-muted-foreground text-sm">{content.eyebrow}</p>
             <h1 className="mt-3 font-heading text-6xl leading-none sm:text-8xl">
-              Delivery details
+              {content.title}
             </h1>
           </div>
 
@@ -76,10 +79,11 @@ export function CheckoutPageView({
             <div className="grid gap-10">
               <section>
                 <div className="mb-5">
-                  <h2 className="text-xl font-medium">Address</h2>
+                  <h2 className="text-xl font-medium">
+                    {content.addressTitle}
+                  </h2>
                   <p className="mt-1 text-muted-foreground text-sm">
-                    India-only delivery for this launch. Billing uses the same
-                    address.
+                    {content.addressDescription}
                   </p>
                 </div>
                 <CheckoutAddressForm defaultValues={getAddressDefaults(cart)} />
@@ -87,9 +91,11 @@ export function CheckoutPageView({
 
               <section className="border-border border-t pt-8">
                 <div className="mb-5">
-                  <h2 className="text-xl font-medium">Shipping</h2>
+                  <h2 className="text-xl font-medium">
+                    {content.shippingTitle}
+                  </h2>
                   <p className="mt-1 text-muted-foreground text-sm">
-                    Save the address first, then choose a delivery method.
+                    {content.shippingDescription}
                   </p>
                 </div>
 
@@ -101,20 +107,19 @@ export function CheckoutPageView({
                     />
                   ) : (
                     <div className="border border-border px-5 py-6">
-                      <h3 className="font-medium">
-                        No shipping options available.
-                      </h3>
+                      <h3 className="font-medium">{content.noShippingTitle}</h3>
                       <p className="mt-2 text-muted-foreground text-sm">
-                        Check the address or shipping setup in Medusa.
+                        {content.noShippingDescription}
                       </p>
                     </div>
                   )
                 ) : (
                   <div className="border border-border px-5 py-6">
-                    <h3 className="font-medium">Address needed first.</h3>
+                    <h3 className="font-medium">
+                      {content.addressRequiredTitle}
+                    </h3>
                     <p className="mt-2 text-muted-foreground text-sm">
-                      Shipping options appear after the delivery address is
-                      saved.
+                      {content.addressRequiredDescription}
                     </p>
                   </div>
                 )}
@@ -122,7 +127,7 @@ export function CheckoutPageView({
             </div>
 
             <aside className="border border-border p-5 sm:p-6 lg:sticky lg:top-24">
-              <h2 className="font-medium">Order summary</h2>
+              <h2 className="font-medium">{content.summaryTitle}</h2>
               <div className="mt-5 grid gap-4 border-border border-b pb-5">
                 {cart.items.map((item, index) => (
                   <div

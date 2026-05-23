@@ -18,6 +18,8 @@ Use this checklist before substantial refactors, feature work, and launch-readin
 - Keep route files focused on routing, metadata, and server data orchestration.
 - Move reusable page sections into `components/content`, `components/site`, or feature view components.
 - Keep commerce/domain behavior in `features/*`.
+- Keep editable brand, page, empty-state, and support copy in `src/content/*` modules. Page structure can stay in code, but public copy should have one clean replacement point for a future CMS.
+- Do not show setup, backend, environment, launch-draft, or implementation wording to customers.
 - Keep Medusa access in `lib/medusa`; Client Components must receive typed props or call Server Actions.
 - Do not import Medusa helpers into Client Components except as type-only imports.
 - Keep `"use client"` files narrow and interaction-focused.
@@ -41,11 +43,12 @@ Use this checklist before substantial refactors, feature work, and launch-readin
 - Use semantic tokens such as `bg-background`, `text-foreground`, `border-border`, `bg-muted`, `text-muted-foreground`, `bg-primary`, and `text-destructive`.
 - Do not add one-off hex, rgb, hsl, or oklch values in components.
 - Keep raw color values in token files or metadata/icon generation files only.
-- Arbitrary values are allowed for layout constraints, exact aspect ratios, CSS functions, and typography clamps when a named token would be less clear.
+- Arbitrary values are allowed for layout constraints, exact aspect ratios, and CSS functions only.
+- Do not use arbitrary text sizes. Add a named Tailwind v4 text token in `globals.css` instead.
 - Avoid arbitrary color, shadow, blur, gradient, and decorative background utilities in components.
 - Prefer `rounded-none`, `rounded-sm`, `rounded-md`, or token-backed shadcn radii. Avoid large decorative rounding unless the component pattern requires it.
 - Run `pnpm --dir apps/storefront lint`, `pnpm --dir apps/storefront lint:tailwind`, `pnpm --dir apps/storefront typecheck`, and `pnpm --dir apps/storefront build` after styling or UI changes.
-- `lint:tailwind` blocks raw colors, arbitrary color utilities, and gradient utilities outside explicit token/metadata files.
+- `lint:tailwind` blocks raw colors, arbitrary color utilities, arbitrary text sizes, and gradient utilities outside explicit token/metadata files.
 
 ## Backend Rules
 

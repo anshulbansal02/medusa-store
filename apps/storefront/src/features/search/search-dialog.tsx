@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { siteContent } from "@/content/site-content";
 import type { StorefrontProductCategory } from "@/lib/medusa/categories";
 import type { StorefrontProduct } from "@/lib/medusa/products";
 
@@ -25,6 +26,7 @@ type SearchDialogProps = {
 const maxVisibleProducts = 6;
 
 export function SearchDialog({ products, categories }: SearchDialogProps) {
+  const content = siteContent.search;
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
   const productResults = normalizedQuery
@@ -51,7 +53,7 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
           <Button
             variant="ghost"
             size="icon-lg"
-            aria-label="Search"
+            aria-label={content.action}
             className="rounded-none text-muted-foreground hover:text-foreground"
           />
         }
@@ -63,9 +65,9 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
         showCloseButton
       >
         <div className="border-border border-b px-4 pt-4 pb-3 sm:px-5 sm:pt-5">
-          <DialogTitle className="sr-only">Search products</DialogTitle>
+          <DialogTitle className="sr-only">{content.dialogTitle}</DialogTitle>
           <DialogDescription className="sr-only">
-            Search product names, categories, colors, and product notes.
+            {content.dialogDescription}
           </DialogDescription>
           <form action="/search" className="flex gap-2 pr-10">
             <Input
@@ -74,11 +76,11 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
               name="q"
               value={query}
               onChange={(event) => setQuery(event.currentTarget.value)}
-              placeholder="Search dresses, co-ords, colors"
+              placeholder={content.dialogPlaceholder}
               className="h-12 rounded-none border-border bg-background px-4"
             />
             <Button type="submit" size="lg" className="h-12 rounded-none px-5">
-              Search
+              {content.action}
             </Button>
           </form>
         </div>
@@ -86,7 +88,9 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
         <div className="max-h-[min(72svh,680px)] overflow-y-auto px-4 py-4 sm:px-5">
           {categoryResults.length > 0 ? (
             <div>
-              <p className="text-muted-foreground text-sm">Edits</p>
+              <p className="text-muted-foreground text-sm">
+                {content.editsLabel}
+              </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {categoryResults.map((category) => (
                   <Link
@@ -105,7 +109,7 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
           <div className={categoryResults.length > 0 ? "mt-6" : ""}>
             <div className="flex items-center justify-between gap-4">
               <p className="text-muted-foreground text-sm">
-                {normalizedQuery ? "Matching styles" : "Latest styles"}
+                {normalizedQuery ? content.matchingLabel : content.latestLabel}
               </p>
               {normalizedQuery ? (
                 <Link
@@ -113,7 +117,7 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
                   prefetch={false}
                   className="text-sm underline-offset-4 hover:underline"
                 >
-                  View all
+                  {content.viewAllAction}
                 </Link>
               ) : null}
             </div>
@@ -152,16 +156,16 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
               </div>
             ) : (
               <div className="mt-3 border border-border px-4 py-6">
-                <p className="font-medium text-sm">No styles found.</p>
+                <p className="font-medium text-sm">{content.emptyTitle}</p>
                 <p className="mt-1 text-muted-foreground text-sm">
-                  Try a broader search or browse the current edit.
+                  {content.emptyDescription}
                 </p>
                 <Link
                   href="/shop"
                   prefetch={false}
                   className="mt-4 inline-flex text-sm underline-offset-4 hover:underline"
                 >
-                  Browse shop
+                  {content.browseAction}
                 </Link>
               </div>
             )}

@@ -3,22 +3,21 @@ import Link from "next/link";
 
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { siteContent } from "@/content/site-content";
 import { ProductCard } from "@/features/products/product-card";
 import { absoluteUrl } from "@/lib/config/site";
 import { getProductCategories } from "@/lib/medusa/categories";
 import { getProducts } from "@/lib/medusa/products";
 
 export const metadata: Metadata = {
-  title: "Shop New Arrivals | The Label",
-  description:
-    "Shop premium western occasion wear, dresses, co-ords, and statement tops for India.",
+  title: siteContent.shop.metadata.title,
+  description: siteContent.shop.metadata.description,
   alternates: {
     canonical: absoluteUrl("/shop"),
   },
   openGraph: {
-    title: "Shop New Arrivals | The Label",
-    description:
-      "Shop premium western occasion wear, dresses, co-ords, and statement tops for India.",
+    title: siteContent.shop.metadata.title,
+    description: siteContent.shop.metadata.description,
     url: absoluteUrl("/shop"),
     type: "website",
   },
@@ -30,7 +29,7 @@ export default async function ShopPage() {
     getProductCategories(12),
   ]);
   const categoryLinks = [
-    { href: "/shop", label: "All" },
+    { href: "/shop", label: siteContent.shop.allCategoryLabel },
     ...categories.map((category) => ({
       href: `/shop/${category.handle}`,
       label: category.name,
@@ -46,15 +45,14 @@ export default async function ShopPage() {
           <div className="grid gap-8 border-border border-b pb-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                New arrivals
+                {siteContent.shop.eyebrow}
               </p>
               <h1 className="mt-3 max-w-3xl font-heading text-6xl leading-none sm:text-8xl">
-                Shop the edit.
+                {siteContent.shop.title}
               </h1>
             </div>
             <p className="max-w-2xl text-muted-foreground lg:justify-self-end">
-              Dresses, co-ords, and sharper tops for dinners, wedding functions,
-              launches, and weekends that need more polish.
+              {siteContent.shop.description}
             </p>
           </div>
 
@@ -75,7 +73,7 @@ export default async function ShopPage() {
               ))}
             </nav>
             <p className="text-muted-foreground text-sm">
-              {products.length} styles
+              {products.length} {siteContent.shop.countLabel}
             </p>
           </div>
 
@@ -92,11 +90,10 @@ export default async function ShopPage() {
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
               <h2 className="text-base font-medium">
-                Products are not available yet.
+                {siteContent.shop.emptyTitle}
               </h2>
               <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                Start Medusa with a publishable key and published products to
-                populate the shop.
+                {siteContent.shop.emptyDescription}
               </p>
             </div>
           )}
@@ -105,18 +102,11 @@ export default async function ShopPage() {
 
       <section className="border-border border-y px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[1440px] gap-5 text-sm md:grid-cols-3">
-          <p>
-            <span className="font-medium">Size notes close by.</span> Product
-            pages will keep fit and measurements near size selection.
-          </p>
-          <p>
-            <span className="font-medium">Prepaid checkout.</span> Razorpay
-            payment is available after address and shipping are saved.
-          </p>
-          <p>
-            <span className="font-medium">India shipping.</span> Dispatch and
-            return details stay visible before purchase.
-          </p>
+          {siteContent.shop.valueStrip.map((item) => (
+            <p key={item.title}>
+              <span className="font-medium">{item.title}</span> {item.text}
+            </p>
+          ))}
         </div>
       </section>
 
