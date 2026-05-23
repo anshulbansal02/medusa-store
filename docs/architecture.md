@@ -87,6 +87,7 @@ Vercel Pro:
 AWS Lightsail:
   Production Medusa backend/admin compute
   Single 4 GB instance in Singapore
+  Ubuntu 22.04 LTS host OS
   Docker Compose Medusa server and worker containers
   Caddy reverse proxy and HTTPS termination
 
@@ -129,7 +130,11 @@ Production deploys start as controlled Docker Compose updates from GitHub Action
 
 Production Medusa database migrations require an explicit manual approval gate in the deployment workflow. Use expand-migrate-contract for schema changes and do not combine destructive schema cleanup with the same-minute production app cutover.
 
-Use Terraform, not OpenTofu, for v1 infrastructure as code. Terraform owns durable infrastructure, not application releases. Use Terraform for AWS Lightsail, Cloudflare DNS/R2, Upstash Redis, Vercel non-secret project/domain configuration, and Neon resources where provider support is reliable. Use GitHub Actions for image builds, GHCR pushes, deploys, migrations, health checks, and rollback. Do not commit live secret values through Terraform.
+Use Terraform, not OpenTofu, for v1 infrastructure as code. Terraform owns durable infrastructure, not application releases. Use Terraform for AWS Lightsail, Cloudflare DNS/R2, Upstash Redis, Vercel project/domain/environment configuration, and Neon resources where provider support is reliable. Use GitHub Actions for image builds, GHCR pushes, deploys, migrations, health checks, and rollback. Do not commit live secret values through Terraform.
+
+Manage the Vercel storefront project and configuration through Terraform where provider support is reliable. Keep Vercel deployments in GitHub Actions. Before managing Vercel secret environment variables in Terraform, confirm the remote state security posture and provider sensitive handling.
+
+Manage Neon through Terraform only after provider review/audit passes. If the Neon provider is not reliable enough, create Neon manually and document/import stable resources later.
 
 Terraform code lives under `infra/terraform` with environment directories and shared modules.
 
@@ -137,9 +142,23 @@ Terraform remote state uses an AWS S3 backend with DynamoDB locking. Use a small
 
 Terraform uses separate environment directories for `prod` and `qa`, with separate state and shared modules. Do not use Terraform workspaces for v1 environment separation.
 
-GitHub Actions writes Medusa runtime env files to Lightsail from GitHub environment secrets during deploy. Production uses GitHub environment protection/approval. Terraform must not manage live runtime secret values.
+Run Terraform `plan` and `apply` locally for v1 while using S3 remote state and DynamoDB locking. GitHub Actions may validate Terraform code later, but must not apply infrastructure until the team intentionally changes that decision.
+
+Create the S3 state bucket and DynamoDB lock table through a small `infra/terraform/bootstrap` config with local state. Use local state only for this backend bootstrap boundary.
+
+Pin Terraform CLI and provider versions in each root module, commit `.terraform.lock.hcl`, and upgrade providers intentionally in separate changes.
+
+Commit non-secret Terraform tfvars for environment configuration. Never commit secret values in tfvars; provide examples or secure local input paths for secret values.
+
+All Terraform code must pass `terraform fmt` and root modules must pass `terraform validate` before apply. Add repo scripts for these checks during Terraform implementation.
+
+AWS SSM Parameter Store is the central runtime config and secret store for Medusa. GitHub Actions fetches SSM parameters during deploy and writes Medusa runtime env files to Lightsail. Production uses GitHub environment protection/approval. Terraform may manage SSM parameters and Vercel env vars, including secret values, after provider behavior is reviewed. Treat Terraform remote state as a secret-bearing artifact.
 
 Lightsail host bootstrap is a separate committed script/runbook under `infra/`. Terraform creates the VM and network resources; bootstrap installs Docker, Docker Compose plugin, Caddy, deployment directories, permissions, and approved host-level hardening. App deployments remain in GitHub Actions.
+
+The Lightsail host uses Ubuntu 22.04 LTS. Node.js 24 is provided by the Medusa Docker image, not by the host OS.
+
+Medusa production Docker builds use an official Node 24 Debian slim base image with multi-stage builds. Do not use Alpine for v1 unless image-size pressure becomes real and native dependency compatibility is verified.
 
 Use Better Stack for uptime checks/alerts and Sentry for storefront and Medusa application error tracking. Keep local Docker and Caddy logs available on Lightsail for server investigation. Do not self-host the observability stack on the production VM for v1.
 

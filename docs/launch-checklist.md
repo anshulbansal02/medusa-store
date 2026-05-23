@@ -153,6 +153,8 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Public Lightsail SSH is closed after Tailscale access is verified, with emergency access documented.
 - Docker Compose is running separate Medusa server and worker services.
 - Lightsail bootstrap script/runbook has been run and is committed under `infra/`.
+- Lightsail host OS is Ubuntu 22.04 LTS; Node.js runtime is inside the Medusa Docker image.
+- Medusa Docker image uses Node 24 Debian slim, not Alpine, unless compatibility is revalidated.
 - Production Lightsail automatic snapshots are enabled and understood as host recovery only.
 - Medusa production image is stored privately in GHCR.
 - Production deploy uses an immutable image tag, not only `latest`.
@@ -161,7 +163,11 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Production Medusa database migrations require explicit approval before running.
 - Cloudflare Tunnel is not required for v1 public ingress.
 - Vercel, Lightsail/deploy, and any remaining platform deploy secrets are stored only in approved secret stores and injected at runtime.
-- GitHub Actions writes Lightsail runtime env files from GitHub environment secrets during deploy.
+- AWS SSM Parameter Store paths exist for Medusa production and QA runtime config/secrets.
+- Terraform remote state bucket is encrypted, versioned, public-access-blocked, and access-restricted because state may contain secrets.
+- Terraform backend bootstrap was created through `infra/terraform/bootstrap`.
+- Terraform production/QA applies are run locally with S3 remote state and DynamoDB locking.
+- GitHub Actions fetches SSM parameters and writes Lightsail runtime env files during deploy.
 - Generated Lightsail env files have restrictive permissions.
 - QA backend domains are pending the QA/staging infrastructure decision.
 - QA Medusa containers are stopped by default if sharing the production Lightsail instance.

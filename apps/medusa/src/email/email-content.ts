@@ -12,6 +12,10 @@ export const emailContent = {
       support:
         "For support, reply to this email with your order number.",
       previewPrefix: "confirmed. Total",
+      subjectWithOrder: "Your The Label order {orderNumber} is confirmed",
+      subjectFallback: "Your The Label order is confirmed",
+      textFallback:
+        "Thank you for your order{orderNumber}. Total: {orderTotal}.",
     },
     owner: {
       heading: "New order received",
@@ -22,6 +26,10 @@ export const emailContent = {
       guestCustomer: "guest customer",
       previewPrefix: "New order",
       previewFrom: "from",
+      subjectWithOrder: "New The Label order {orderNumber}",
+      subjectFallback: "New The Label order",
+      textFallback:
+        "New order{orderNumber} for {orderTotal} from {customerEmail}.",
     },
     summary: {
       order: "Order",

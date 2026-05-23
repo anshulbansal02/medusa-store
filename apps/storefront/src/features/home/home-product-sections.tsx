@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { ProductSectionProps } from "@/features/home/home-section-types";
 import { ProductCard } from "@/features/products/product-card";
+import { ProductGrid } from "@/features/products/product-grid";
 
 export function NewArrivalsSection({ content, products }: ProductSectionProps) {
   return (
@@ -26,11 +27,7 @@ export function NewArrivalsSection({ content, products }: ProductSectionProps) {
         </div>
 
         {products.length > 0 ? (
-          <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <ProductGrid products={products} />
         ) : (
           <div className="border border-border px-5 py-8 sm:px-8">
             <h3 className="text-base font-medium">

@@ -41,6 +41,11 @@ export const catalogContent = {
     countLabel: "styles",
   },
   product: {
+    card: {
+      viewAriaLabelPrefix: "View",
+      viewDetailsLabel: "View details",
+      imageAltSuffix: "styled on a model",
+    },
     statusLabel: "New arrival",
     deliveryTitle: "Delivery",
     deliveryText: "India shipping with prepaid checkout.",
@@ -97,5 +102,6 @@ export const catalogContent = {
     viewAllAction: "View all",
     resultSingular: "result",
     resultPlural: "results",
+    imageAltSuffix: "styled on a model",
   },
 } as const;

@@ -9,6 +9,7 @@ import { siteContent } from "@/content/site-content";
 import { AddToCartForm } from "@/features/cart/add-to-cart-form";
 import { ProductCard } from "@/features/products/product-card";
 import { ProductGallery } from "@/features/products/product-gallery";
+import { ProductGrid } from "@/features/products/product-grid";
 import { ProductSizeChart } from "@/features/products/product-size-chart";
 import { absoluteUrl } from "@/lib/config/site";
 import { getCategoryByHandle } from "@/lib/medusa/categories";
@@ -128,15 +129,7 @@ async function CollectionRoute({ handle }: { handle: string }) {
           </div>
 
           {products.length > 0 ? (
-            <div className="grid gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-4">
-              {products.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  eager={index < 4}
-                />
-              ))}
-            </div>
+            <ProductGrid products={products} prioritizeInitialImages />
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
               <h2 className="text-base font-medium">{content.emptyTitle}</h2>

@@ -5,6 +5,7 @@ export const homeContent = {
       "Premium western occasion wear for India, built around newness, visual appeal, and a low-friction shopping flow.",
   },
   hero: {
+    imageAltSuffix: "styled on a model",
     productEyebrow: "Featured style",
     eyebrow: "The first edit",
     title: "Designed to be noticed.",

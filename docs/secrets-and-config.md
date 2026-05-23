@@ -40,15 +40,15 @@ Use two hosted environments:
 Rules:
 
 - Vercel stores storefront QA/prod environment variables.
-- Production Medusa runtime variables are stored in GitHub environment secrets and written to the approved Lightsail deployment path by GitHub Actions during deploy.
-- QA Medusa runtime variables are stored in GitHub environment secrets and written to the approved Lightsail deployment path by GitHub Actions during QA deploy/start.
+- Production Medusa runtime variables are stored in AWS SSM Parameter Store and written to the approved Lightsail deployment path by GitHub Actions during deploy.
+- QA Medusa runtime variables are stored in separate AWS SSM Parameter Store paths and written to the approved Lightsail deployment path by GitHub Actions during QA deploy/start.
 - QA and production use separate Razorpay keys, webhook secrets, database URLs, admin credentials, JWT secrets, cookie secrets, and object storage credentials.
 - QA must not write to production data stores.
 - Local uses portless for UI app URLs, direct fixed nonstandard API ports, Docker Compose Postgres/Redis, and local app env files.
 
 ## Medusa Runtime Access Controls
 
-Production Medusa compute runs on AWS Lightsail. GitHub Actions writes runtime env files from GitHub environment secrets during deploy.
+Production Medusa compute runs on AWS Lightsail. GitHub Actions fetches runtime config/secrets from AWS SSM Parameter Store and writes runtime env files during deploy.
 
 Rules:
 
@@ -57,8 +57,33 @@ Rules:
 - Keep the Lightsail SSH surface narrow and key-based.
 - Keep production runtime secrets readable only by the deployment user/process.
 - Keep QA and production runtime variables separate.
-- Terraform may manage non-secret infrastructure settings, but must not commit live runtime secret values.
-- Use GitHub environment protection/approval for production secrets and deploys.
+- Terraform may manage SSM parameters and Vercel env vars, including secret values, after provider behavior is reviewed.
+- Treat Terraform remote state as secret-bearing and restrict access accordingly.
+- Use GitHub environment protection/approval for production deploys.
+- Vercel environment variables are managed by Terraform where practical; secret values require provider behavior review and secret-bearing state controls.
+
+## AWS SSM Parameter Store
+
+Use AWS SSM Parameter Store as the central runtime config and secret store for Medusa.
+
+Path layout:
+
+```txt
+/ecom/prod/medusa/*
+/ecom/qa/medusa/*
+```
+
+Rules:
+
+- Store secrets as `SecureString`.
+- Keep QA and production under separate paths.
+- GitHub Actions may read only the environment path needed for the current deploy.
+- Terraform may manage parameter values after provider behavior is reviewed.
+- Prefer write-only SSM value support where available.
+- Terraform state may contain secret values and must be protected like a secret store.
+- Do not commit SSM parameter values to Git, Terraform variables, docs, or workflow logs.
+- Commit only non-secret Terraform tfvars; never commit secret values in tfvars.
+- GitHub environment secrets should hold only deploy/bootstrap credentials needed to run Terraform, read SSM, and access Lightsail, not duplicate the full Medusa app secret set.
 
 ## Railway Auth And Access Controls (Historical Phase 1 Notes)
 

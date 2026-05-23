@@ -15,8 +15,11 @@ const allowedRawColorFiles = new Set([
 const checkedExtensions = new Set([".css", ".ts", ".tsx"]);
 const rawColorPattern = /#[0-9a-fA-F]{3,8}|rgba?\(|hsla?\(|oklch\(/g;
 const arbitraryColorClassPattern =
-  /\b(?:bg|text|border|ring|outline|from|via|to|shadow)-\[(?:#|rgb|hsl|oklch)/g;
+  /\b(?:accent|bg|border|caret|decoration|divide|fill|from|outline|placeholder|ring|shadow|stroke|text|to|via)-\[(?:#|rgb|hsl|oklch)/g;
 const arbitraryTextSizeClassPattern = /\b(?:\w+:)*text-\[[^\]]+\]/g;
+const arbitraryTypographyClassPattern =
+  /\b(?:\w+:)*(?:leading|tracking)-\[[^\]]+\]/g;
+const arbitraryStrokeWidthClassPattern = /\b(?:\w+:)*stroke-\[[^\]]+\]/g;
 const gradientClassPattern = /\bbg-gradient[^\s"`']*/g;
 
 async function listFiles(dir) {
@@ -74,6 +77,22 @@ for (const file of await listFiles(sourceDir)) {
       file: relativePath,
       line: getLineNumber(source, match.index ?? 0),
       message: `arbitrary text-size utility "${match[0]}" should use a text token`,
+    });
+  }
+
+  for (const match of source.matchAll(arbitraryTypographyClassPattern)) {
+    violations.push({
+      file: relativePath,
+      line: getLineNumber(source, match.index ?? 0),
+      message: `arbitrary typography utility "${match[0]}" should use a token`,
+    });
+  }
+
+  for (const match of source.matchAll(arbitraryStrokeWidthClassPattern)) {
+    violations.push({
+      file: relativePath,
+      line: getLineNumber(source, match.index ?? 0),
+      message: `arbitrary stroke-width utility "${match[0]}" should use a token`,
     });
   }
 

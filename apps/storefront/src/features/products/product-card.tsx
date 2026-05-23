@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { siteContent } from "@/content/site-content";
 import { WishlistButton } from "@/features/wishlist/wishlist-button";
 import type { StorefrontProduct } from "@/lib/medusa/products";
 
@@ -12,6 +13,7 @@ export function ProductCard({
   eager?: boolean;
 }) {
   const categoryName = product.categories[0]?.name;
+  const content = siteContent.product.card;
 
   return (
     <article className="group">
@@ -20,12 +22,12 @@ export function ProductCard({
           href={product.href}
           prefetch={false}
           className="block"
-          aria-label={`View ${product.name}`}
+          aria-label={`${content.viewAriaLabelPrefix} ${product.name}`}
         >
           <div className="relative aspect-[4/5] overflow-hidden bg-muted">
             <Image
               src={product.image}
-              alt={`${product.name} styled on a model`}
+              alt={`${product.name} ${content.imageAltSuffix}`}
               fill
               loading={eager ? "eager" : "lazy"}
               fetchPriority={eager ? "high" : "auto"}
@@ -33,7 +35,7 @@ export function ProductCard({
               className="object-cover transition duration-500 ease-out group-hover:scale-[1.03]"
             />
             <span className="absolute right-3 bottom-3 bg-background/92 px-3 py-1.5 text-xs opacity-0 transition group-hover:opacity-100">
-              View details
+              {content.viewDetailsLabel}
             </span>
           </div>
         </Link>

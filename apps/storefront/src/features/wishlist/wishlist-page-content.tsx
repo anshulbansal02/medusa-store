@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
 import { siteContent } from "@/content/site-content";
-import { ProductCard } from "@/features/products/product-card";
+import { ProductGrid } from "@/features/products/product-grid";
 import { useWishlistStore } from "@/features/wishlist/wishlist-store";
 import type { StorefrontProduct } from "@/lib/medusa/products";
 import { cn } from "@/lib/utils";
@@ -63,11 +63,5 @@ export function WishlistPageContent({ products }: WishlistPageContentProps) {
     );
   }
 
-  return (
-    <div className="grid gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-4">
-      {savedProducts.map((product, index) => (
-        <ProductCard key={product.id} product={product} eager={index < 4} />
-      ))}
-    </div>
-  );
+  return <ProductGrid products={savedProducts} />;
 }

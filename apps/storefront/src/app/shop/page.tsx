@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { siteContent } from "@/content/site-content";
-import { ProductCard } from "@/features/products/product-card";
+import { ProductGrid } from "@/features/products/product-grid";
 import { absoluteUrl } from "@/lib/config/site";
 import { getProductCategories } from "@/lib/medusa/categories";
 import { getProducts } from "@/lib/medusa/products";
@@ -79,15 +79,7 @@ export default async function ShopPage() {
           </div>
 
           {products.length > 0 ? (
-            <div className="grid gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-4">
-              {products.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  eager={index < 4}
-                />
-              ))}
-            </div>
+            <ProductGrid products={products} prioritizeInitialImages />
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
               <h2 className="text-base font-medium">{content.emptyTitle}</h2>

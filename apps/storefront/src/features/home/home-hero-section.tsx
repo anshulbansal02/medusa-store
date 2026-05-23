@@ -30,7 +30,7 @@ export function HeroSection({
                 <div className="relative aspect-[4/5] overflow-hidden bg-muted lg:aspect-[16/18] lg:min-h-[720px]">
                   <Image
                     src={primaryProduct.image}
-                    alt={`${primaryProduct.name} styled on a model`}
+                    alt={`${primaryProduct.name} ${content.hero.imageAltSuffix}`}
                     fill
                     loading="eager"
                     fetchPriority="high"
@@ -101,7 +101,7 @@ export function HeroSection({
                         <div className="relative aspect-[4/5] overflow-hidden bg-muted">
                           <Image
                             src={product.image}
-                            alt={`${product.name} styled on a model`}
+                            alt={`${product.name} ${content.hero.imageAltSuffix}`}
                             fill
                             loading={index === 0 ? "eager" : "lazy"}
                             sizes="(min-width: 1024px) 22vw, 50vw"

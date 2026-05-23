@@ -204,6 +204,8 @@ function SearchProductResults({
 }
 
 function SearchProductResult({ product }: { product: StorefrontProduct }) {
+  const content = siteContent.search;
+
   return (
     <Link
       href={product.href}
@@ -213,7 +215,7 @@ function SearchProductResult({ product }: { product: StorefrontProduct }) {
       <div className="relative aspect-[4/5] overflow-hidden bg-muted">
         <Image
           src={product.image}
-          alt={`${product.name} styled on a model`}
+          alt={`${product.name} ${content.imageAltSuffix}`}
           fill
           sizes="72px"
           className="object-cover transition duration-300 ease-out group-hover:scale-[1.03]"

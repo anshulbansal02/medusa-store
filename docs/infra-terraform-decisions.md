@@ -460,32 +460,36 @@ Reason:
 - A separate branch is enough for lightweight internal QA when paired with separate Redis, secrets, and payment keys.
 - Shared production DB is never acceptable for QA.
 
-### Decision 15: Lightsail Runtime Secret Injection
+### Decision 15: Runtime Config And Secret Store
 
-Question: how should production Medusa secrets get onto the Lightsail host?
-
-Options:
+Question: where should Medusa runtime config and secrets be centrally managed?
 
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
-| GitHub Actions writes env files from environment secrets | Store secrets in GitHub environments and write `.env.prod` / `.env.qa` to Lightsail during deploy over SSH. | Repeatable, auditable deploy path, no secrets in Git or Terraform, simple for v1. | Secrets pass through CI runtime and SSH; workflow permissions must be tight. | Accepted |
-| Manual env files on server | SSH and edit `.env.prod` manually. | Simple first setup. | Easy to drift, less auditable, harder to recreate. | Rejected for v1 |
-| AWS Secrets Manager/SSM | Store secrets in AWS and fetch at deploy/runtime. | Strong AWS-native secret management. | More setup and integration complexity for v1. | Rejected for v1 |
+| AWS SSM Parameter Store managed by Terraform | Store runtime config/secrets centrally in SSM paths and manage them through Terraform where provider behavior is safe enough. | Central AWS-native config store, standard parameters have no additional charge, SecureString support, versioning/IAM, no custom sync scripts. | Terraform state may contain secret values and must be treated as a secret-bearing artifact. | Accepted |
+| GitHub environment secrets only | Store app secrets directly in GitHub environments and write env files during deploy. | Simple and close to CI. | GitHub becomes the primary long-term secret store; weaker central config story. | Rejected as primary store |
+| AWS Secrets Manager | Store all secrets in Secrets Manager. | Strong secret-management product with rotation features. | More cost and complexity than needed for v1. | Rejected for v1 |
+| Manual env files on server | SSH and edit `.env.prod` manually. | Simple first setup. | Easy to drift, less auditable, harder to recreate. | Rejected |
 
 Decision:
 
-- Store production and QA runtime secrets in GitHub environment secrets.
-- Use GitHub Actions to write runtime env files onto Lightsail during deploy.
-- Keep env files out of Git and Terraform.
-- Use GitHub environment protection/approval for production.
-- Restrict workflow permissions and SSH key scope.
-- Set restrictive file permissions on generated env files on the server.
+- Use AWS SSM Parameter Store as the central runtime config/secrets store for Medusa.
+- Use hierarchical paths such as `/ecom/prod/medusa/*` and `/ecom/qa/medusa/*`.
+- Store secrets as `SecureString`.
+- Terraform may manage SSM parameters, including secret values, after provider behavior is reviewed.
+- Prefer write-only SSM value support where available.
+- Accept that Terraform remote state may contain secret values.
+- Treat Terraform remote state as a secret-bearing artifact.
+- GitHub Actions fetches SSM parameters during deploy and writes `.env.prod` / `.env.qa` to Lightsail over Tailscale SSH.
+- Keep generated env files out of Git and with restrictive server permissions.
+- GitHub environment secrets should hold only deploy/bootstrap credentials needed to read SSM, run Terraform, and reach Lightsail, not duplicate the full app secret set.
 
 Reason:
 
-- This keeps v1 secret handling repeatable without adding AWS Secrets Manager/SSM complexity.
-- GitHub Actions already owns deploys, so env-file generation belongs in the deployment workflow rather than Terraform.
-- Production approvals provide a useful control point for secrets and deploys.
+- SSM Parameter Store gives a simple central source for runtime configuration without Secrets Manager cost/complexity.
+- Avoiding custom secret-sync scripts keeps the setup simpler and less fragile.
+- Terraform state can expose secret values, so remote state must be secured like a secret store.
+- GitHub Actions still owns deploy mechanics, but not the long-term app-secret source of truth.
 
 ### Decision 16: Lightsail Server Bootstrap
 
@@ -676,9 +680,118 @@ Reason:
 - Tailscale avoids depending on changing personal IPs or broad GitHub Actions runner IP ranges.
 - Public SSH does not need to remain exposed for v1.
 
+### Decision 23: Lightsail Host OS
+
+Question: which host operating system should the Lightsail VM use?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Ubuntu 22.04 LTS | Use Ubuntu Jammy as the Lightsail host OS. | Mature LTS, broad docs for Docker/Caddy/Tailscale, matches raw setup guide, boring production choice. | Slightly older than 24.04. | Accepted |
+| Ubuntu 24.04 LTS | Use Ubuntu Noble as the Lightsail host OS. | Newer LTS, supported by Docker and Lightsail. | Newer LTS edge cases are not worth it for this host role. | Rejected for v1 |
+| Debian | Use Debian host OS. | Lighter and stable. | Slightly less aligned with common Lightsail/Docker/Caddy/Tailscale examples for this project. | Rejected for v1 |
+| Amazon Linux 2023 | Use AWS-native Linux host OS. | AWS-native default. | Less aligned with our Docker/Caddy/Tailscale examples and troubleshooting path. | Rejected for v1 |
+
+Decision:
+
+- Use Ubuntu 22.04 LTS for the Lightsail host.
+- Do not install Node.js on the host for app runtime.
+- Run Medusa with Node.js 24 inside the production Docker image.
+- Host packages are limited to Docker Engine, Docker Compose plugin, Caddy, Tailscale, and basic operational tooling.
+
+Reason:
+
+- The host OS only needs to run the container/proxy/access stack.
+- Node 24 is a container-runtime requirement, not a host-OS requirement.
+- Ubuntu 22.04 LTS is mature, well documented, and good enough for a 4 GB production VPS.
+
+### Decision 24: Medusa Docker Base Image
+
+Question: which Node base image should Medusa use in production Docker builds?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Node 24 Debian slim | Use an official Node 24 Debian slim image for Medusa build/runtime stages. | Better native dependency compatibility, official Node image, glibc-based, still smaller than full Debian. | Larger than Alpine. | Accepted |
+| Node 24 Alpine | Use an official Node 24 Alpine image. | Smaller image. | musl/native dependency compatibility issues are more likely; troubleshooting can cost more than the image-size savings. | Rejected for v1 |
+| Host Node runtime | Install Node on Lightsail and run Medusa directly. | Avoids Docker image complexity. | Violates our containerized runtime direction and makes migration harder. | Rejected |
+
+Decision:
+
+- Use an official Node 24 Debian slim image for Medusa production Docker builds.
+- Prefer multi-stage builds.
+- Do not use Alpine for v1 unless image size becomes a real problem and native dependency compatibility is verified.
+- Do not install host Node.js for production Medusa runtime.
+
+Reason:
+
+- The project requires Node.js 24.
+- Debian slim is the safer production default for Medusa and Node native dependencies.
+- Image size is less important than predictable installs/builds and simpler debugging.
+
+### Decision 25: Vercel Terraform Management
+
+Question: should Terraform manage the Vercel storefront project and configuration?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Manage Vercel through Terraform | Use the official Vercel Terraform provider for storefront project, domains, and environment variables where supported. | Complete infra-as-code coverage, repeatable storefront platform setup, fewer dashboard-only changes. | Secrets may enter Terraform state if managed directly; provider environment variable resource modes must not be mixed. | Accepted |
+| Manage only DNS/domain records | Keep Vercel project/env config in dashboard or GitHub Actions and manage only Cloudflare DNS. | Avoids Vercel secrets in Terraform state. | Less complete infrastructure-as-code coverage. | Rejected |
+
+Decision:
+
+- Manage the Vercel storefront project and configuration through Terraform for v1 where provider support is reliable.
+- Manage Vercel domains through Terraform.
+- Manage Vercel environment variables through Terraform where practical.
+- Keep Vercel deployments in GitHub Actions, not Terraform.
+- Do not mix Vercel project inline `environment` config with standalone Vercel environment variable resources.
+
+Secret-state caution:
+
+- Terraform state can contain managed secret values even when outputs are marked sensitive.
+- Before adding Vercel secret environment variables to Terraform, confirm the remote state security posture and the Vercel provider's sensitive handling.
+- Terraform may manage Vercel secret environment variables directly after provider behavior is reviewed.
+- Treat remote Terraform state as a secret-bearing artifact.
+
+Reason:
+
+- The official Vercel Terraform provider supports projects, project domains, and environment variable resources.
+- Full infra-as-code is preferred for this project.
+- Avoiding custom Vercel secret-sync scripts keeps the setup simpler.
+- Deployments are release operations and remain better handled by GitHub Actions.
+
+### Decision 26: Neon Terraform Management
+
+Question: should Terraform manage Neon project, branches, roles, and databases?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Terraform-managed Neon after provider audit | Use Terraform for Neon project/branch/database/role resources after reviewing provider maturity and behavior. | Complete infra-as-code coverage and reproducible QA branch setup. | Neon provider support appears community-maintained; provider drift/import/secret behavior must be reviewed before production use. | Accepted |
+| Manual Neon setup | Create/manage Neon in dashboard and document outputs. | Avoids relying on a community provider. | Less complete IaC and more manual drift risk. | Rejected for v1 unless audit fails |
+| Hybrid manual-first/import-later | Create Neon manually, then import stable resources later. | Safer fallback if provider is not mature enough. | More transition work. | Fallback |
+
+Decision:
+
+- Manage Neon through Terraform if provider review/audit passes.
+- Review provider source, registry docs, supported resources, import behavior, sensitive outputs, region IDs, pooled/direct connection outputs, and branch lifecycle behavior before implementation.
+- If the review fails, create Neon manually and document/import stable resources later.
+- Do not put Neon passwords or connection strings into committed Terraform variables.
+
+Reason:
+
+- Full Terraform ownership is preferred for infrastructure consistency.
+- Neon branching is part of the QA/staging plan, so reproducible branch management is valuable.
+- Provider maturity must be verified because Neon Terraform support is not as clearly official as AWS/Cloudflare/Vercel.
+
 ## Round 1: Terraform Setup
 
-### Decision 23: IaC Tool
+### Decision 27: IaC Tool
 
 Question: should the project use Terraform or OpenTofu?
 
@@ -700,7 +813,7 @@ Reason:
 - Vendor docs and examples for AWS, Cloudflare, Vercel, Upstash, and community Neon providers are easiest to follow as Terraform.
 - Consistency matters more than tool neutrality for this initial setup.
 
-### Decision 24: Terraform Scope
+### Decision 28: Terraform Scope
 
 Question: what should Terraform own in v1?
 
@@ -725,12 +838,12 @@ Terraform must own:
 - Cloudflare DNS records.
 - Cloudflare R2 bucket and stable bucket settings where provider support is solid.
 - Upstash production Redis and QA Redis.
-- Vercel project/domain/non-secret configuration where provider support fits cleanly.
+- Vercel project/domain/environment configuration where provider support fits cleanly.
 - Remote Terraform state resources after the state backend decision is made.
 
 Terraform should own if provider support is reliable:
 
-- Neon project, production branch/database/role, QA branch/database/role, and non-secret outputs.
+- Neon project, production branch/database/role, QA branch/database/role, and non-secret outputs after provider review/audit passes.
 
 Terraform must not own:
 
@@ -748,7 +861,7 @@ Reason:
 - Keeping deployments out of Terraform avoids turning infrastructure state into application release state.
 - Keeping live secret values out of Terraform/Git reduces accidental exposure risk.
 
-### Decision 25: Terraform Directory Layout
+### Decision 29: Terraform Directory Layout
 
 Question: where should Terraform live?
 
@@ -788,7 +901,7 @@ Reason:
 - `infra/terraform` keeps infrastructure code separate from application code without requiring a separate repo.
 - The `infra/` parent leaves room for future runbooks, bootstrap scripts, or non-Terraform operational files.
 
-### Decision 26: Terraform State Backend
+### Decision 30: Terraform State Backend
 
 Question: where should Terraform state live?
 
@@ -806,6 +919,9 @@ Decision:
 - Use DynamoDB for Terraform state locking.
 - Do not use local state for shared or production infrastructure.
 - Do not add HCP Terraform/Terraform Cloud for v1.
+- Treat Terraform state as secret-bearing because Terraform may manage SSM and Vercel secret values.
+- Enable S3 block public access, encryption, and versioning for the state bucket.
+- Restrict state bucket access to the minimum human and CI principals needed.
 
 Bootstrap note:
 
@@ -817,7 +933,132 @@ Reason:
 - We already use AWS for Lightsail, so S3/DynamoDB avoids adding another state platform.
 - S3 remote state with DynamoDB locking is a standard, durable Terraform backend pattern.
 
-### Decision 27: Environments
+### Decision 31: Terraform Execution
+
+Question: should Terraform apply run locally or from GitHub Actions?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Local Terraform apply with remote state | Run `terraform plan/apply` from the operator machine while using S3 remote state and DynamoDB locking. | Simpler credential model for one engineer, fewer CI secrets, still has shared remote state safety. | Less CI audit trail; depends on operator discipline. | Accepted |
+| GitHub Actions plan/apply with approval | Run Terraform from CI with protected production apply. | Repeatable runner, CI audit trail, useful for teams. | Requires broad cloud credentials in CI and more workflow setup. | Rejected for v1 |
+| Mixed local and CI apply | Allow both local and CI applies. | Flexible. | Process drift and unclear source of operational truth. | Rejected |
+
+Decision:
+
+- Run Terraform `plan` and `apply` locally for v1.
+- Always use S3 remote state and DynamoDB locking.
+- Never use local state for production or QA infrastructure.
+- GitHub Actions may run `terraform fmt` / `terraform validate` later, but must not apply infrastructure in v1.
+- Revisit GitHub Actions apply if another engineer joins or infra changes become frequent.
+
+Reason:
+
+- There is one engineer/operator plus Codex assistance.
+- Infra changes should be infrequent.
+- Keeping broad provider credentials out of CI is simpler and safer for v1.
+- Remote state and locking provide the important safety properties even with local execution.
+
+### Decision 32: Terraform State Bootstrap
+
+Question: how should the S3 state bucket and DynamoDB lock table be created?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Bootstrap Terraform config | Use a small `infra/terraform/bootstrap` config with local state to create the S3 state bucket and DynamoDB lock table, then use remote state for real environments. | Repeatable, versioned, standard pattern, avoids manual console drift. | One small bootstrap local state file must be handled carefully. | Accepted |
+| Manual AWS console/CLI setup | Create bucket/table manually. | Quick once. | Less reproducible and easier to drift. | Rejected |
+| Main Terraform creates its own backend | Try to create backend resources from the same config that uses them. | None meaningful. | Backend must exist before it can be used reliably. | Rejected |
+
+Decision:
+
+- Add `infra/terraform/bootstrap` for Terraform backend bootstrap resources.
+- Use local state only for this bootstrap config.
+- Bootstrap creates the S3 state bucket and DynamoDB lock table.
+- Main `prod` and `qa` environment configs use the S3 backend and DynamoDB locking from the start.
+- Keep bootstrap state secure and do not use it for application/provider resources.
+
+Reason:
+
+- Terraform backends need to exist before normal environment state can use them.
+- A tiny bootstrap config is more repeatable than manual console setup.
+- Local state is acceptable only for this initial backend bootstrap boundary.
+
+### Decision 33: Terraform And Provider Version Pinning
+
+Question: should Terraform CLI and provider versions be pinned?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Strict version pinning | Pin Terraform CLI and provider version ranges in each root module. | Predictable applies, safer upgrades, standard practice for production IaC. | Requires intentional upgrade work. | Accepted |
+| Loose latest-compatible versions | Allow broad latest versions. | Less maintenance. | Unexpected provider behavior can affect infra applies. | Rejected |
+
+Decision:
+
+- Pin the Terraform CLI version with `required_version`.
+- Pin provider version ranges with `required_providers`.
+- Commit `.terraform.lock.hcl`.
+- Upgrade Terraform/providers intentionally in separate changes.
+
+Reason:
+
+- This setup uses multiple providers: AWS, Cloudflare, Upstash, Vercel, and likely Neon.
+- Provider behavior changes can affect production infrastructure.
+- Pinning versions is normal production Terraform practice.
+
+### Decision 34: Terraform Variable Files
+
+Question: should environment `tfvars` files be committed?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Commit non-secret tfvars only | Commit environment configuration values that are safe for Git, and keep secret values out of committed files. | Clear reviewable config, reproducible non-secret setup, safer default. | Secret values need a separate input path during apply. | Accepted |
+| Commit all tfvars including secrets | Put every variable in Git. | Fully reproducible. | Unsafe; secrets in Git history. | Rejected |
+| Commit no tfvars | Keep all values local/untracked. | Avoids accidental committed secrets. | Less reviewable and easier to drift. | Rejected |
+
+Decision:
+
+- Commit non-secret environment tfvars.
+- Never commit secret values in tfvars.
+- Provide `.tfvars.example` files where useful.
+- Secret values may be supplied locally during apply or through another approved secure input path.
+- Even when Terraform manages secret values, they must not enter Git.
+
+Reason:
+
+- Non-secret config belongs in version control for review and reproducibility.
+- Git history is not an acceptable place for secrets.
+
+### Decision 35: Terraform Formatting And Validation
+
+Question: should Terraform formatting and validation be required?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Require `terraform fmt` and `terraform validate` | All Terraform code must format and validate before apply/merge. | Standard Terraform hygiene, catches syntax/provider issues early. | Requires Terraform init/provider availability for validation. | Accepted |
+| No formal requirement | Run commands ad hoc. | Less setup. | Easier to commit broken Terraform. | Rejected |
+
+Decision:
+
+- Require `terraform fmt` for all Terraform code.
+- Require `terraform validate` for root modules before apply.
+- Add repo scripts for Terraform formatting/validation during implementation.
+- GitHub Actions may run Terraform format/validate later without apply permissions.
+
+Reason:
+
+- Formatting and validation are standard Terraform quality gates.
+- They catch low-cost mistakes before touching infrastructure.
+
+### Decision 36: Environments
 
 Question: should Terraform model QA and production separately?
 

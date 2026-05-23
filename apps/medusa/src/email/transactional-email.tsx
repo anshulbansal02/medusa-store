@@ -9,6 +9,7 @@ import {
 } from "./templates/order-placed";
 import { transactionalEmailTemplates } from "./template-ids";
 import { getEmailConfig } from "../config/env";
+import { emailContent } from "./email-content";
 
 export type TransactionalEmailContent = {
   subject: string;
@@ -104,6 +105,16 @@ function formatPrice(amount?: number | null, currencyCode = "inr") {
   }).format(amount ?? 0);
 }
 
+function interpolateEmailText(
+  template: string,
+  values: Record<string, string>,
+) {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+    template,
+  );
+}
+
 async function renderEmail(node: ReactNode) {
   const html = await render(node);
 
@@ -119,18 +130,25 @@ async function buildOrderPlacedEmail(
   const currencyCode = order.currency_code ?? "inr";
   const orderNumber = getOrderNumber(order);
   const subject = orderNumber
-    ? `Your The Label order ${orderNumber} is confirmed`
-    : "Your The Label order is confirmed";
+    ? interpolateEmailText(emailContent.orderPlaced.customer.subjectWithOrder, {
+        orderNumber,
+      })
+    : emailContent.orderPlaced.customer.subjectFallback;
   const { html, text } = await renderEmail(
     <CustomerOrderPlacedEmail order={order} orderUrl={getOrderUrl(order)} />,
+  );
+  const textFallback = interpolateEmailText(
+    emailContent.orderPlaced.customer.textFallback,
+    {
+      orderNumber: orderNumber ? ` ${orderNumber}` : "",
+      orderTotal: formatPrice(order.total, currencyCode),
+    },
   );
 
   return {
     subject,
     html,
-    text:
-      text ||
-      `Thank you for your order${orderNumber ? ` ${orderNumber}` : ""}. Total: ${formatPrice(order.total, currencyCode)}.`,
+    text: text || textFallback,
     replyTo: getReplyTo(),
     ...createOrderMetadata({
       order,
@@ -146,18 +164,26 @@ async function buildOwnerOrderPlacedEmail(
   const currencyCode = order.currency_code ?? "inr";
   const orderNumber = getOrderNumber(order);
   const subject = orderNumber
-    ? `New The Label order ${orderNumber}`
-    : "New The Label order";
+    ? interpolateEmailText(emailContent.orderPlaced.owner.subjectWithOrder, {
+        orderNumber,
+      })
+    : emailContent.orderPlaced.owner.subjectFallback;
   const { html, text } = await renderEmail(
     <OwnerOrderPlacedEmail order={order} />,
+  );
+  const textFallback = interpolateEmailText(
+    emailContent.orderPlaced.owner.textFallback,
+    {
+      orderNumber: orderNumber ? ` ${orderNumber}` : "",
+      orderTotal: formatPrice(order.total, currencyCode),
+      customerEmail: order.email ?? emailContent.orderPlaced.owner.guestCustomer,
+    },
   );
 
   return {
     subject,
     html,
-    text:
-      text ||
-      `New order${orderNumber ? ` ${orderNumber}` : ""} for ${formatPrice(order.total, currencyCode)} from ${order.email ?? "guest customer"}.`,
+    text: text || textFallback,
     replyTo: getReplyTo(),
     ...createOrderMetadata({
       order,

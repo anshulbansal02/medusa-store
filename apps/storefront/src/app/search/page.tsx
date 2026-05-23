@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/site/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { siteContent } from "@/content/site-content";
-import { ProductCard } from "@/features/products/product-card";
+import { ProductGrid } from "@/features/products/product-grid";
 import { getProducts } from "@/lib/medusa/products";
 
 export const metadata: Metadata = {
@@ -82,15 +82,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
 
           {results.length > 0 ? (
-            <div className="grid gap-x-5 gap-y-11 sm:grid-cols-2 lg:grid-cols-4">
-              {results.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  eager={index < 4}
-                />
-              ))}
-            </div>
+            <ProductGrid products={results} prioritizeInitialImages />
           ) : (
             <div className="border border-border px-5 py-8 sm:px-8">
               <h2 className="font-medium">{content.emptyTitle}</h2>
