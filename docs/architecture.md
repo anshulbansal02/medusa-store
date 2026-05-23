@@ -292,6 +292,8 @@ qa-admin.brand.com   QA Admin, only if hosted QA backend exists
 
 Manage production DNS in Cloudflare after a planned cutover from the current Shopify-managed DNS setup. This does not require transferring registrar ownership unless the business intentionally chooses to do that later.
 
+Keep this service-separated domain layout for v1. Do not mount Medusa API or Admin under storefront paths.
+
 Do not mount Medusa Admin/API under storefront paths unless there is a specific future reason.
 
 ## Environments

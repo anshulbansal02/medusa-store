@@ -1058,7 +1058,41 @@ Reason:
 - Formatting and validation are standard Terraform quality gates.
 - They catch low-cost mistakes before touching infrastructure.
 
-### Decision 36: Environments
+### Decision 36: Domain Layout
+
+Question: what hostname layout should production and QA use?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Service-separated subdomains | Use `www`, `api`, `admin`, `media`, `qa`, `qa-api`, and `qa-admin`. | Clear ownership, safer CORS/cache/security policies, easier migration/debugging. | More DNS records. | Accepted |
+| Path-based backend/admin | Put API/admin under storefront paths such as `/api` or `/admin`. | Fewer hostnames. | Couples storefront and backend routing; makes Cloudflare Access/cache/CORS boundaries less clean. | Rejected |
+| Single QA hostname for all QA surfaces | Route all QA through one hostname. | Fewer records. | Less explicit and weaker isolation between QA storefront/API/admin behavior. | Rejected |
+
+Decision:
+
+```txt
+brand.com            redirect to www.brand.com
+www.brand.com        production storefront on Vercel
+
+api.brand.com        production Medusa API on Lightsail/Caddy
+admin.brand.com      production Medusa Admin on Lightsail/Caddy + Cloudflare Access
+media.brand.com      Cloudflare R2 public media domain
+
+qa.brand.com         QA storefront
+qa-api.brand.com     QA Medusa API
+qa-admin.brand.com   QA Medusa Admin
+```
+
+Reason:
+
+- Separate hostnames keep storefront, API, admin, and media security/cache/CORS policies clean.
+- `admin.brand.com` can have Cloudflare Access without affecting storefront/API.
+- `media.brand.com` can follow R2/CDN behavior without API cache risk.
+- API/admin can move away from Lightsail later without changing storefront/media hostnames.
+
+### Decision 37: Environments
 
 Question: should Terraform model QA and production separately?
 
