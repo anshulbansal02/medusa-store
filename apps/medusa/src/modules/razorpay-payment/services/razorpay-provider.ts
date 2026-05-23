@@ -24,51 +24,31 @@ import type {
 } from "@medusajs/framework/types";
 import {
   AbstractPaymentProvider,
-  BigNumber,
-  MathBN,
   MedusaError,
   PaymentActions,
   PaymentSessionStatus,
 } from "@medusajs/framework/utils";
 import Razorpay from "razorpay";
 
-type RazorpayPaymentProviderOptions = {
-  key_id: string;
-  key_secret: string;
-  webhook_secret?: string;
-};
-
-type RazorpayPaymentData = {
-  id?: string;
-  order_id?: string;
-  amount?: number;
-  currency?: string;
-  payments?: Record<string, unknown>;
-  session_id?: string;
-};
-
-type RazorpayOrder = {
-  id: string;
-  amount: number;
-  amount_paid?: number;
-  currency: string;
-  status: "created" | "attempted" | "paid";
-  notes?: Record<string, unknown>;
-};
-
-type RazorpayPayment = {
-  id: string;
-  amount: number;
-  currency: string;
-  status: "created" | "authorized" | "captured" | "refunded" | "failed";
-  captured?: boolean;
-  order_id?: string;
-  notes?: Record<string, unknown>;
-};
-
-type RazorpayPaymentList = {
-  items?: RazorpayPayment[];
-};
+import { toSmallestUnit } from "./money";
+import {
+  getOrderId,
+  getPaymentSessionStatus,
+  getSuccessfulPayments,
+} from "./payment-state";
+import type {
+  RazorpayOrder,
+  RazorpayPaymentList,
+  RazorpayPaymentProviderOptions,
+  RazorpayWebhookEvent,
+} from "./types";
+import {
+  getHeader,
+  getRawWebhookBody,
+  getWebhookAmount,
+  getWebhookOrderId,
+  getWebhookSessionId,
+} from "./webhook";
 
 type InjectedDependencies = {
   logger?: {
@@ -76,169 +56,7 @@ type InjectedDependencies = {
   };
 };
 
-type RazorpayWebhookEvent = {
-  event?: string;
-  payload?: {
-    payment?: {
-      entity?: RazorpayPayment;
-    };
-    order?: {
-      entity?: RazorpayOrder;
-    };
-  };
-};
-
 const providerIdentifier = "razorpay";
-
-function getCurrencyMultiplier(currencyCode: string) {
-  const zeroDecimalCurrencies = new Set([
-    "BIF",
-    "CLP",
-    "DJF",
-    "GNF",
-    "JPY",
-    "KMF",
-    "KRW",
-    "MGA",
-    "PYG",
-    "RWF",
-    "UGX",
-    "VND",
-    "VUV",
-    "XAF",
-    "XOF",
-    "XPF",
-  ]);
-  const threeDecimalCurrencies = new Set([
-    "BHD",
-    "IQD",
-    "JOD",
-    "KWD",
-    "OMR",
-    "TND",
-  ]);
-  const normalizedCurrency = currencyCode.toUpperCase();
-
-  if (zeroDecimalCurrencies.has(normalizedCurrency)) {
-    return 1;
-  }
-
-  if (threeDecimalCurrencies.has(normalizedCurrency)) {
-    return 1000;
-  }
-
-  return 100;
-}
-
-function toSmallestUnit(amount: InitiatePaymentInput["amount"], currency: string) {
-  const multiplier = getCurrencyMultiplier(currency);
-  const normalizedAmount =
-    Math.round(new BigNumber(MathBN.mult(amount, multiplier)).numeric) /
-    multiplier;
-  const smallestAmount = new BigNumber(
-    MathBN.mult(normalizedAmount, multiplier),
-  );
-
-  return Number.parseInt(
-    smallestAmount.numeric.toString().split(".")[0] ?? "0",
-    10,
-  );
-}
-
-function fromSmallestUnit(amount: number, currency: string) {
-  return amount / getCurrencyMultiplier(currency);
-}
-
-function getOrderId(data?: Record<string, unknown>) {
-  const paymentData = data as RazorpayPaymentData | undefined;
-
-  return paymentData?.id ?? paymentData?.order_id ?? "";
-}
-
-function getSuccessfulPayments(payments: RazorpayPaymentList) {
-  return (
-    payments.items?.filter(
-      (payment) =>
-        payment.status === "authorized" || payment.status === "captured",
-    ) ?? []
-  );
-}
-
-function getHeader(headers: Record<string, unknown>, name: string) {
-  const value = headers[name] ?? headers[name.toLowerCase()];
-
-  if (Array.isArray(value)) {
-    return typeof value[0] === "string" ? value[0] : undefined;
-  }
-
-  return typeof value === "string" ? value : undefined;
-}
-
-function getRawWebhookBody(rawData: ProviderWebhookPayload["payload"]["rawData"]) {
-  return Buffer.isBuffer(rawData) ? rawData : Buffer.from(rawData);
-}
-
-function getWebhookEntityNotes(
-  entity: RazorpayPayment | RazorpayOrder | undefined,
-) {
-  return entity?.notes ?? {};
-}
-
-function getWebhookSessionId(event: RazorpayWebhookEvent) {
-  const paymentNotes = getWebhookEntityNotes(event.payload?.payment?.entity);
-  const orderNotes = getWebhookEntityNotes(event.payload?.order?.entity);
-  const sessionId = paymentNotes.session_id ?? orderNotes.session_id;
-
-  return typeof sessionId === "string" ? sessionId : "";
-}
-
-function getWebhookAmount(event: RazorpayWebhookEvent) {
-  const payment = event.payload?.payment?.entity;
-  const order = event.payload?.order?.entity;
-  const amount = payment?.amount ?? order?.amount_paid ?? order?.amount;
-  const currency = payment?.currency ?? order?.currency;
-
-  if (typeof amount !== "number" || typeof currency !== "string") {
-    return null;
-  }
-
-  return fromSmallestUnit(amount, currency);
-}
-
-function getWebhookOrderId(event: RazorpayWebhookEvent) {
-  return (
-    event.payload?.order?.entity?.id ??
-    event.payload?.payment?.entity?.order_id ??
-    ""
-  );
-}
-
-function getPaymentSessionStatus({
-  order,
-  payments,
-}: {
-  order: RazorpayOrder;
-  payments: RazorpayPaymentList;
-}) {
-  if (order.status === "paid") {
-    return PaymentSessionStatus.CAPTURED;
-  }
-
-  const authorizedAmount = getSuccessfulPayments(payments).reduce(
-    (total, payment) => total + payment.amount,
-    0,
-  );
-
-  if (authorizedAmount >= order.amount) {
-    return PaymentSessionStatus.AUTHORIZED;
-  }
-
-  if (order.status === "attempted") {
-    return PaymentSessionStatus.REQUIRES_MORE;
-  }
-
-  return PaymentSessionStatus.PENDING;
-}
 
 export default class RazorpayPaymentProviderService extends AbstractPaymentProvider<RazorpayPaymentProviderOptions> {
   static identifier = providerIdentifier;

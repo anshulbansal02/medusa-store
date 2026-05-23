@@ -1,7 +1,7 @@
 # Engineering Standards
 
 Status: canonical v1 engineering standards
-Last reviewed: 2026-05-15
+Last reviewed: 2026-05-23
 
 ## Principles
 
@@ -111,6 +111,7 @@ Rules:
 - Customize installed shadcn local components through variants, tokens, and Tailwind utilities instead of forking ad hoc copies.
 - Do not hand-roll components that shadcn already provides.
 - If shadcn does not provide a suitable component, compose a local component with the same style pattern using Base UI, Vaul, or another established accessible primitive.
+- Keep direct `@base-ui/react` imports inside `components/ui/*`; feature and page components should consume local UI primitives.
 - Compose non-interactive layout/content components from semantic HTML and design-token-backed Tailwind utilities.
 - Use a local `cn()` helper based on `clsx` and `tailwind-merge`.
 
@@ -124,6 +125,9 @@ Rules:
 - Do not add component-level CSS files.
 - Do not add custom CSS classes unless a CSS feature cannot be expressed cleanly with Tailwind utilities or tokens.
 - Prefer semantic design tokens over one-off literal values.
+- Do not use raw color values or arbitrary color utilities in components. Raw colors belong in token files or metadata/icon generation files.
+- Arbitrary values are acceptable for exact layout constraints, aspect ratios, and typography clamps when they are clearer than adding a token.
+- Run `pnpm --dir apps/storefront lint:tailwind` to block raw colors, arbitrary color utilities, and gradient utilities outside explicit token/metadata files.
 - Keep theming configurable in the same spirit as shadcn-style CSS variables.
 - Do not add dark mode tokens for v1.
 - Use proper SVG/icon-library icons; do not use emoji as UI icons or placeholders unless explicitly requested.
@@ -267,7 +271,7 @@ Guardrails:
 ## Accessibility
 
 - Use semantic HTML.
-- Use Base UI or established primitives for menus, dialogs, cart, search, filters, and overlays.
+- Build menus, dialogs, cart, search, filters, and overlays from local shadcn-style primitives backed by Base UI or another established accessible primitive.
 - Do not invent custom accessibility primitives unless necessary.
 - Prefer native semantics before ARIA.
 - Ensure keyboard navigation works.
@@ -319,6 +323,9 @@ Rules:
 - Do not build custom cart/order/payment logic.
 - Keep integrations isolated and documented.
 - Preserve upgrade path.
+- Centralize backend environment/config reads in a config helper or in Medusa module options; avoid direct `process.env` reads in route, workflow, subscriber, and provider logic.
+- Provider option validation should fail fast with clear errors.
+- Runtime integration failures should log context without secrets and return safe customer-facing messages.
 
 ## Migrations And Seeds
 

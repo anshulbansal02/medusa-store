@@ -10,6 +10,7 @@
     "start:local": "PORTLESS_HTTPS=0 portless --script start:app",
     "start:app": "next start",
     "lint": "biome check",
+    "lint:tailwind": "node scripts/tailwind-token-audit.mjs",
     "typecheck": "tsc --noEmit",
     "format": "biome format --write",
     "format:check": "biome format"

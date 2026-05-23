@@ -8,6 +8,8 @@ import {
   WorkflowResponse,
 } from "@medusajs/framework/workflows-sdk";
 
+import { getEmailConfig } from "../config/env";
+
 type WorkflowInput = {
   id: string;
 };
@@ -42,7 +44,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
 
     const notifications = transform({ orders }, ({ orders }) => {
       const order = orders[0];
-      const ownerEmail = process.env.OWNER_ORDER_EMAIL;
+      const ownerEmail = getEmailConfig().ownerOrderEmail;
       const baseNotification = {
         channel: "email",
         data: {
@@ -68,7 +70,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
               },
             ]
           : []),
-        ...(ownerEmail && !ownerEmail.includes("replace_me")
+        ...(ownerEmail
           ? [
               {
                 ...baseNotification,

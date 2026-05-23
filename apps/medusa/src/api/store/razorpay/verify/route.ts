@@ -1,8 +1,11 @@
 import crypto from "node:crypto";
 
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
+import type { Logger } from "@medusajs/framework/types";
 import Razorpay from "razorpay";
 import { z } from "zod";
+
+import { getRazorpayConfig } from "../../../../config/env";
 
 const verifyRazorpayPaymentSchema = z.object({
   razorpay_order_id: z.string().min(1),
@@ -25,14 +28,6 @@ type RazorpayOrder = {
   amount_paid?: number;
   currency?: string;
 };
-
-function isConfigured(value?: string): value is string {
-  return (
-    typeof value === "string" &&
-    value.length > 0 &&
-    !value.includes("replace_me")
-  );
-}
 
 function isValidSignature({
   orderId,
@@ -96,18 +91,15 @@ function paymentMatchesOrder({
 }
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const keyId = process.env.RAZORPAY_KEY_ID;
-  const secret = process.env.RAZORPAY_KEY_SECRET;
+  const config = getRazorpayConfig();
 
-  if (!isConfigured(keyId) || !isConfigured(secret)) {
+  if (!config.isConfigured) {
     res.status(503).json({
       verified: false,
       message: "Razorpay verification is not configured.",
     });
     return;
   }
-  const razorpayKeyId = keyId;
-  const razorpaySecret = secret;
 
   const parsed = verifyRazorpayPaymentSchema.safeParse(req.body);
 
@@ -130,7 +122,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       orderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
       signature: razorpay_signature,
-      secret: razorpaySecret,
+      secret: config.keySecret,
     })
   ) {
     res.status(200).json({ verified: false });
@@ -138,8 +130,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   const razorpay = new Razorpay({
-    key_id: razorpayKeyId,
-    key_secret: razorpaySecret,
+    key_id: config.keyId,
+    key_secret: config.keySecret,
   });
 
   try {
@@ -156,7 +148,15 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         paymentId: razorpay_payment_id,
       }),
     });
-  } catch {
+  } catch (error) {
+    const logger = req.scope.resolve("logger") as Logger;
+
+    logger.error(
+      `Razorpay verification fetch failed for order ${razorpay_order_id}: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
+    );
+
     res.status(200).json({
       verified: false,
     });

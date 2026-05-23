@@ -7,6 +7,7 @@ import {
   type OrderPlacedEmailData,
   OwnerOrderPlacedEmail,
 } from "./templates/order-placed";
+import { getEmailConfig } from "../config/env";
 
 export type TransactionalEmailContent = {
   subject: string;
@@ -39,10 +40,9 @@ function isOrderPlacedEmailData(value: unknown): value is OrderPlacedEmailData {
 }
 
 function getSiteUrl() {
-  const siteUrl =
-    process.env.STOREFRONT_URL ?? process.env.NEXT_PUBLIC_SITE_URL;
+  const siteUrl = getEmailConfig().storefrontUrl;
 
-  if (!siteUrl || siteUrl.includes("replace_me")) {
+  if (!siteUrl) {
     return null;
   }
 
@@ -60,14 +60,7 @@ function getOrderUrl(order: OrderPlacedEmailData) {
 }
 
 function getReplyTo() {
-  const replyTo =
-    process.env.TRANSACTIONAL_REPLY_TO_EMAIL ?? process.env.RESEND_REPLY_TO_EMAIL;
-
-  if (!replyTo || replyTo.includes("replace_me")) {
-    return undefined;
-  }
-
-  return replyTo;
+  return getEmailConfig().replyTo;
 }
 
 function toTagValue(value: string | number | null | undefined) {

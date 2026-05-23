@@ -1,49 +1,37 @@
 import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 
+import {
+  getMedusaConfig,
+  getR2Config,
+  getRazorpayConfig,
+  getResendConfig,
+} from './src/config/env'
+
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
-function isConfigured(value?: string) {
-  return (
-    typeof value === 'string' &&
-    value.length > 0 &&
-    !value.includes('replace_me')
-  )
-}
-
-const razorpayConfigured =
-  isConfigured(process.env.RAZORPAY_KEY_ID) &&
-  isConfigured(process.env.RAZORPAY_KEY_SECRET)
-const resendConfigured =
-  isConfigured(process.env.RESEND_API_KEY) &&
-  isConfigured(process.env.RESEND_FROM_EMAIL)
-const r2Configured =
-  isConfigured(process.env.S3_FILE_URL) &&
-  isConfigured(process.env.S3_REGION) &&
-  isConfigured(process.env.S3_BUCKET) &&
-  isConfigured(process.env.S3_ENDPOINT) &&
-  isConfigured(process.env.S3_ACCESS_KEY_ID) &&
-  isConfigured(process.env.S3_SECRET_ACCESS_KEY)
+const medusaConfig = getMedusaConfig()
+const razorpayConfig = getRazorpayConfig()
+const resendConfig = getResendConfig()
+const r2Config = getR2Config()
 
 module.exports = defineConfig({
   projectConfig: {
-    databaseUrl: process.env.DATABASE_URL,
-    redisUrl: process.env.REDIS_URL,
-    workerMode:
-      (process.env.MEDUSA_WORKER_MODE as 'shared' | 'server' | 'worker') ||
-      'shared',
+    databaseUrl: medusaConfig.databaseUrl,
+    redisUrl: medusaConfig.redisUrl,
+    workerMode: medusaConfig.workerMode,
     http: {
-      storeCors: process.env.STORE_CORS!,
-      adminCors: process.env.ADMIN_CORS!,
-      authCors: process.env.AUTH_CORS!,
-      jwtSecret: process.env.JWT_SECRET!,
-      cookieSecret: process.env.COOKIE_SECRET!,
+      storeCors: medusaConfig.http.storeCors!,
+      adminCors: medusaConfig.http.adminCors!,
+      authCors: medusaConfig.http.authCors!,
+      jwtSecret: medusaConfig.http.jwtSecret!,
+      cookieSecret: medusaConfig.http.cookieSecret!,
     },
   },
   admin: {
-    backendUrl: process.env.MEDUSA_BACKEND_URL,
+    backendUrl: medusaConfig.admin.backendUrl,
   },
   modules: [
-    ...(razorpayConfigured
+    ...(razorpayConfig.isConfigured
       ? [
           {
             resolve: '@medusajs/medusa/payment',
@@ -53,9 +41,9 @@ module.exports = defineConfig({
                   resolve: './src/modules/razorpay-payment',
                   id: 'razorpay',
                   options: {
-                    key_id: process.env.RAZORPAY_KEY_ID,
-                    key_secret: process.env.RAZORPAY_KEY_SECRET,
-                    webhook_secret: process.env.RAZORPAY_WEBHOOK_SECRET,
+                    key_id: razorpayConfig.keyId,
+                    key_secret: razorpayConfig.keySecret,
+                    webhook_secret: razorpayConfig.webhookSecret,
                   },
                 },
               ],
@@ -63,7 +51,7 @@ module.exports = defineConfig({
           },
         ]
       : []),
-    ...(resendConfigured
+    ...(resendConfig.isConfigured
       ? [
           {
             resolve: '@medusajs/medusa/notification',
@@ -73,8 +61,8 @@ module.exports = defineConfig({
                   resolve: './src/modules/resend-notification',
                   id: 'resend',
                   options: {
-                    api_key: process.env.RESEND_API_KEY,
-                    from: process.env.RESEND_FROM_EMAIL,
+                    api_key: resendConfig.apiKey,
+                    from: resendConfig.from,
                   },
                   channels: ['email'],
                 },
@@ -83,7 +71,7 @@ module.exports = defineConfig({
           },
         ]
       : []),
-    ...(r2Configured
+    ...(r2Config.isConfigured
       ? [
           {
             resolve: '@medusajs/medusa/file',
@@ -93,12 +81,12 @@ module.exports = defineConfig({
                   resolve: '@medusajs/medusa/file-s3',
                   id: 's3',
                   options: {
-                    file_url: process.env.S3_FILE_URL,
-                    access_key_id: process.env.S3_ACCESS_KEY_ID,
-                    secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
-                    region: process.env.S3_REGION,
-                    bucket: process.env.S3_BUCKET,
-                    endpoint: process.env.S3_ENDPOINT,
+                    file_url: r2Config.fileUrl,
+                    access_key_id: r2Config.accessKeyId,
+                    secret_access_key: r2Config.secretAccessKey,
+                    region: r2Config.region,
+                    bucket: r2Config.bucket,
+                    endpoint: r2Config.endpoint,
                     cache_control: 'public, max-age=31536000',
                   },
                 },

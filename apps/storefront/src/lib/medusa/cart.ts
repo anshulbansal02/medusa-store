@@ -1,127 +1,25 @@
 import { cookies } from "next/headers";
 
-import {
-  formatStorePrice,
-  medusaDelete,
-  medusaFetch,
-  medusaPostJson,
-} from "@/lib/medusa/client";
+import { toShippingOption, toStorefrontCart } from "@/lib/medusa/cart-mappers";
+import type {
+  CheckoutAddressPayload,
+  MedusaCartParentResponse,
+  MedusaCartResponse,
+  MedusaShippingOptionsResponse,
+  StorefrontCart,
+} from "@/lib/medusa/cart-types";
+import { medusaDelete, medusaFetch, medusaPostJson } from "@/lib/medusa/client";
 import { getDefaultRegionId } from "@/lib/medusa/regions";
 
 const cartCookieName = "the_label_cart_id";
 
-type MedusaCartLineItem = {
-  id: string;
-  variant_id?: string | null;
-  thumbnail?: string | null;
-  product_title?: string | null;
-  product_handle?: string | null;
-  variant_title?: string | null;
-  quantity?: number;
-  unit_price?: number;
-  total?: number;
-};
-
-type MedusaAddress = {
-  first_name?: string | null;
-  last_name?: string | null;
-  address_1?: string | null;
-  address_2?: string | null;
-  city?: string | null;
-  province?: string | null;
-  postal_code?: string | null;
-  country_code?: string | null;
-  phone?: string | null;
-};
-
-type MedusaShippingMethod = {
-  amount?: number;
-  shipping_option_id?: string;
-};
-
-type MedusaCart = {
-  id: string;
-  email?: string | null;
-  currency_code?: string;
-  total?: number;
-  subtotal?: number;
-  item_total?: number;
-  shipping_total?: number;
-  items?: MedusaCartLineItem[];
-  shipping_address?: MedusaAddress | null;
-  shipping_methods?: MedusaShippingMethod[];
-};
-
-type MedusaCartResponse = {
-  cart?: MedusaCart;
-};
-
-type MedusaCartParentResponse = {
-  parent?: MedusaCart;
-};
-
-type MedusaShippingOption = {
-  id: string;
-  name: string;
-  amount?: number;
-  calculated_price?: {
-    calculated_amount?: number;
-    currency_code?: string;
-  };
-  type?: {
-    description?: string | null;
-  } | null;
-};
-
-type MedusaShippingOptionsResponse = {
-  shipping_options?: MedusaShippingOption[];
-};
-
-export type CartItem = {
-  id: string;
-  variantId: string;
-  name: string;
-  href: string;
-  variant: string;
-  quantity: number;
-  unitPrice: string;
-  total: string;
-  image: string | null;
-};
-
-export type StorefrontCart = {
-  id: string;
-  email: string;
-  total: string;
-  subtotal: string;
-  shippingTotal: string;
-  itemCount: number;
-  items: CartItem[];
-  shippingAddress: StorefrontAddress | null;
-  selectedShippingOptionId: string | null;
-};
-
-export type StorefrontAddress = {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  address1: string;
-  address2: string;
-  city: string;
-  province: string;
-  postalCode: string;
-};
-
-export type StorefrontShippingOption = {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-};
-
-export type CheckoutAddressPayload = StorefrontAddress & {
-  email: string;
-};
+export type {
+  CartItem,
+  CheckoutAddressPayload,
+  StorefrontAddress,
+  StorefrontCart,
+  StorefrontShippingOption,
+} from "@/lib/medusa/cart-types";
 
 function getCartCookieOptions() {
   return {
@@ -130,78 +28,6 @@ function getCartCookieOptions() {
     path: "/",
     sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
-  };
-}
-
-function toStorefrontAddress(address?: MedusaAddress | null) {
-  if (!address?.address_1) {
-    return null;
-  }
-
-  return {
-    firstName: address.first_name ?? "",
-    lastName: address.last_name ?? "",
-    phone: address.phone ?? "",
-    address1: address.address_1,
-    address2: address.address_2 ?? "",
-    city: address.city ?? "",
-    province: address.province ?? "",
-    postalCode: address.postal_code ?? "",
-  };
-}
-
-function toStorefrontCart(cart: MedusaCart): StorefrontCart {
-  const currencyCode = cart.currency_code ?? "inr";
-  const items =
-    cart.items?.map((item) => {
-      const quantity = item.quantity ?? 0;
-      const unitAmount = item.unit_price ?? 0;
-      const totalAmount = item.total ?? unitAmount * quantity;
-      const handle = item.product_handle ?? "";
-
-      return {
-        id: item.id,
-        variantId: item.variant_id ?? "",
-        name: item.product_title ?? "Product",
-        href: handle ? `/shop/${handle}` : "/shop",
-        variant: item.variant_title ?? "",
-        quantity,
-        unitPrice: formatStorePrice(unitAmount, currencyCode) ?? "",
-        total: formatStorePrice(totalAmount, currencyCode) ?? "",
-        image: item.thumbnail ?? null,
-      };
-    }) ?? [];
-
-  return {
-    id: cart.id,
-    email: cart.email ?? "",
-    total: formatStorePrice(cart.total ?? 0, currencyCode) ?? "",
-    subtotal:
-      formatStorePrice(cart.item_total ?? cart.subtotal ?? 0, currencyCode) ??
-      "",
-    shippingTotal:
-      formatStorePrice(cart.shipping_total ?? 0, currencyCode) ?? "",
-    itemCount: items.reduce((count, item) => count + item.quantity, 0),
-    items,
-    shippingAddress: toStorefrontAddress(cart.shipping_address),
-    selectedShippingOptionId:
-      cart.shipping_methods?.[0]?.shipping_option_id ?? null,
-  };
-}
-
-function toShippingOption(
-  option: MedusaShippingOption,
-  currencyCode = "inr",
-): StorefrontShippingOption {
-  const amount =
-    option.calculated_price?.calculated_amount ?? option.amount ?? 0;
-  const priceCurrency = option.calculated_price?.currency_code ?? currencyCode;
-
-  return {
-    id: option.id,
-    name: option.name,
-    description: option.type?.description ?? "",
-    price: formatStorePrice(amount, priceCurrency) ?? "",
   };
 }
 
