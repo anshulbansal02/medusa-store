@@ -37,6 +37,9 @@ When tracking is used:
 ## Payments And Refunds
 
 - V1 is prepaid only through Razorpay.
+- Razorpay Dashboard payment capture should remain automatic unless the team intentionally switches to manual capture and updates this runbook.
+- Razorpay webhooks should point to the Medusa payment webhook endpoint for the active environment:
+  `/hooks/payment/razorpay_razorpay`.
 - Capture/refund state must remain consistent between Medusa Admin and Razorpay.
 - Do not refund manually from Razorpay without checking the matching Medusa order.
 - If payment state is unclear, pause fulfillment until Razorpay and Medusa agree.

@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+
 import type {
   AuthorizePaymentInput,
   AuthorizePaymentOutput,
@@ -11,6 +13,7 @@ import type {
   GetPaymentStatusOutput,
   InitiatePaymentInput,
   InitiatePaymentOutput,
+  ProviderWebhookPayload,
   RefundPaymentInput,
   RefundPaymentOutput,
   RetrievePaymentInput,
@@ -33,7 +36,6 @@ type RazorpayPaymentProviderOptions = {
   key_id: string;
   key_secret: string;
   webhook_secret?: string;
-  capture?: "automatic" | "manual";
 };
 
 type RazorpayPaymentData = {
@@ -42,6 +44,7 @@ type RazorpayPaymentData = {
   amount?: number;
   currency?: string;
   payments?: Record<string, unknown>;
+  session_id?: string;
 };
 
 type RazorpayOrder = {
@@ -50,6 +53,7 @@ type RazorpayOrder = {
   amount_paid?: number;
   currency: string;
   status: "created" | "attempted" | "paid";
+  notes?: Record<string, unknown>;
 };
 
 type RazorpayPayment = {
@@ -58,6 +62,8 @@ type RazorpayPayment = {
   currency: string;
   status: "created" | "authorized" | "captured" | "refunded" | "failed";
   captured?: boolean;
+  order_id?: string;
+  notes?: Record<string, unknown>;
 };
 
 type RazorpayPaymentList = {
@@ -67,6 +73,18 @@ type RazorpayPaymentList = {
 type InjectedDependencies = {
   logger?: {
     warn: (message: string) => void;
+  };
+};
+
+type RazorpayWebhookEvent = {
+  event?: string;
+  payload?: {
+    payment?: {
+      entity?: RazorpayPayment;
+    };
+    order?: {
+      entity?: RazorpayOrder;
+    };
   };
 };
 
@@ -127,6 +145,10 @@ function toSmallestUnit(amount: InitiatePaymentInput["amount"], currency: string
   );
 }
 
+function fromSmallestUnit(amount: number, currency: string) {
+  return amount / getCurrencyMultiplier(currency);
+}
+
 function getOrderId(data?: Record<string, unknown>) {
   const paymentData = data as RazorpayPaymentData | undefined;
 
@@ -140,6 +162,47 @@ function getSuccessfulPayments(payments: RazorpayPaymentList) {
         payment.status === "authorized" || payment.status === "captured",
     ) ?? []
   );
+}
+
+function getHeader(headers: Record<string, unknown>, name: string) {
+  const value = headers[name] ?? headers[name.toLowerCase()];
+
+  if (Array.isArray(value)) {
+    return typeof value[0] === "string" ? value[0] : undefined;
+  }
+
+  return typeof value === "string" ? value : undefined;
+}
+
+function getRawWebhookBody(rawData: ProviderWebhookPayload["payload"]["rawData"]) {
+  return Buffer.isBuffer(rawData) ? rawData : Buffer.from(rawData);
+}
+
+function getWebhookEntityNotes(
+  entity: RazorpayPayment | RazorpayOrder | undefined,
+) {
+  return entity?.notes ?? {};
+}
+
+function getWebhookSessionId(event: RazorpayWebhookEvent) {
+  const paymentNotes = getWebhookEntityNotes(event.payload?.payment?.entity);
+  const orderNotes = getWebhookEntityNotes(event.payload?.order?.entity);
+  const sessionId = paymentNotes.session_id ?? orderNotes.session_id;
+
+  return typeof sessionId === "string" ? sessionId : "";
+}
+
+function getWebhookAmount(event: RazorpayWebhookEvent) {
+  const payment = event.payload?.payment?.entity;
+  const order = event.payload?.order?.entity;
+  const amount = payment?.amount ?? order?.amount_paid ?? order?.amount;
+  const currency = payment?.currency ?? order?.currency;
+
+  if (typeof amount !== "number" || typeof currency !== "string") {
+    return null;
+  }
+
+  return fromSmallestUnit(amount, currency);
 }
 
 function getPaymentSessionStatus({
@@ -226,9 +289,6 @@ export default class RazorpayPaymentProviderService extends AbstractPaymentProvi
         cart_id: cartId,
         session_id: sessionId,
       },
-      payment: {
-        capture: this.options_.capture ?? "automatic",
-      },
     })) as RazorpayOrder;
 
     return {
@@ -239,6 +299,7 @@ export default class RazorpayPaymentProviderService extends AbstractPaymentProvi
         order_id: order.id,
         amount: order.amount,
         currency: order.currency,
+        session_id: sessionId,
       },
     };
   }
@@ -400,9 +461,72 @@ export default class RazorpayPaymentProviderService extends AbstractPaymentProvi
     return { data: input.data };
   }
 
-  async getWebhookActionAndData(): Promise<WebhookActionResult> {
-    return {
-      action: PaymentActions.NOT_SUPPORTED,
+  async getWebhookActionAndData(
+    payload: ProviderWebhookPayload["payload"],
+  ): Promise<WebhookActionResult> {
+    if (!this.options_.webhook_secret) {
+      this.logger_?.warn(
+        "Razorpay webhook received, but webhook_secret is not configured.",
+      );
+      return { action: PaymentActions.NOT_SUPPORTED };
+    }
+
+    const signature = getHeader(payload.headers, "x-razorpay-signature");
+
+    if (!signature) {
+      return { action: PaymentActions.NOT_SUPPORTED };
+    }
+
+    const expectedSignature = crypto
+      .createHmac("sha256", this.options_.webhook_secret)
+      .update(getRawWebhookBody(payload.rawData))
+      .digest("hex");
+    const expectedBuffer = Buffer.from(expectedSignature);
+    const signatureBuffer = Buffer.from(signature);
+
+    if (
+      expectedBuffer.length !== signatureBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, signatureBuffer)
+    ) {
+      return { action: PaymentActions.NOT_SUPPORTED };
+    }
+
+    const event = payload.data as RazorpayWebhookEvent;
+    const sessionId = getWebhookSessionId(event);
+    const amount = getWebhookAmount(event);
+
+    if (!sessionId || amount === null) {
+      return { action: PaymentActions.NOT_SUPPORTED };
+    }
+
+    const data = {
+      session_id: sessionId,
+      amount,
     };
+
+    switch (event.event) {
+      case "order.paid":
+      case "payment.captured":
+        return {
+          action: PaymentActions.SUCCESSFUL,
+          data,
+        };
+      case "payment.authorized":
+        return {
+          action: event.payload?.payment?.entity?.captured
+            ? PaymentActions.SUCCESSFUL
+            : PaymentActions.AUTHORIZED,
+          data,
+        };
+      case "payment.failed":
+        return {
+          action: PaymentActions.FAILED,
+          data,
+        };
+      default:
+        return {
+          action: PaymentActions.NOT_SUPPORTED,
+        };
+    }
   }
 }

@@ -4,6 +4,7 @@ Status: v1 manual launch checklist
 Last reviewed: 2026-05-15
 
 This checklist is intentionally lightweight. There is no written test suite for v1, so manual checks must be disciplined.
+Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and production setup.
 
 ## Build And Code
 
@@ -59,9 +60,17 @@ This checklist is intentionally lightweight. There is no written test suite for 
 ## Payments
 
 - Razorpay keys are separated for QA/prod.
+- Razorpay Dashboard payment capture is set to automatic for QA/prod.
+- Razorpay webhooks are configured per environment:
+  - URL: `{MEDUSA_BACKEND_URL}/hooks/payment/razorpay_razorpay`.
+  - Events: `order.paid`, `payment.captured`, `payment.authorized`, `payment.failed`.
+  - Secret matches `RAZORPAY_WEBHOOK_SECRET`.
 - Razorpay signature verification is implemented server-side.
+- Razorpay callback verification fetches the payment/order from Razorpay before returning success.
+- Razorpay webhook signature verification is implemented server-side.
 - Payment failure does not create a misleading paid order.
 - Payment success maps to correct order state.
+- Checkout callback failure still completes the cart through the Razorpay webhook.
 - No payment secrets are exposed to the browser.
 
 ## Email

@@ -142,8 +142,13 @@ Rules:
 - No COD in v1.
 - No custom EMI/pay-later UX in v1.
 - Create payment sessions through Medusa Store API.
+- Create a Razorpay Order from the Medusa payment provider before opening Razorpay Checkout.
 - Verify Razorpay signatures server-side through the Medusa backend.
-- Use webhooks for final payment state where available.
+- Bind Checkout success callbacks to the server-created Razorpay order for the active cart.
+- Use Medusa's payment webhook route for final payment state:
+  `/hooks/payment/razorpay_razorpay`.
+- Subscribe Razorpay webhooks to `order.paid`, `payment.captured`, `payment.authorized`, and `payment.failed`.
+- Configure automatic capture in the Razorpay Dashboard for QA and production unless the business intentionally changes to manual capture later.
 - Never mark orders paid from only a frontend callback.
 
 ## Shipping

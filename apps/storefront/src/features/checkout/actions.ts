@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import {
   type CheckoutAddressInput,
   checkoutAddressSchema,
@@ -52,6 +53,52 @@ type CompletePaymentActionResult =
       message: string;
     };
 
+const razorpayCheckoutCookieName = "the_label_razorpay_checkout";
+
+function revalidateCheckoutViews() {
+  revalidatePath("/checkout");
+  revalidatePath("/bag");
+}
+
+function getRazorpayCheckoutCookieOptions() {
+  return {
+    httpOnly: true,
+    maxAge: 60 * 15,
+    path: "/",
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+  };
+}
+
+function serializeRazorpayCheckout(cartId: string, orderId: string) {
+  return JSON.stringify({ cartId, orderId });
+}
+
+function parseRazorpayCheckout(value: string | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(value) as unknown;
+
+    if (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      "cartId" in parsed &&
+      "orderId" in parsed &&
+      typeof parsed.cartId === "string" &&
+      typeof parsed.orderId === "string"
+    ) {
+      return parsed;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export async function saveCheckoutAddressAction(
   input: CheckoutAddressInput,
 ): Promise<CheckoutActionResult> {
@@ -66,8 +113,7 @@ export async function saveCheckoutAddressAction(
 
   try {
     await updateCartAddress(result.data);
-    revalidatePath("/checkout");
-    revalidatePath("/bag");
+    revalidateCheckoutViews();
 
     return {
       ok: true,
@@ -100,6 +146,13 @@ export async function startRazorpayPaymentAction(): Promise<RazorpayPaymentActio
 
   try {
     const payment = await createRazorpayPaymentSession(cart.id);
+    const cookieStore = await cookies();
+
+    cookieStore.set(
+      razorpayCheckoutCookieName,
+      serializeRazorpayCheckout(cart.id, payment.orderId),
+      getRazorpayCheckoutCookieOptions(),
+    );
 
     return {
       ok: true,
@@ -137,12 +190,28 @@ export async function verifyAndCompleteRazorpayPaymentAction(
   }
 
   try {
+    const cookieStore = await cookies();
+    const expectedCheckout = parseRazorpayCheckout(
+      cookieStore.get(razorpayCheckoutCookieName)?.value,
+    );
+
+    if (
+      !expectedCheckout ||
+      expectedCheckout.cartId !== cart.id ||
+      expectedCheckout.orderId !== payload.razorpay_order_id
+    ) {
+      return {
+        ok: false,
+        message: "Payment verification did not match this checkout session.",
+      };
+    }
+
     await verifyRazorpayPayment(payload);
     const orderId = await completeCartPayment(cart.id);
 
+    cookieStore.delete(razorpayCheckoutCookieName);
     await clearCurrentCart();
-    revalidatePath("/checkout");
-    revalidatePath("/bag");
+    revalidateCheckoutViews();
 
     return {
       ok: true,
@@ -171,8 +240,7 @@ export async function selectShippingMethodAction(
 
   try {
     await setCartShippingMethod(optionId);
-    revalidatePath("/checkout");
-    revalidatePath("/bag");
+    revalidateCheckoutViews();
 
     return {
       ok: true,

@@ -88,6 +88,7 @@ Expected secret/config groups:
 - Medusa CORS origins.
 - Storefront URL and Medusa backend URL.
 - Razorpay key ID, key secret, and webhook secret.
+- Razorpay Dashboard payment capture setting and webhook endpoint per environment.
 - Resend API key and sender domain config.
 - Owner new-order notification email address.
 - R2 account, bucket, endpoint, access key, and secret key.

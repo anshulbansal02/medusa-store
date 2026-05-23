@@ -38,7 +38,12 @@ Use official docs first when implementation depends on current platform behavior
 ## Payments And Email
 
 - Razorpay docs: https://razorpay.com/docs/
+- Razorpay Standard Checkout integration: https://razorpay.com/docs/payments/payment-gateway/quick-integration/integration-steps/
+- Razorpay webhook validation: https://razorpay.com/docs/webhooks/validate-test/
+- Razorpay payment capture settings: https://razorpay.com/docs/payments/payments/capture-settings/
 - Razorpay payment methods: https://razorpay.com/docs/payments/payment-methods/
+- Medusa payment provider docs: https://docs.medusajs.com/resources/commerce-modules/payment/payment-provider
+- Medusa payment webhook events: https://docs.medusajs.com/resources/commerce-modules/payment/webhook-events
 - Resend docs: https://resend.com/docs
 - Resend sending limits: https://resend.com/docs/knowledge-base/resend-sending-limits
 - Resend pricing: https://resend.com/pricing
