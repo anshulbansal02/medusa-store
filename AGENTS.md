@@ -15,7 +15,9 @@ Current direction:
 - Email: Resend.
 - Media: Cloudflare R2.
 - Analytics: Cloudflare Web Analytics.
-- Hosting: Vercel + Railway.
+- Hosting: Vercel Pro storefront + AWS Lightsail Medusa compute.
+- Database/cache: Neon Postgres Singapore + Upstash Redis Singapore.
+- Infrastructure: Terraform-managed durable infra with GitHub Actions-managed deploys.
 
 Canonical docs:
 
@@ -27,6 +29,8 @@ Canonical docs:
 - `docs/secrets-and-config.md`
 - `docs/operations.md`
 - `docs/implementation-plan.md`
+- `docs/infra-terraform-decisions.md`
+- `docs/infra-terraform-implementation-plan.md`
 - `docs/launch-checklist.md`
 - `docs/cost-model.md`
 - `docs/references.md`

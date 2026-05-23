@@ -14,6 +14,8 @@ This folder contains the canonical planning and implementation context for the f
 - [Operations](operations.md): owner/admin order, fulfillment, tracking, and access workflows.
 - [Razorpay Integration](razorpay-integration.md): payment provider, webhook, QA, and production setup rules.
 - [Implementation Plan](implementation-plan.md): MVP boundary, build phases, launch scope.
+- [Infrastructure And Terraform Decisions](infra-terraform-decisions.md): confirmed infrastructure and Terraform decisions.
+- [Infrastructure And Terraform Implementation Plan](infra-terraform-implementation-plan.md): execution order for Terraform, infra, deploy, and launch setup.
 - [Launch Checklist](launch-checklist.md): manual readiness checks before production launch.
 - [Cost Model](cost-model.md): recurring cost assumptions and guardrails.
 - [References](references.md): official docs and research sources to verify implementation details.
