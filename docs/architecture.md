@@ -96,7 +96,7 @@ External managed data services:
 
 Cloudflare:
   Authoritative DNS after cutover from Shopify-managed DNS
-  Optional proxy/security layer in front of the Lightsail origin
+  Proxied API/admin records in front of the Lightsail origin
   R2 media storage
   Web Analytics
   Optional Turnstile
@@ -114,6 +114,12 @@ Do not split Medusa compute, Postgres, and Redis across India and Singapore for 
 Production Medusa compute runs on AWS Lightsail, but durable state must not live on the Lightsail instance. Keep production Postgres, Redis, and media external so the app host can be replaced without moving order, catalog, customer, payment, workflow, or media data.
 
 Use Caddy on the Lightsail instance as the origin reverse proxy and HTTPS manager. Cloudflare DNS/proxy may sit in front, but Cloudflare Tunnel is not the primary public ingress for v1.
+
+Proxy `api.brand.com` and `admin.brand.com` through Cloudflare in production. Keep full end-to-end HTTPS from browser to Cloudflare to Caddy; do not use Flexible SSL.
+
+Launch with Lightsail `80/443` open publicly for simpler DNS/TLS validation. After the Cloudflare-proxied path is stable, restrict origin HTTP/HTTPS access to Cloudflare IP ranges. Keep SSH restricted to the smallest practical trusted source set.
+
+Use Tailscale for routine human SSH and GitHub Actions deploy access to Lightsail. After Tailscale access is tested, close public port `22`; keep Lightsail browser SSH or temporary IP-restricted public SSH as emergency access.
 
 Run Medusa with Docker Compose using one production image and separate `medusa-server` and `medusa-worker` services. Keep deployment mechanics, registry choice, and image tagging as CI/CD decisions.
 

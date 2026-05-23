@@ -49,7 +49,7 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
           aria-label={content.openLabel}
           className="size-9 rounded-none text-muted-foreground hover:bg-transparent hover:text-foreground lg:hidden"
         >
-          <Menu className="size-4 stroke-[1.6]" aria-hidden="true" />
+          <Menu className="size-4 stroke-icon" aria-hidden="true" />
         </Button>
       </DrawerTrigger>
       <DrawerContent className="h-dvh w-[86vw] max-w-sm rounded-none border-border bg-background text-foreground">
@@ -67,7 +67,7 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
             aria-label={content.closeLabel}
             className="inline-flex size-9 cursor-pointer items-center justify-center text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <X className="size-4 stroke-[1.6]" aria-hidden="true" />
+            <X className="size-4 stroke-icon" aria-hidden="true" />
           </DrawerClose>
         </div>
 
@@ -78,7 +78,7 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
             onClick={closeMenu}
             className="flex min-h-12 items-center gap-3 border-border border-b text-sm font-medium transition hover:text-primary"
           >
-            <Search className="size-4 stroke-[1.6]" aria-hidden="true" />
+            <Search className="size-4 stroke-icon" aria-hidden="true" />
             {content.searchLabel}
           </Link>
 

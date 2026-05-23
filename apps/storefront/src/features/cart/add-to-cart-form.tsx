@@ -202,7 +202,7 @@ function QuantitySelector({
           onClick={() => onChange((value) => Math.max(1, value - 1))}
           className="h-full w-11 rounded-none text-muted-foreground hover:bg-muted hover:text-foreground disabled:text-muted-foreground/40"
         >
-          <Minus className="size-4 stroke-[1.6]" aria-hidden="true" />
+          <Minus className="size-4 stroke-icon" aria-hidden="true" />
         </Button>
         <span className="w-10 text-center text-sm font-medium">{quantity}</span>
         <Button
@@ -214,7 +214,7 @@ function QuantitySelector({
           onClick={() => onChange((value) => Math.min(9, value + 1))}
           className="h-full w-11 rounded-none text-muted-foreground hover:bg-muted hover:text-foreground disabled:text-muted-foreground/40"
         >
-          <Plus className="size-4 stroke-[1.6]" aria-hidden="true" />
+          <Plus className="size-4 stroke-icon" aria-hidden="true" />
         </Button>
       </div>
     </div>

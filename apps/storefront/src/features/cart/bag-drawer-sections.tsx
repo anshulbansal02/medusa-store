@@ -9,7 +9,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { siteContent } from "@/content/site-content";
-import type { StorefrontCart } from "@/lib/medusa/cart";
+import type { CartItem, StorefrontCart } from "@/lib/medusa/cart";
 import { cn } from "@/lib/utils";
 
 type BagDrawerHeaderProps = {
@@ -33,6 +33,14 @@ type BagDrawerFooterProps = {
 
 type EmptyBagDrawerProps = {
   closeBag: () => void;
+};
+
+type BagDrawerLineItemProps = {
+  closeBag: () => void;
+  isPending: boolean;
+  item: CartItem;
+  onRemoveItem: (lineItemId: string) => void;
+  onUpdateQuantity: (lineItemId: string, quantity: number) => void;
 };
 
 const content = siteContent.bag;
@@ -59,7 +67,7 @@ export function BagDrawerHeader({
         aria-label={content.closeLabel}
         className="inline-flex size-9 cursor-pointer items-center justify-center text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <X className="size-4 stroke-[1.6]" aria-hidden="true" />
+        <X className="size-4 stroke-icon" aria-hidden="true" />
       </DrawerClose>
     </div>
   );
@@ -76,87 +84,122 @@ export function BagDrawerItems({
     <div className="flex-1 overflow-y-auto px-5 py-5">
       <div className="grid gap-5">
         {cart.items.map((item) => (
-          <article key={item.id} className="grid grid-cols-[88px_1fr] gap-4">
+          <BagDrawerLineItem
+            key={item.id}
+            closeBag={closeBag}
+            isPending={isPending}
+            item={item}
+            onRemoveItem={onRemoveItem}
+            onUpdateQuantity={onUpdateQuantity}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BagDrawerLineItem({
+  closeBag,
+  isPending,
+  item,
+  onRemoveItem,
+  onUpdateQuantity,
+}: BagDrawerLineItemProps) {
+  return (
+    <article className="grid grid-cols-[88px_1fr] gap-4">
+      <Link
+        href={item.href}
+        prefetch={false}
+        onClick={closeBag}
+        className="relative aspect-[4/5] overflow-hidden bg-muted"
+      >
+        {item.image ? (
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            sizes="88px"
+            className="object-cover"
+          />
+        ) : null}
+      </Link>
+
+      <div className="min-w-0">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
             <Link
               href={item.href}
               prefetch={false}
               onClick={closeBag}
-              className="relative aspect-[4/5] overflow-hidden bg-muted"
+              className="block truncate text-sm font-medium hover:underline hover:underline-offset-4"
             >
-              {item.image ? (
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  sizes="88px"
-                  className="object-cover"
-                />
-              ) : null}
+              {item.name}
             </Link>
+            {item.variant ? (
+              <p className="mt-1 text-muted-foreground text-xs">
+                {item.variant}
+              </p>
+            ) : null}
+          </div>
+          <p className="shrink-0 text-sm font-medium">{item.total}</p>
+        </div>
 
-            <div className="min-w-0">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <Link
-                    href={item.href}
-                    prefetch={false}
-                    onClick={closeBag}
-                    className="block truncate text-sm font-medium hover:underline hover:underline-offset-4"
-                  >
-                    {item.name}
-                  </Link>
-                  {item.variant ? (
-                    <p className="mt-1 text-muted-foreground text-xs">
-                      {item.variant}
-                    </p>
-                  ) : null}
-                </div>
-                <p className="shrink-0 text-sm font-medium">{item.total}</p>
-              </div>
-
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <div className="inline-flex h-9 items-center border border-border">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`${content.decreaseQuantityPrefix} ${item.name} ${content.quantitySuffix}`}
-                    disabled={isPending || item.quantity <= 1}
-                    onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                    className="h-full w-9 rounded-none text-muted-foreground hover:bg-muted hover:text-foreground disabled:text-muted-foreground/40"
-                  >
-                    <Minus className="size-4 stroke-[1.6]" aria-hidden="true" />
-                  </Button>
-                  <span className="w-8 text-center text-sm">
-                    {item.quantity}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`${content.increaseQuantityPrefix} ${item.name} ${content.quantitySuffix}`}
-                    disabled={isPending || item.quantity >= 9}
-                    onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                    className="h-full w-9 rounded-none text-muted-foreground hover:bg-muted hover:text-foreground disabled:text-muted-foreground/40"
-                  >
-                    <Plus className="size-4 stroke-[1.6]" aria-hidden="true" />
-                  </Button>
-                </div>
-                <Button
-                  type="button"
-                  variant="link"
-                  size="xs"
-                  disabled={isPending}
-                  onClick={() => onRemoveItem(item.id)}
-                  className="h-auto rounded-none px-0 text-muted-foreground text-xs hover:text-foreground"
-                >
-                  {content.removeAction}
-                </Button>
-              </div>
-            </div>
-          </article>
-        ))}
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <BagLineQuantityControl
+            isPending={isPending}
+            item={item}
+            onUpdateQuantity={onUpdateQuantity}
+          />
+          <Button
+            type="button"
+            variant="link"
+            size="xs"
+            disabled={isPending}
+            onClick={() => onRemoveItem(item.id)}
+            className="h-auto rounded-none px-0 text-muted-foreground text-xs hover:text-foreground"
+          >
+            {content.removeAction}
+          </Button>
+        </div>
       </div>
+    </article>
+  );
+}
+
+function BagLineQuantityControl({
+  isPending,
+  item,
+  onUpdateQuantity,
+}: {
+  isPending: boolean;
+  item: CartItem;
+  onUpdateQuantity: (lineItemId: string, quantity: number) => void;
+}) {
+  return (
+    <div className="inline-flex h-9 items-center border border-border">
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label={`${content.decreaseQuantityPrefix} ${item.name} ${content.quantitySuffix}`}
+        disabled={isPending || item.quantity <= 1}
+        onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+        className="h-full w-9 rounded-none text-muted-foreground hover:bg-muted hover:text-foreground disabled:text-muted-foreground/40"
+      >
+        <Minus className="size-4 stroke-icon" aria-hidden="true" />
+      </Button>
+      <span className="w-8 text-center text-sm">{item.quantity}</span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label={`${content.increaseQuantityPrefix} ${item.name} ${content.quantitySuffix}`}
+        disabled={isPending || item.quantity >= 9}
+        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+        className="h-full w-9 rounded-none text-muted-foreground hover:bg-muted hover:text-foreground disabled:text-muted-foreground/40"
+      >
+        <Plus className="size-4 stroke-icon" aria-hidden="true" />
+      </Button>
     </div>
   );
 }

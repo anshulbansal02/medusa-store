@@ -81,7 +81,7 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
           />
         }
       >
-        <Search className="size-4 stroke-[1.6]" aria-hidden="true" />
+        <Search className="size-4 stroke-icon" aria-hidden="true" />
       </DialogTrigger>
       <DialogContent
         className="top-4 max-w-3xl translate-y-0 gap-0 rounded-none border border-border bg-background p-0 sm:top-6 sm:max-w-3xl"

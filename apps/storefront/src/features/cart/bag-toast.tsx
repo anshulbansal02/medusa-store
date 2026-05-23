@@ -53,7 +53,7 @@ export function BagToast() {
         </Link>
         <div className="min-w-0 py-0.5">
           <p className="flex items-center gap-1.5 text-muted-foreground text-xs uppercase">
-            <ShoppingBag className="size-3.5 stroke-[1.6]" aria-hidden="true" />
+            <ShoppingBag className="size-3.5 stroke-icon" aria-hidden="true" />
             {content.addedToastLabel}
           </p>
           <p className="mt-1 truncate font-medium text-sm">{addedItem.name}</p>
@@ -70,7 +70,7 @@ export function BagToast() {
           onClick={dismissAddedItem}
           className="size-8 rounded-none text-muted-foreground hover:bg-transparent hover:text-foreground"
         >
-          <X className="size-4 stroke-[1.6]" aria-hidden="true" />
+          <X className="size-4 stroke-icon" aria-hidden="true" />
         </Button>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">

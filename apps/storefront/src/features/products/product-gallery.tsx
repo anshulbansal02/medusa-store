@@ -94,7 +94,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             className="object-cover transition duration-300 ease-out group-hover:scale-[1.015]"
           />
           <span className="absolute right-3 bottom-3 grid size-10 place-items-center bg-background/90 text-foreground shadow-sm backdrop-blur-sm transition group-hover:bg-background">
-            <Expand className="size-4 stroke-[1.6]" aria-hidden="true" />
+            <Expand className="size-4 stroke-icon" aria-hidden="true" />
           </span>
         </DialogTrigger>
 
@@ -115,7 +115,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               />
             }
           >
-            <X className="size-5 stroke-[1.6]" aria-hidden="true" />
+            <X className="size-5 stroke-icon" aria-hidden="true" />
           </DialogClose>
 
           <div className="flex snap-x snap-mandatory overflow-x-auto">

@@ -13,7 +13,7 @@ type TrustIconKey = keyof typeof trustIcons;
 function TrustIcon({ icon }: { icon: TrustIconKey }) {
   const Icon = trustIcons[icon];
 
-  return <Icon className="mt-0.5 size-5 shrink-0 stroke-[1.6] text-primary" />;
+  return <Icon className="mt-0.5 size-5 shrink-0 stroke-icon text-primary" />;
 }
 
 export function TrustStrip({ content }: HomeSectionProps) {

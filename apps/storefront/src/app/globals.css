@@ -102,3 +102,11 @@
     @apply font-sans;
   }
 }
+
+@utility stroke-icon {
+  stroke-width: 1.6;
+}
+
+@utility stroke-icon-strong {
+  stroke-width: 1.7;
+}

@@ -82,7 +82,7 @@ export function BagDrawer({ initialCart, initialItemCount }: BagDrawerProps) {
           aria-label={content.openLabel}
           className="relative size-9 rounded-none text-muted-foreground hover:bg-transparent hover:text-foreground"
         >
-          <ShoppingBag className="size-4 stroke-[1.6]" aria-hidden="true" />
+          <ShoppingBag className="size-4 stroke-icon" aria-hidden="true" />
           {itemCount > 0 ? (
             <span className="-right-0.5 -top-0.5 absolute flex size-4 items-center justify-center rounded-full bg-primary text-primary-foreground text-tiny leading-none">
               {itemCount}

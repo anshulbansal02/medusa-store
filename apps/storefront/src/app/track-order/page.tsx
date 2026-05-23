@@ -97,7 +97,7 @@ function HelpIcon({ icon }: { icon: HelpIconKey }) {
 
   return (
     <Icon
-      className="size-4 stroke-[1.6] text-muted-foreground"
+      className="size-4 stroke-icon text-muted-foreground"
       aria-hidden="true"
     />
   );

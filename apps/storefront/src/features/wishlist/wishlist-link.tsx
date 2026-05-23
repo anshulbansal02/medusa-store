@@ -18,7 +18,7 @@ export function WishlistLink() {
       aria-label={content.openLabel}
       className="relative grid size-9 cursor-pointer place-items-center transition hover:bg-muted"
     >
-      <Heart className="size-4 stroke-[1.6]" aria-hidden="true" />
+      <Heart className="size-4 stroke-icon" aria-hidden="true" />
       {hasHydrated && count > 0 ? (
         <span className="-top-1 -right-1 absolute grid size-4 place-items-center bg-primary text-primary-foreground text-tiny leading-none">
           {count}

@@ -17,6 +17,8 @@ import {
 } from "react-email";
 import type { ReactNode } from "react";
 
+import { emailContent } from "../email-content";
+
 export type OrderEmailItem = {
   title?: string | null;
   subtitle?: string | null;
@@ -54,6 +56,7 @@ const emailTailwindConfig = {
           accentDark: "#7f2431",
           background: "#f7f1ee",
           border: "#e6d8d1",
+          buttonText: "#ffffff",
           faint: "#9a8a83",
           inset: "#f3ebe6",
           panel: "#fffaf7",
@@ -102,7 +105,12 @@ export function getOrderNumber(order: OrderPlacedEmailData) {
 }
 
 function getItemTitle(item: OrderEmailItem) {
-  return item.product_title ?? item.subtitle ?? item.title ?? "Product";
+  return (
+    item.product_title ??
+    item.subtitle ??
+    item.title ??
+    emailContent.orderPlaced.items.fallbackTitle
+  );
 }
 
 function Summary({
@@ -117,7 +125,7 @@ function Summary({
       <Row>
         <Column>
           <Text className="m-0 mb-1 font-bold text-emailMicro text-email-faint uppercase tracking-emailLabel">
-            Order
+            {emailContent.orderPlaced.summary.order}
           </Text>
           <Text className="m-0 font-bold text-emailBody text-email-text">
             {getOrderNumber(order)}
@@ -125,7 +133,7 @@ function Summary({
         </Column>
         <Column>
           <Text className="m-0 mb-1 font-bold text-emailMicro text-email-faint uppercase tracking-emailLabel">
-            Total
+            {emailContent.orderPlaced.summary.total}
           </Text>
           <Text className="m-0 font-bold text-emailBody text-email-text">
             {formatPrice(order.total, currencyCode)}
@@ -133,10 +141,10 @@ function Summary({
         </Column>
         <Column>
           <Text className="m-0 mb-1 font-bold text-emailMicro text-email-faint uppercase tracking-emailLabel">
-            Payment
+            {emailContent.orderPlaced.summary.payment}
           </Text>
           <Text className="m-0 font-bold text-emailBody text-email-text">
-            Prepaid
+            {emailContent.orderPlaced.summary.paymentValue}
           </Text>
         </Column>
       </Row>
@@ -161,7 +169,7 @@ function OrderItems({
 }) {
   return (
     <Section className="mt-[30px]">
-      <SectionTitle>Your pieces</SectionTitle>
+      <SectionTitle>{emailContent.orderPlaced.items.customerTitle}</SectionTitle>
       {order.items?.map((item, index) => {
         const title = getItemTitle(item);
 
@@ -188,7 +196,8 @@ function OrderItems({
                 {title}
               </Text>
               <Text className="m-0 mt-1 text-emailSmall text-email-muted">
-                Qty {item.quantity ?? 0}
+                {emailContent.orderPlaced.items.quantityPrefix}{" "}
+                {item.quantity ?? 0}
               </Text>
             </Column>
             <Column className="py-[14px] text-right">
@@ -213,18 +222,21 @@ function Totals({
   return (
     <Section className="mt-5">
       <TotalRow
-        label="Subtotal"
+        label={emailContent.orderPlaced.totals.subtotal}
         value={formatPrice(order.subtotal, currencyCode)}
       />
       <TotalRow
-        label="Shipping"
+        label={emailContent.orderPlaced.totals.shipping}
         value={formatPrice(order.shipping_total, currencyCode)}
       />
-      <TotalRow label="Tax" value={formatPrice(order.tax_total, currencyCode)} />
+      <TotalRow
+        label={emailContent.orderPlaced.totals.tax}
+        value={formatPrice(order.tax_total, currencyCode)}
+      />
       <Row>
         <Column>
           <Text className="m-0 mt-2 font-bold text-emailTotal text-email-text">
-            Total
+            {emailContent.orderPlaced.totals.total}
           </Text>
         </Column>
         <Column>
@@ -255,15 +267,19 @@ function TotalRow({ label, value }: { label: string; value: string }) {
 function NextSteps() {
   return (
     <Section className="mt-7">
-      <SectionTitle>What happens next</SectionTitle>
-      <Text className="m-0 mb-2 text-emailBase leading-emailBody text-email-muted">
-        The store team will review your order, prepare your pieces, and email
-        you again when dispatch is ready.
-      </Text>
-      <Text className="m-0 text-emailBase leading-emailBody text-email-muted">
-        Keep this email for your order number if you need help with sizing,
-        shipping, or returns.
-      </Text>
+      <SectionTitle>{emailContent.orderPlaced.nextSteps.title}</SectionTitle>
+      {emailContent.orderPlaced.nextSteps.body.map((paragraph, index) => (
+        <Text
+          key={paragraph}
+          className={
+            index === 0
+              ? "m-0 mb-2 text-emailBase leading-emailBody text-email-muted"
+              : "m-0 text-emailBase leading-emailBody text-email-muted"
+          }
+        >
+          {paragraph}
+        </Text>
+      ))}
     </Section>
   );
 }
@@ -274,7 +290,9 @@ export function CustomerOrderPlacedEmail({
 }: OrderPlacedEmailProps) {
   const currencyCode = order.currency_code ?? "inr";
   const orderNumber = getOrderNumber(order);
-  const preview = `Order ${orderNumber ?? ""} confirmed. Total ${formatPrice(order.total, currencyCode)}.`;
+  const preview = `Order ${orderNumber ?? ""} ${
+    emailContent.orderPlaced.customer.previewPrefix
+  } ${formatPrice(order.total, currencyCode)}.`;
 
   return (
     <Html lang="en">
@@ -285,18 +303,18 @@ export function CustomerOrderPlacedEmail({
           <Container className="mx-auto max-w-[640px] px-4 py-7">
             <Section className="border border-email-border bg-email-panel p-[30px]">
               <Text className="m-0 mb-[18px] font-bold text-emailTiny text-email-accent uppercase tracking-emailBrand">
-                The Label
+                {emailContent.brand.name}
               </Text>
               <Heading
                 as="h1"
                 className="m-0 font-heading font-normal text-emailTitle leading-emailTitle text-email-text"
               >
-                Order confirmed
+                {emailContent.orderPlaced.customer.heading}
               </Heading>
               <Text className="m-0 mt-4 text-emailBase leading-emailBody text-email-muted">
-                We have received your order
-                {orderNumber ? ` ${orderNumber}` : ""}. Here is your receipt
-                and what happens next.
+                {emailContent.orderPlaced.customer.introPrefix}
+                {orderNumber ? ` ${orderNumber}` : ""}.{" "}
+                {emailContent.orderPlaced.customer.introSuffix}
               </Text>
 
               <Summary order={order} currencyCode={currencyCode} />
@@ -305,9 +323,9 @@ export function CustomerOrderPlacedEmail({
                 <Section className="mt-[22px]">
                   <Button
                     href={orderUrl}
-                    className="inline-block bg-email-accentDark px-[22px] font-bold text-emailBase leading-emailButton text-white no-underline"
+                    className="inline-block bg-email-accentDark px-[22px] font-bold text-emailBase text-email-buttonText leading-emailButton no-underline"
                   >
-                    View order
+                    {emailContent.orderPlaced.customer.action}
                   </Button>
                 </Section>
               ) : null}
@@ -318,7 +336,7 @@ export function CustomerOrderPlacedEmail({
               <NextSteps />
 
               <Text className="m-0 mt-7 text-emailBase leading-emailBody text-email-muted">
-                For support, reply to this email with your order number.
+                {emailContent.orderPlaced.customer.support}
               </Text>
             </Section>
           </Container>
@@ -331,7 +349,11 @@ export function CustomerOrderPlacedEmail({
 export function OwnerOrderPlacedEmail({ order }: OrderPlacedEmailProps) {
   const currencyCode = order.currency_code ?? "inr";
   const orderNumber = getOrderNumber(order);
-  const preview = `New order${orderNumber ? ` ${orderNumber}` : ""} from ${order.email ?? "guest customer"}.`;
+  const preview = `${emailContent.orderPlaced.owner.previewPrefix}${
+    orderNumber ? ` ${orderNumber}` : ""
+  } ${emailContent.orderPlaced.owner.previewFrom} ${
+    order.email ?? emailContent.orderPlaced.owner.guestCustomer
+  }.`;
 
   return (
     <Html lang="en">
@@ -342,23 +364,25 @@ export function OwnerOrderPlacedEmail({ order }: OrderPlacedEmailProps) {
           <Container className="mx-auto max-w-[640px] px-4 py-7">
             <Section className="border border-email-border bg-email-panel p-7">
               <Text className="m-0 mb-[18px] font-bold text-emailTiny text-email-accent uppercase tracking-emailBrand">
-                The Label Admin
+                {emailContent.brand.adminName}
               </Text>
               <Heading
                 as="h1"
                 className="m-0 font-heading font-normal text-emailOwnerTitle leading-emailOwnerTitle text-email-text"
               >
-                New order received
+                {emailContent.orderPlaced.owner.heading}
               </Heading>
               <Text className="m-0 mt-4 text-emailBase leading-emailBody text-email-muted">
-                Order{orderNumber ? ` ${orderNumber}` : ""} was placed by{" "}
-                {order.email ?? "guest customer"}.
+                {emailContent.orderPlaced.owner.introPrefix}
+                {orderNumber ? ` ${orderNumber}` : ""}{" "}
+                {emailContent.orderPlaced.owner.introSuffix}{" "}
+                {order.email ?? emailContent.orderPlaced.owner.guestCustomer}.
               </Text>
 
               <Summary order={order} currencyCode={currencyCode} />
 
               <Section className="mt-6">
-                <SectionTitle>Items</SectionTitle>
+                <SectionTitle>{emailContent.orderPlaced.items.ownerTitle}</SectionTitle>
                 {order.items?.map((item, index) => (
                   <Text
                     key={`${getItemTitle(item)}-${index}`}
@@ -370,8 +394,7 @@ export function OwnerOrderPlacedEmail({ order }: OrderPlacedEmailProps) {
               </Section>
 
               <Text className="m-0 mt-6 text-emailBase leading-emailBody text-email-muted">
-                Open the order dashboard to capture payment, fulfill items, and
-                add tracking updates.
+                {emailContent.orderPlaced.owner.dashboardPrompt}
               </Text>
             </Section>
           </Container>

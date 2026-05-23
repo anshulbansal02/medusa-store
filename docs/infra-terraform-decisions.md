@@ -599,9 +599,86 @@ Reason:
 - Cloudflare Access gives a clean outer identity gate without managing a shared proxy password.
 - The project already uses Cloudflare DNS, so Access fits the chosen platform boundary.
 
+### Decision 20: Cloudflare Proxy For API/Admin
+
+Question: should API/admin hostnames be proxied through Cloudflare?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Cloudflare proxied records for API/admin | `api.brand.com` and `admin.brand.com` resolve to Cloudflare anycast IPs and proxy to the Lightsail origin. | Hides origin IP from normal DNS, adds free DDoS/proxy layer, enables Access/WAF/rate-limit options later. | Adds Cloudflare edge behavior to debug; origin must still be secured. | Accepted |
+| DNS-only direct to Lightsail | DNS points directly to the Lightsail static IP. | Simplest request path. | Exposes origin IP directly and loses Cloudflare proxy protections. | Rejected for production |
+
+Decision:
+
+- Proxy `api.brand.com` through Cloudflare for production.
+- Proxy `admin.brand.com` through Cloudflare and protect it with Cloudflare Access.
+- Keep Caddy serving valid HTTPS at the origin.
+- Use full end-to-end HTTPS; do not use Cloudflare Flexible SSL.
+- Keep origin firewall and SSH hardening; Cloudflare proxy is not a replacement for host security.
+
+Reason:
+
+- Cloudflare's free plan includes core DNS/proxy/CDN/SSL/DDoS protection features suitable for this v1 layer.
+- Dynamic API responses still reach the origin, so performance is not the main reason; security and operational controls are.
+- Proxying now keeps the path open for future WAF/rate-limit rules without changing DNS architecture.
+
+### Decision 21: Lightsail Origin Firewall For HTTP/HTTPS
+
+Question: should Lightsail `80/443` be open publicly or restricted to Cloudflare IP ranges?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Open `80/443` publicly at launch | Lightsail allows public HTTP/HTTPS while Cloudflare proxy is configured in DNS. | Simplest launch path, fewer moving parts during DNS/TLS setup. | Direct origin access is possible if the IP is known. | Accepted initial posture |
+| Restrict `80/443` to Cloudflare IP ranges | Only Cloudflare edge IP ranges can reach the origin HTTP/HTTPS ports. | Stronger origin protection after Cloudflare proxy is stable. | Requires correct Cloudflare IP allowlist maintenance; easier to break origin during setup. | Accepted later hardening |
+| No public inbound, tunnel only | Use Cloudflare Tunnel for all ingress. | Hides origin network path. | Tunnel-first was rejected for v1 primary ingress. | Rejected |
+
+Decision:
+
+- Launch with Lightsail `80/443` open publicly.
+- Keep Cloudflare proxied DNS records for API/admin.
+- After the proxied path, Caddy HTTPS, health checks, and deploys are stable, restrict `80/443` to Cloudflare IP ranges.
+- Keep SSH restricted to the smallest practical trusted source set.
+
+Reason:
+
+- Cloudflare-only origin firewalling is stronger, but first-launch DNS/TLS/debugging is simpler with public `80/443`.
+- This is a phased hardening step, not a rejection of origin restriction.
+
+### Decision 22: SSH And Deploy Access To Lightsail
+
+Question: how should human SSH and GitHub Actions deploy access reach the Lightsail host?
+
+Options:
+
+| Option | What it means | Pros | Risks / tradeoffs | Status |
+| --- | --- | --- | --- | --- |
+| Tailscale for SSH/deploy access | Install Tailscale on Lightsail; human devices and GitHub Actions join the tailnet and SSH to the private Tailscale IP. | No permanent public SSH, stable private access from changing networks, works for personal devices and CI deploys. | Requires Tailscale setup/ACLs and tested CI connectivity. | Accepted |
+| Public SSH restricted to trusted IPs | Keep port `22` open only to selected IPs. | Simple and AWS-native. | Annoying with changing personal IPs; GitHub Actions IP ranges are broad/dynamic. | Fallback only |
+| Public SSH open to anywhere, key-only | Leave SSH open globally with key auth. | Simplest. | Unnecessary public attack surface. | Rejected |
+| Cloudflare Access/Tunnel for SSH | Use Cloudflare Zero Trust for SSH. | Strong access layer. | More setup and not needed because Tailscale account already exists. | Rejected for v1 |
+
+Decision:
+
+- Use Tailscale for human SSH and GitHub Actions deploy access.
+- Install Tailscale on the Lightsail VM during bootstrap.
+- Close public port `22` after Tailscale access is tested.
+- GitHub Actions deploy jobs may join the tailnet using Tailscale's GitHub Action and deploy over the server's Tailscale IP.
+- Use Tailscale ACLs so only approved personal devices/users and the deploy identity can access the host.
+- Keep emergency access through Lightsail browser SSH or temporary IP-restricted public SSH.
+
+Reason:
+
+- Only one operator needs routine access, across a few personal devices.
+- Tailscale avoids depending on changing personal IPs or broad GitHub Actions runner IP ranges.
+- Public SSH does not need to remain exposed for v1.
+
 ## Round 1: Terraform Setup
 
-### Decision 20: IaC Tool
+### Decision 23: IaC Tool
 
 Question: should the project use Terraform or OpenTofu?
 
@@ -623,7 +700,7 @@ Reason:
 - Vendor docs and examples for AWS, Cloudflare, Vercel, Upstash, and community Neon providers are easiest to follow as Terraform.
 - Consistency matters more than tool neutrality for this initial setup.
 
-### Decision 21: Terraform Scope
+### Decision 24: Terraform Scope
 
 Question: what should Terraform own in v1?
 
@@ -671,7 +748,7 @@ Reason:
 - Keeping deployments out of Terraform avoids turning infrastructure state into application release state.
 - Keeping live secret values out of Terraform/Git reduces accidental exposure risk.
 
-### Decision 22: Terraform Directory Layout
+### Decision 25: Terraform Directory Layout
 
 Question: where should Terraform live?
 
@@ -711,7 +788,7 @@ Reason:
 - `infra/terraform` keeps infrastructure code separate from application code without requiring a separate repo.
 - The `infra/` parent leaves room for future runbooks, bootstrap scripts, or non-Terraform operational files.
 
-### Decision 23: Terraform State Backend
+### Decision 26: Terraform State Backend
 
 Question: where should Terraform state live?
 
@@ -740,7 +817,7 @@ Reason:
 - We already use AWS for Lightsail, so S3/DynamoDB avoids adding another state platform.
 - S3 remote state with DynamoDB locking is a standard, durable Terraform backend pattern.
 
-### Decision 24: Environments
+### Decision 27: Environments
 
 Question: should Terraform model QA and production separately?
 

@@ -243,7 +243,7 @@ function ProductRouteContent({
             <div className="grid gap-4 border-border border-t pt-6 text-sm">
               <div className="flex gap-3">
                 <Truck
-                  className="mt-0.5 size-4 shrink-0 stroke-[1.6] text-muted-foreground"
+                  className="mt-0.5 size-4 shrink-0 stroke-icon text-muted-foreground"
                   aria-hidden="true"
                 />
                 <div>
@@ -255,7 +255,7 @@ function ProductRouteContent({
               </div>
               <div className="flex gap-3">
                 <RefreshCw
-                  className="mt-0.5 size-4 shrink-0 stroke-[1.6] text-muted-foreground"
+                  className="mt-0.5 size-4 shrink-0 stroke-icon text-muted-foreground"
                   aria-hidden="true"
                 />
                 <div>
@@ -272,7 +272,7 @@ function ProductRouteContent({
                 {product.detailSections.map((section) => (
                   <section key={section.key} className="flex gap-3">
                     <ShieldCheck
-                      className="mt-0.5 size-4 shrink-0 stroke-[1.6] text-muted-foreground"
+                      className="mt-0.5 size-4 shrink-0 stroke-icon text-muted-foreground"
                       aria-hidden="true"
                     />
                     <div>

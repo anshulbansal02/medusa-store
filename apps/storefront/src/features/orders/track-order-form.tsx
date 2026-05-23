@@ -111,7 +111,7 @@ export function TrackOrderForm() {
           className="h-12 rounded-none px-6"
         >
           {isPending ? content.pendingButton : content.submitButton}
-          <ArrowRight className="size-4 stroke-[1.6]" aria-hidden="true" />
+          <ArrowRight className="size-4 stroke-icon" aria-hidden="true" />
         </Button>
         {message ? (
           <output className="text-muted-foreground text-sm">{message}</output>

@@ -41,7 +41,7 @@ export function WishlistButton({
     >
       <Heart
         className={cn(
-          "size-4 stroke-[1.7]",
+          "size-4 stroke-icon-strong",
           isSaved ? "fill-current" : "fill-transparent",
         )}
         aria-hidden="true"

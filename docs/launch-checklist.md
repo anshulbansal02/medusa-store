@@ -146,6 +146,11 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 
 - HTTPS configured for all public domains.
 - Caddy is running on Lightsail and routing API/admin hostnames to Medusa.
+- Cloudflare proxies production `api` and `admin` records.
+- Cloudflare SSL mode is full end-to-end HTTPS, not Flexible SSL.
+- Lightsail `80/443` are open for launch and Cloudflare-only origin restriction is tracked as post-stability hardening.
+- Tailscale SSH/deploy access works before public SSH is closed.
+- Public Lightsail SSH is closed after Tailscale access is verified, with emergency access documented.
 - Docker Compose is running separate Medusa server and worker services.
 - Lightsail bootstrap script/runbook has been run and is committed under `infra/`.
 - Production Lightsail automatic snapshots are enabled and understood as host recovery only.

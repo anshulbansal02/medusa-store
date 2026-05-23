@@ -10,18 +10,18 @@ import {
   OccasionEditSection,
   TrustStrip,
 } from "@/features/home/home-sections";
-import { absoluteUrl, siteConfig } from "@/lib/config/site";
+import { absoluteUrl } from "@/lib/config/site";
 import { getHomeProducts } from "@/lib/medusa/products";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} | Occasion wear for evenings out`,
-  description: siteConfig.description,
+  title: siteContent.home.metadata.title,
+  description: siteContent.home.metadata.description,
   alternates: {
     canonical: absoluteUrl("/"),
   },
   openGraph: {
-    title: `${siteConfig.name} | Occasion wear for evenings out`,
-    description: siteConfig.description,
+    title: siteContent.home.metadata.title,
+    description: siteContent.home.metadata.description,
     url: absoluteUrl("/"),
     type: "website",
   },

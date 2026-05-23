@@ -1,4 +1,9 @@
 export const homeContent = {
+  metadata: {
+    title: "The Label | Occasion wear for evenings out",
+    description:
+      "Premium western occasion wear for India, built around newness, visual appeal, and a low-friction shopping flow.",
+  },
   hero: {
     productEyebrow: "Featured style",
     eyebrow: "The first edit",
