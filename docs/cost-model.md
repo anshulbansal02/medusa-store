@@ -10,7 +10,7 @@ Target: keep recurring operating cost around USD 50/month or lower where practic
 - Vercel Pro account is acceptable.
 - AWS Lightsail 4 GB is accepted for production Medusa compute.
 - Existing domain is already purchased through Shopify.
-- Existing AWS account is available, but AWS is not the default for v1.
+- Existing AWS account is available and used for Lightsail compute, Terraform state, and SSM Parameter Store.
 - Production Postgres is Neon in Singapore.
 - Production Redis is Upstash in Singapore, pay-as-you-go initially.
 - Avoid extra paid services unless they clearly reduce complexity or risk.

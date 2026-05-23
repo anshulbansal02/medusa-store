@@ -302,14 +302,13 @@ Required:
 - Razorpay signatures verified server-side.
 - Webhooks verified where possible.
 - CORS locked to known origins.
-- Admin protected with strong credentials.
+- Admin protected with Cloudflare Access plus strong Medusa Admin credentials.
 - No sensitive data in logs.
 - Postgres backups enabled.
 - Least-privilege R2/S3 tokens.
 
-Preferred:
+Required:
 
-- Cloudflare Access for admin if simple.
 - Cloudflare Turnstile for public forms.
 
 ## Backend Customization
