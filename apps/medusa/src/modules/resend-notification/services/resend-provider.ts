@@ -6,10 +6,9 @@ import {
 import { Resend } from "resend";
 
 import {
-  buildOwnerOrderPlacedEmail,
-  buildOrderPlacedEmail,
-  type OrderPlacedEmailData,
-} from "./order-placed-email";
+  renderTransactionalEmail,
+  type TransactionalEmailContent,
+} from "../../../email/transactional-email";
 
 type ResendNotificationProviderOptions = {
   api_key: string;
@@ -21,13 +20,12 @@ type InjectedDependencies = {
 };
 
 const providerIdentifier = "resend";
-const orderPlacedTemplate = "order-placed";
-const ownerOrderPlacedTemplate = "owner-order-placed";
 
-function isOrderPlacedEmailData(value: unknown): value is OrderPlacedEmailData {
-  return Boolean(value) && typeof value === "object";
+function getIdempotencyKey(data: Record<string, unknown> | null | undefined) {
+  return typeof data?.email_idempotency_key === "string"
+    ? data.email_idempotency_key
+    : undefined;
 }
-
 export default class ResendNotificationProviderService extends AbstractNotificationProviderService {
   static identifier = providerIdentifier;
 
@@ -69,23 +67,13 @@ export default class ResendNotificationProviderService extends AbstractNotificat
     let subject = notification.content?.subject;
     let html = notification.content?.html;
     let text = notification.content?.text;
+    let rendered: TransactionalEmailContent | null = null;
 
     if (!subject || !html) {
-      const order = notification.data?.order;
-
-      if (!isOrderPlacedEmailData(order)) {
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
-          `Unsupported email template: ${notification.template}`,
-        );
-      }
-
-      const rendered =
-        notification.template === ownerOrderPlacedTemplate
-          ? await buildOwnerOrderPlacedEmail(order)
-          : notification.template === orderPlacedTemplate
-            ? await buildOrderPlacedEmail(order)
-            : null;
+      rendered = await renderTransactionalEmail({
+        template: notification.template,
+        data: notification.data,
+      });
 
       if (!rendered) {
         throw new MedusaError(
@@ -99,13 +87,21 @@ export default class ResendNotificationProviderService extends AbstractNotificat
       text = rendered.text;
     }
 
-    const { data, error } = await this.resend_.emails.send({
-      from,
-      to: notification.to,
-      subject,
-      html,
-      text,
-    });
+    const { data, error } = await this.resend_.emails.send(
+      {
+        from,
+        to: notification.to,
+        subject,
+        html,
+        text,
+        headers: rendered?.headers,
+        replyTo: rendered?.replyTo,
+        tags: rendered?.tags,
+      },
+      {
+        idempotencyKey: getIdempotencyKey(notification.data),
+      },
+    );
 
     if (error) {
       this.logger_.error(`Resend email failed: ${error.message}`);

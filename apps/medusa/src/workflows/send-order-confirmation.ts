@@ -58,6 +58,10 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
           ? [
               {
                 ...baseNotification,
+                data: {
+                  ...baseNotification.data,
+                  email_idempotency_key: `order-placed-customer-${order.id}`,
+                },
                 to: order.email,
                 template: "order-placed",
                 idempotency_key: `order-placed-customer-${order.id}`,
@@ -68,6 +72,10 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
           ? [
               {
                 ...baseNotification,
+                data: {
+                  ...baseNotification.data,
+                  email_idempotency_key: `order-placed-owner-${order.id}`,
+                },
                 to: ownerEmail,
                 template: "owner-order-placed",
                 idempotency_key: `order-placed-owner-${order.id}`,

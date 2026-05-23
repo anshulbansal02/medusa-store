@@ -1,4 +1,4 @@
-import type { OrderPlacedEmailData } from "../src/modules/resend-notification/services/order-placed-email";
+import type { OrderPlacedEmailData } from "../src/email/templates/order-placed";
 
 export const previewOrder = {
   id: "order_preview",
@@ -13,11 +13,15 @@ export const previewOrder = {
   items: [
     {
       product_title: "Noor Draped Midi Dress",
+      thumbnail:
+        "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=160&q=80",
       quantity: 1,
       total: 6_800,
     },
     {
       product_title: "Mira Satin Evening Top",
+      thumbnail:
+        "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=160&q=80",
       quantity: 1,
       total: 7_200,
     },

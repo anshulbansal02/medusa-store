@@ -4,6 +4,10 @@
     "apps/storefront": {
       "name": "storefront",
       "script": "dev:app"
+    },
+    "apps/medusa": {
+      "name": "email",
+      "script": "email:dev:app"
     }
   }
 }
