@@ -41,7 +41,7 @@ sudo systemctl reload caddy
 
 for _ in $(seq 1 30); do
   if curl -fsS http://127.0.0.1:29181/health >/dev/null; then
-    docker image prune -f >/dev/null
+    docker image prune -af >/dev/null
     echo "Medusa deploy completed."
     exit 0
   fi
