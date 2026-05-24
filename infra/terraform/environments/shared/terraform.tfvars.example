@@ -1,28 +1,28 @@
 aws_region  = "ap-southeast-1"
 aws_profile = "your-aws-profile"
 
-github_owner = "anshulbansal02"
-github_repo  = "medusa-store"
+github_owner = "your-github-owner"
+github_repo  = "your-github-repo"
 
 # Prefer TF_VAR_vercel_api_token in the shell instead of committing this.
 vercel_api_token = "vercel-token"
 
-vercel_storefront_qa_project_name   = "medusa-store-storefront-qa"
-vercel_storefront_prod_project_name = "medusa-store-storefront-prod"
+vercel_storefront_qa_project_name   = "your-storefront-qa-project"
+vercel_storefront_prod_project_name = "your-storefront-prod-project"
 vercel_storefront_function_regions  = ["sin1"]
 
 vercel_storefront_qa_medusa_publishable_key = "pk_qa_publishable_key"
 
-production_apex_domain      = "neonfold.com"
-production_storefront_domain = "www.neonfold.com"
-qa_storefront_domain         = "qa.neonfold.com"
-qa_medusa_api_domain         = "qa-api.neonfold.com"
-qa_medusa_admin_domain       = "qa-admin.neonfold.com"
-production_medusa_api_domain = "api.neonfold.com"
-production_medusa_admin_domain = "admin.neonfold.com"
-production_media_domain      = "media.neonfold.com"
-qa_media_domain              = "qa-media.neonfold.com"
-qa_medusa_static_ip          = "52.77.164.161"
+production_apex_domain        = "example.com"
+production_storefront_domain  = "www.example.com"
+qa_storefront_domain          = "qa.example.com"
+qa_medusa_api_domain          = "qa-api.example.com"
+qa_medusa_admin_domain        = "qa-admin.example.com"
+production_medusa_api_domain  = "api.example.com"
+production_medusa_admin_domain = "admin.example.com"
+production_media_domain       = "media.example.com"
+qa_media_domain               = "qa-media.example.com"
+qa_medusa_static_ip           = "203.0.113.10"
 
 # Prefer CLOUDFLARE_API_TOKEN in the shell instead of committing it.
 cloudflare_site_enabled     = true
@@ -31,8 +31,8 @@ cloudflare_r2_media_enabled = true
 cloudflare_web_analytics_enabled = false
 cloudflare_account_id       = "cloudflare-account-id"
 cloudflare_zone_id          = "cloudflare-zone-id"
-qa_media_bucket_name        = "ecom-qa-media"
-production_media_bucket_name = "ecom-prod-media"
+qa_media_bucket_name         = "your-qa-media-bucket"
+production_media_bucket_name = "your-prod-media-bucket"
 
 # Prefer TF_VAR_better_stack_uptime_api_token or BETTERUPTIME_API_TOKEN instead of committing it.
 better_stack_uptime_enabled = true

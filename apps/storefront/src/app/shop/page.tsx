@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { siteContent } from "@/content/site-content";
-import { ProductGrid } from "@/features/products/product-grid";
+import {
+  ProductListing,
+  type ProductListingSearchParams,
+} from "@/features/products/product-listing";
 import { absoluteUrl } from "@/lib/config/site";
 import { getProductCategories } from "@/lib/medusa/categories";
 import { getProducts } from "@/lib/medusa/products";
@@ -23,73 +25,34 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ShopPage() {
+type ShopPageProps = {
+  searchParams?: Promise<ProductListingSearchParams>;
+};
+
+export default async function ShopPage({ searchParams }: ShopPageProps) {
+  const params = await searchParams;
   const [products, categories] = await Promise.all([
-    getProducts({ limit: 24 }),
+    getProducts({ limit: 100 }),
     getProductCategories(12),
   ]);
   const content = siteContent.shop;
-  const categoryLinks = [
-    { href: "/shop", label: content.allCategoryLabel },
-    ...categories.map((category) => ({
-      href: `/shop/${category.handle}`,
-      label: category.name,
-    })),
-  ];
 
   return (
     <main className="min-h-screen">
       <SiteHeader />
 
-      <section className="px-4 pt-28 pb-10 sm:px-6 sm:pt-32 lg:px-8">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="grid gap-8 border-border border-b pb-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {content.eyebrow}
-              </p>
-              <h1 className="mt-3 max-w-3xl font-heading text-6xl leading-none sm:text-8xl">
-                {content.title}
-              </h1>
-            </div>
-            <p className="max-w-2xl text-muted-foreground lg:justify-self-end">
-              {content.description}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-5 py-6 md:flex-row md:items-center md:justify-between">
-            <nav
-              aria-label={content.categoryNavigationLabel}
-              className="-mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0"
-            >
-              {categoryLinks.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  prefetch={false}
-                  className="shrink-0 border border-border px-4 py-2 text-sm transition hover:border-foreground"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-            <p className="text-muted-foreground text-sm">
-              {products.length} {content.countLabel}
-            </p>
-          </div>
-
-          {products.length > 0 ? (
-            <ProductGrid products={products} prioritizeInitialImages />
-          ) : (
-            <div className="border border-border px-5 py-8 sm:px-8">
-              <h2 className="text-base font-medium">{content.emptyTitle}</h2>
-              <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                {content.emptyDescription}
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+      <ProductListing
+        actionPath="/shop"
+        activeCategoryHref="/shop"
+        categories={categories}
+        description={content.description}
+        emptyDescription={content.emptyDescription}
+        emptyTitle={content.emptyTitle}
+        eyebrow={content.eyebrow}
+        products={products}
+        searchParams={params}
+        title={content.title}
+      />
 
       <section className="border-border border-y px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-[1440px] gap-5 text-sm md:grid-cols-3">

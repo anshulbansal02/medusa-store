@@ -15,14 +15,14 @@ upstash_redis_budget         = 20
 
 # Export secret values with TF_VAR_* instead of committing them:
 # export TF_VAR_neon_api_key="..."
-neon_org_id                            = "org-soft-pond-66604026"
-neon_region_id                         = "aws-ap-southeast-1"
-neon_pg_version                        = 17
-neon_history_retention_seconds         = 21600
+neon_org_id                    = "your-neon-org-id"
+neon_region_id                 = "aws-ap-southeast-1"
+neon_pg_version                = 17
+neon_history_retention_seconds = 21600
 
-qa_storefront_domain = "qa.neonfold.com"
-qa_medusa_api_domain = "qa-api.neonfold.com"
-qa_medusa_admin_domain = "qa-admin.neonfold.com"
-qa_media_domain = "qa-media.neonfold.com"
-qa_media_bucket_name = "ecom-qa-media"
+qa_storefront_domain    = "qa.example.com"
+qa_medusa_api_domain    = "qa-api.example.com"
+qa_medusa_admin_domain = "qa-admin.example.com"
+qa_media_domain        = "qa-media.example.com"
+qa_media_bucket_name   = "your-qa-media-bucket"
 cloudflare_r2_account_id = "cloudflare-account-id"

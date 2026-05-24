@@ -37,6 +37,8 @@ function productMatchesQuery(product: StorefrontProduct, query: string) {
   return [
     product.name,
     product.note,
+    ...product.colors,
+    ...product.sizes,
     ...product.categories.map((category) => category.name),
   ].some((value) => value.toLowerCase().includes(query));
 }

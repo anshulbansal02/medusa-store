@@ -22,6 +22,62 @@ function readText(value: unknown) {
   return "";
 }
 
+function toLabelFromKey(value: string) {
+  return value
+    .trim()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function readTagList(value: unknown): string[] {
+  if (typeof value === "string" || typeof value === "number") {
+    const text = readText(value);
+
+    return text ? [text] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => {
+      if (isRecord(item)) {
+        return readTagList(item.label ?? item.name ?? item.title ?? item.text);
+      }
+
+      return readTagList(item);
+    });
+  }
+
+  if (isRecord(value)) {
+    return Object.entries(value).flatMap(([key, entry]) => {
+      if (typeof entry === "boolean") {
+        return entry ? [toLabelFromKey(key)] : [];
+      }
+
+      return readTagList(entry);
+    });
+  }
+
+  return [];
+}
+
+export function toProductCardTags(
+  metadata: MedusaMetadata | null | undefined,
+): string[] {
+  if (!isRecord(metadata)) {
+    return [];
+  }
+
+  const tags = [
+    metadata.featured === true ? "Featured" : "",
+    ...readTagList(metadata.product_tags),
+    ...readTagList(metadata.card_tags),
+    ...readTagList(metadata.badges),
+    ...readTagList(metadata.tags),
+  ].filter(Boolean);
+
+  return Array.from(new Set(tags)).slice(0, 3);
+}
+
 function slugifyDetailTitle(title: string) {
   return title
     .trim()

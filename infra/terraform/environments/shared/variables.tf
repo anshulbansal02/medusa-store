@@ -35,13 +35,13 @@ variable "vercel_api_token" {
 variable "vercel_storefront_qa_project_name" {
   description = "Vercel project name for the QA storefront."
   type        = string
-  default     = "medusa-store-storefront-qa"
+  default     = "your-storefront-qa-project"
 }
 
 variable "vercel_storefront_prod_project_name" {
   description = "Vercel project name for the production storefront."
   type        = string
-  default     = "medusa-store-storefront-prod"
+  default     = "your-storefront-prod-project"
 }
 
 variable "vercel_storefront_function_regions" {
@@ -51,69 +51,68 @@ variable "vercel_storefront_function_regions" {
 }
 
 variable "vercel_storefront_qa_medusa_publishable_key" {
-  description = "QA Medusa publishable API key configured on the QA Vercel project. This is browser-safe."
+  description = "QA Medusa publishable API key configured on the QA Vercel project. This is browser-safe, but still environment-specific; pass it through ignored tfvars or TF_VAR_vercel_storefront_qa_medusa_publishable_key."
   type        = string
-  default     = "pk_8c1d080d0113830ac1d39a30dfa86c7927b475e1413899f479b408a95bb39b85"
+  sensitive   = true
 }
 
 variable "production_apex_domain" {
   description = "Production apex domain."
   type        = string
-  default     = "neonfold.com"
+  default     = "example.com"
 }
 
 variable "production_storefront_domain" {
   description = "Production storefront domain."
   type        = string
-  default     = "www.neonfold.com"
+  default     = "www.example.com"
 }
 
 variable "qa_storefront_domain" {
   description = "QA storefront domain."
   type        = string
-  default     = "qa.neonfold.com"
+  default     = "qa.example.com"
 }
 
 variable "qa_medusa_api_domain" {
   description = "QA Medusa API domain."
   type        = string
-  default     = "qa-api.neonfold.com"
+  default     = "qa-api.example.com"
 }
 
 variable "qa_medusa_admin_domain" {
   description = "QA Medusa Admin domain."
   type        = string
-  default     = "qa-admin.neonfold.com"
+  default     = "qa-admin.example.com"
 }
 
 variable "production_medusa_api_domain" {
   description = "Future production Medusa API domain. DNS is deferred until production compute exists."
   type        = string
-  default     = "api.neonfold.com"
+  default     = "api.example.com"
 }
 
 variable "production_medusa_admin_domain" {
   description = "Future production Medusa Admin domain. DNS is deferred until production compute exists."
   type        = string
-  default     = "admin.neonfold.com"
+  default     = "admin.example.com"
 }
 
 variable "production_media_domain" {
   description = "Production media domain served from Cloudflare R2."
   type        = string
-  default     = "media.neonfold.com"
+  default     = "media.example.com"
 }
 
 variable "qa_media_domain" {
   description = "QA media domain served from Cloudflare R2."
   type        = string
-  default     = "qa-media.neonfold.com"
+  default     = "qa-media.example.com"
 }
 
 variable "qa_medusa_static_ip" {
-  description = "QA Medusa Lightsail static public IP used for Cloudflare DNS."
+  description = "QA Medusa Lightsail static public IP used for Cloudflare DNS. Pass the real value through ignored tfvars or TF_VAR_qa_medusa_static_ip."
   type        = string
-  default     = "52.77.164.161"
 }
 
 variable "cloudflare_site_enabled" {
@@ -149,13 +148,13 @@ variable "cloudflare_web_analytics_enabled" {
 variable "qa_media_bucket_name" {
   description = "Cloudflare R2 bucket name for QA media."
   type        = string
-  default     = "ecom-qa-media"
+  default     = "your-qa-media-bucket"
 }
 
 variable "production_media_bucket_name" {
   description = "Cloudflare R2 bucket name for production media."
   type        = string
-  default     = "ecom-prod-media"
+  default     = "your-prod-media-bucket"
 }
 
 variable "better_stack_uptime_enabled" {

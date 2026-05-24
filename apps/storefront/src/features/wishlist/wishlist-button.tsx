@@ -33,16 +33,19 @@ export function WishlistButton({
           : `Save ${productName} to wishlist`
       }
       aria-pressed={isSaved}
+      data-saved={isSaved}
       className={cn(
-        "size-10 rounded-none bg-background/90 text-foreground shadow-sm hover:bg-background",
+        "size-10 rounded-none bg-transparent text-foreground shadow-none transition duration-300 hover:-translate-y-0.5 hover:bg-transparent hover:text-primary active:translate-y-0 data-[saved=true]:text-primary motion-reduce:transition-none",
         className,
       )}
       onClick={() => toggleProduct(productId)}
     >
       <Heart
         className={cn(
-          "size-4 stroke-icon-strong",
-          isSaved ? "fill-current" : "fill-transparent",
+          "size-5 stroke-icon-strong drop-shadow-sm transition duration-300 group-hover/button:scale-110 motion-reduce:transition-none",
+          isSaved
+            ? "fill-current"
+            : "fill-background/85 group-hover/button:fill-background",
         )}
         aria-hidden="true"
       />

@@ -29,10 +29,16 @@ const productListFields = [
   "title",
   "handle",
   "description",
+  "metadata",
   "thumbnail",
+  "*options",
+  "*options.values",
   "*images",
   "*categories",
   "*variants",
+  "variants.metadata",
+  "*variants.options",
+  "*variants.options.option",
 ].join(",");
 
 const productDetailFields = [
@@ -44,10 +50,13 @@ const productDetailFields = [
   "metadata",
   "thumbnail",
   "*options",
+  "*options.values",
   "*images",
   "*categories",
   "*variants",
+  "variants.metadata",
   "*variants.options",
+  "*variants.options.option",
 ].join(",");
 
 function buildProductsPath(searchParams: URLSearchParams) {

@@ -24,12 +24,22 @@ export type MedusaVariantOption = {
   };
 };
 
+export type MedusaProductOptionValue = {
+  value?: string;
+};
+
+export type MedusaProductOption = {
+  title?: string;
+  values?: MedusaProductOptionValue[];
+};
+
 export type MedusaVariant = {
   id?: string;
   title?: string;
   options?: MedusaVariantOption[];
   calculated_price?: MedusaPrice | null;
   prices?: MedusaLegacyPrice[];
+  metadata?: MedusaMetadata | null;
 };
 
 export type MedusaMetadata = Record<string, unknown>;
@@ -41,6 +51,7 @@ export type MedusaProduct = {
   description?: string | null;
   thumbnail?: string | null;
   images?: MedusaImage[];
+  options?: MedusaProductOption[];
   variants?: MedusaVariant[];
   categories?: MedusaProductCategory[];
   metadata?: MedusaMetadata | null;
@@ -55,8 +66,14 @@ export type StorefrontProduct = {
   name: string;
   href: string;
   price: string;
+  priceAmount: number | null;
+  currencyCode: string;
   note: string;
   image: string;
+  images: string[];
+  tags: string[];
+  sizes: string[];
+  colors: string[];
   categories: StorefrontProductCategory[];
 };
 

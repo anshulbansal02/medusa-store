@@ -65,6 +65,11 @@ if [[ -z "${admin_path}" ]]; then
   admin_path="/app"
 fi
 
+if [[ -z "${backend_host}" ]]; then
+  echo "MEDUSA_BACKEND_URL must be an https URL with a hostname." >&2
+  exit 1
+fi
+
 docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" --profile migrate run --rm medusa-migrate
 docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" up -d medusa-server medusa-worker
 
@@ -93,14 +98,6 @@ ${admin_host} {
 EOF
 fi
 
-if [[ -z "${backend_host}" && -z "${admin_host}" ]]; then
-  sudo tee -a /etc/caddy/Caddyfile >/dev/null <<'EOF'
-
-:80 {
-  reverse_proxy 127.0.0.1:29181
-}
-EOF
-fi
 sudo caddy fmt --overwrite /etc/caddy/Caddyfile
 sudo caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl reload caddy
@@ -116,5 +113,5 @@ done
 
 echo "Medusa did not become healthy and ready on 127.0.0.1:29181." >&2
 docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" ps >&2
-docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" logs --tail=200 medusa-server >&2
+echo "Detailed application logs remain on the host and are not printed into GitHub Actions." >&2
 exit 1

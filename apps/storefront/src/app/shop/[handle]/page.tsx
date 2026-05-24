@@ -9,10 +9,16 @@ import { siteContent } from "@/content/site-content";
 import { AddToCartForm } from "@/features/cart/add-to-cart-form";
 import { ProductCard } from "@/features/products/product-card";
 import { ProductGallery } from "@/features/products/product-gallery";
-import { ProductGrid } from "@/features/products/product-grid";
+import {
+  ProductListing,
+  type ProductListingSearchParams,
+} from "@/features/products/product-listing";
 import { ProductSizeChart } from "@/features/products/product-size-chart";
 import { absoluteUrl } from "@/lib/config/site";
-import { getCategoryByHandle } from "@/lib/medusa/categories";
+import {
+  getCategoryByHandle,
+  getProductCategories,
+} from "@/lib/medusa/categories";
 import {
   getProductByHandle,
   getProductsByCategoryHandle,
@@ -29,6 +35,7 @@ type ProductPageProps = {
   params: Promise<{
     handle: string;
   }>;
+  searchParams?: Promise<ProductListingSearchParams>;
 };
 
 export async function generateMetadata({
@@ -70,12 +77,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({
+  params,
+  searchParams,
+}: ProductPageProps) {
   const { handle } = await params;
   const product = await getProductByHandle(handle);
 
   if (!product) {
-    return <CollectionRoute handle={handle} />;
+    return <CollectionRoute handle={handle} searchParams={searchParams} />;
   }
 
   const relatedProducts = await getRelatedProducts(product, 4);
@@ -85,11 +95,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
   );
 }
 
-async function CollectionRoute({ handle }: { handle: string }) {
-  const { category, products } = await getProductsByCategoryHandle({
-    handle,
-    limit: 24,
-  });
+async function CollectionRoute({
+  handle,
+  searchParams,
+}: {
+  handle: string;
+  searchParams?: Promise<ProductListingSearchParams>;
+}) {
+  const [params, collectionResult, categories] = await Promise.all([
+    searchParams,
+    getProductsByCategoryHandle({
+      handle,
+      limit: 100,
+    }),
+    getProductCategories(12),
+  ]);
+  const { category, products } = collectionResult;
 
   if (!category) {
     notFound();
@@ -101,45 +122,20 @@ async function CollectionRoute({ handle }: { handle: string }) {
     <main className="min-h-screen">
       <SiteHeader />
 
-      <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="grid gap-8 border-border border-b pb-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
-            <div>
-              <p className="text-muted-foreground text-sm">{category.name}</p>
-              <h1 className="mt-3 max-w-3xl font-heading text-6xl leading-none sm:text-8xl">
-                {category.name}
-              </h1>
-            </div>
-            <p className="max-w-2xl text-muted-foreground lg:justify-self-end">
-              {category.description || content.fallbackDescription}
-            </p>
-          </div>
-
-          <div className="flex items-center justify-between gap-4 py-6">
-            <p className="text-muted-foreground text-sm">
-              {products.length} {content.countLabel}
-            </p>
-            <Link
-              href="/shop"
-              prefetch={false}
-              className="text-sm underline-offset-4 hover:underline"
-            >
-              {content.allProductsAction}
-            </Link>
-          </div>
-
-          {products.length > 0 ? (
-            <ProductGrid products={products} prioritizeInitialImages />
-          ) : (
-            <div className="border border-border px-5 py-8 sm:px-8">
-              <h2 className="text-base font-medium">{content.emptyTitle}</h2>
-              <p className="mt-2 max-w-xl text-muted-foreground text-sm">
-                {content.emptyDescription}
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+      <ProductListing
+        actionPath={`/shop/${category.handle}`}
+        activeCategoryHref={`/shop/${category.handle}`}
+        categories={categories}
+        description={category.description || content.fallbackDescription}
+        emptyActionHref="/shop"
+        emptyActionLabel={content.allProductsAction}
+        emptyDescription={content.emptyDescription}
+        emptyTitle={content.emptyTitle}
+        eyebrow={category.name}
+        products={products}
+        searchParams={params}
+        title={category.name}
+      />
 
       <SiteFooter />
     </main>

@@ -1,6 +1,7 @@
 import { toStorefrontProductCategory } from "@/lib/medusa/categories";
 import { formatStorePrice } from "@/lib/medusa/client";
 import {
+  toProductCardTags,
   toProductDetailSections,
   toSizeChart,
 } from "@/lib/medusa/product-metadata";
@@ -28,10 +29,6 @@ function getProductImage(product: MedusaProduct) {
   return product.thumbnail ?? product.images?.find((image) => image.url)?.url;
 }
 
-function getProductPrice(product: MedusaProduct) {
-  return getVariantPriceInfo(product.variants?.[0]).formatted;
-}
-
 function getVariantPriceInfo(variant: MedusaVariant | undefined) {
   const price = variant?.calculated_price;
   const amount = price?.calculated_amount ?? variant?.prices?.[0]?.amount;
@@ -55,6 +52,20 @@ function getVariantOption(variant: MedusaVariant, optionTitle: string) {
   )?.value;
 }
 
+function getUniqueProductOptions(product: MedusaProduct, optionTitle: string) {
+  const option = product.options?.find(
+    (productOption) => productOption.title?.toLowerCase() === optionTitle,
+  );
+
+  return Array.from(
+    new Set(
+      option?.values
+        ?.map((value) => value.value?.trim())
+        .filter((value): value is string => Boolean(value)) ?? [],
+    ),
+  );
+}
+
 function getSizeRank(size: string) {
   return sizeRank.get(size.trim().toUpperCase()) ?? sizeRank.size;
 }
@@ -71,10 +82,17 @@ function getProductImages(product: MedusaProduct) {
 export function toStorefrontProduct(
   product: MedusaProduct,
 ): StorefrontProduct | null {
-  const image = getProductImage(product);
-  const price = getProductPrice(product);
+  const images = getProductImages(product);
+  const image = getProductImage(product) ?? images[0];
+  const price = getVariantPriceInfo(product.variants?.[0]);
+  const tags = [
+    ...toProductCardTags(product.metadata),
+    ...(product.variants?.flatMap((variant) =>
+      toProductCardTags(variant.metadata),
+    ) ?? []),
+  ];
 
-  if (!image || !price || !product.handle) {
+  if (!image || !price.formatted || !product.handle) {
     return null;
   }
 
@@ -82,9 +100,21 @@ export function toStorefrontProduct(
     id: product.id,
     name: product.title,
     href: `/shop/${product.handle}`,
-    price,
+    price: price.formatted,
+    priceAmount: price.amount,
+    currencyCode: price.currencyCode,
     note: product.description?.split(".")[0] ?? "",
     image,
+    images,
+    tags: Array.from(new Set(tags)).slice(0, 3),
+    sizes: getUniqueProductOptions(product, "size").sort((first, second) => {
+      const rankDifference = getSizeRank(first) - getSizeRank(second);
+
+      return rankDifference || first.localeCompare(second);
+    }),
+    colors: getUniqueProductOptions(product, "color").sort((first, second) =>
+      first.localeCompare(second),
+    ),
     categories:
       product.categories?.map((category) =>
         toStorefrontProductCategory(category),

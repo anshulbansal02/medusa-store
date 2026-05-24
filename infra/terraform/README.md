@@ -14,7 +14,7 @@ Terraform owns durable infrastructure only. It does not deploy application relea
 - Use Terraform CLI `1.15.4`.
 - Run `terraform fmt -recursive infra/terraform` before review.
 - Run `terraform init` in each root before `terraform validate`.
-- Environment roots have the S3 backend bucket checked in after bootstrap creates the bucket.
+- Environment roots use S3 remote state, but the real bucket name must be supplied privately with `terraform init -backend-config=bucket=...` or an ignored backend config file.
 - Do not commit `.terraform/`, local state, plans, provider credentials, or secret tfvars.
 - Commit only non-secret `*.tfvars.example` files.
 - Keep provider credentials in local environment variables or approved secret stores.

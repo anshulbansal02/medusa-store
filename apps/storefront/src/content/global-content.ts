@@ -32,8 +32,9 @@ export const globalContent = {
         links: [
           { href: "/shop", label: "New Arrivals" },
           { href: "/shop/dresses", label: "Dresses" },
-          { href: "/shop/sets", label: "Sets" },
-          { href: "/wishlist", label: "Wishlist" },
+          { href: "/shop/co-ords", label: "Co-ords" },
+          { href: "/shop/tops", label: "Tops" },
+          { href: "/shop/occasion-edit", label: "Occasion Edit" },
         ],
       },
       {

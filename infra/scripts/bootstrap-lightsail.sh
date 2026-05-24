@@ -60,9 +60,6 @@ chmod a+r /usr/share/keyrings/tailscale-archive-keyring.gpg
 curl -fsSL "https://pkgs.tailscale.com/stable/ubuntu/${VERSION_CODENAME}.tailscale-keyring.list" \
   -o /etc/apt/sources.list.d/tailscale.list
 
-# Vector official APT repository.
-bash -c "$(curl -L https://setup.vector.dev)"
-
 apt-get update
 apt-get install -y \
   caddy \
@@ -71,8 +68,24 @@ apt-get install -y \
   docker-ce \
   docker-ce-cli \
   docker-compose-plugin \
-  tailscale \
-  vector
+  tailscale
+
+vector_version="${VECTOR_VERSION:-0.55.0-1}"
+case "$(dpkg --print-architecture)" in
+  amd64) vector_arch="amd64" ;;
+  arm64) vector_arch="arm64" ;;
+  armhf) vector_arch="armhf" ;;
+  *)
+    echo "Unsupported architecture for Vector: $(dpkg --print-architecture)" >&2
+    exit 1
+    ;;
+esac
+vector_deb="/tmp/vector_${vector_version}_${vector_arch}.deb"
+curl --proto '=https' --tlsv1.2 --fail --location \
+  "https://apt.vector.dev/pool/v/ve/vector_${vector_version}_${vector_arch}.deb" \
+  -o "${vector_deb}"
+dpkg -i "${vector_deb}"
+rm -f "${vector_deb}"
 
 install -d -m 0755 /home/ubuntu/ecom
 install -d -m 0755 /home/ubuntu/ecom/{releases,shared,compose}

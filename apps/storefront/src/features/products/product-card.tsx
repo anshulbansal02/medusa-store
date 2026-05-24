@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
 import { siteContent } from "@/content/site-content";
 import { WishlistButton } from "@/features/wishlist/wishlist-button";
 import type { StorefrontProduct } from "@/lib/medusa/products";
+import { cn } from "@/lib/utils";
 
 export function ProductCard({
   product,
@@ -14,6 +16,7 @@ export function ProductCard({
 }) {
   const categoryName = product.categories[0]?.name;
   const content = siteContent.product.card;
+  const hoverImage = product.images.find((image) => image !== product.image);
 
   return (
     <article className="group">
@@ -32,17 +35,47 @@ export function ProductCard({
               loading={eager ? "eager" : "lazy"}
               fetchPriority={eager ? "high" : "auto"}
               sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover transition duration-500 ease-out group-hover:scale-[1.03]"
+              className={cn(
+                "object-cover transition duration-700 ease-out group-hover:scale-[1.03] motion-reduce:transition-none",
+                hoverImage ? "group-hover:opacity-0" : "",
+              )}
             />
-            <span className="absolute right-3 bottom-3 bg-background/92 px-3 py-1.5 text-xs opacity-0 transition group-hover:opacity-100">
-              {content.viewDetailsLabel}
-            </span>
+            {hoverImage ? (
+              <Image
+                src={hoverImage}
+                alt=""
+                fill
+                loading="lazy"
+                sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
+                className="object-cover opacity-0 transition duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100 motion-reduce:transition-none"
+              />
+            ) : null}
+            {product.tags.length > 0 ? (
+              <div className="absolute top-3 right-16 left-3 flex flex-wrap gap-1.5">
+                {product.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-background/90 px-2.5 py-1 text-micro font-medium uppercase tracking-label text-foreground shadow-sm backdrop-blur-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
         </Link>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="absolute right-3 bottom-3 h-9 translate-y-1 rounded-none bg-background/92 px-3.5 text-foreground opacity-0 shadow-sm backdrop-blur-sm transition duration-300 hover:bg-background group-hover:translate-y-0 group-hover:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100 motion-reduce:transition-none"
+        >
+          {content.quickLookLabel}
+        </Button>
         <WishlistButton
           productId={product.id}
           productName={product.name}
-          className="absolute top-3 right-3 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+          className="absolute top-3 right-3 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100 data-[saved=true]:opacity-100"
         />
       </div>
 

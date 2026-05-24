@@ -93,9 +93,8 @@ variable "neon_api_key" {
 }
 
 variable "neon_org_id" {
-  description = "Neon organization ID that owns the Medusa project."
+  description = "Neon organization ID that owns the Medusa project. Pass the real value through ignored tfvars or TF_VAR_neon_org_id."
   type        = string
-  default     = "org-soft-pond-66604026"
 }
 
 variable "neon_region_id" {
@@ -119,31 +118,31 @@ variable "neon_history_retention_seconds" {
 variable "qa_storefront_domain" {
   description = "QA storefront domain."
   type        = string
-  default     = "qa.neonfold.com"
+  default     = "qa.example.com"
 }
 
 variable "qa_medusa_api_domain" {
   description = "QA Medusa API domain."
   type        = string
-  default     = "qa-api.neonfold.com"
+  default     = "qa-api.example.com"
 }
 
 variable "qa_medusa_admin_domain" {
   description = "QA Medusa Admin domain."
   type        = string
-  default     = "qa-admin.neonfold.com"
+  default     = "qa-admin.example.com"
 }
 
 variable "qa_media_domain" {
   description = "QA media domain served from Cloudflare R2."
   type        = string
-  default     = "qa-media.neonfold.com"
+  default     = "qa-media.example.com"
 }
 
 variable "qa_media_bucket_name" {
   description = "Cloudflare R2 bucket name for QA media."
   type        = string
-  default     = "ecom-qa-media"
+  default     = "your-qa-media-bucket"
 }
 
 variable "cloudflare_r2_account_id" {
@@ -154,17 +153,17 @@ variable "cloudflare_r2_account_id" {
 variable "medusa_store_cors_base_origins" {
   description = "Base allowed storefront origins for QA Medusa before derived public domain origins are added."
   type        = list(string)
-  default     = ["http://storefront.localhost", "http://52.77.164.161", "http://100.71.144.128"]
+  default     = ["http://storefront.localhost"]
 }
 
 variable "medusa_admin_cors_base_origins" {
   description = "Base allowed admin origins for QA Medusa before derived public domain origins are added."
   type        = list(string)
-  default     = ["http://localhost:29181", "http://52.77.164.161", "http://100.71.144.128"]
+  default     = ["http://localhost:29181"]
 }
 
 variable "medusa_auth_cors_base_origins" {
   description = "Base allowed auth origins for QA Medusa before derived public domain origins are added."
   type        = list(string)
-  default     = ["http://localhost:29181", "http://52.77.164.161", "http://100.71.144.128"]
+  default     = ["http://localhost:29181"]
 }
