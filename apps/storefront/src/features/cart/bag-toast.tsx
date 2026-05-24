@@ -8,10 +8,12 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { siteContent } from "@/content/site-content";
 import { useBagStore } from "@/features/cart/bag-store";
+import { cn } from "@/lib/utils";
 
 export function BagToast() {
   const content = siteContent.bag;
   const addedItem = useBagStore((state) => state.addedItem);
+  const placement = useBagStore((state) => state.addedItemToastPlacement);
   const dismissAddedItem = useBagStore((state) => state.dismissAddedItem);
   const openBag = useBagStore((state) => state.openBag);
 
@@ -32,7 +34,12 @@ export function BagToast() {
   return (
     <div
       aria-live="polite"
-      className="fade-in-0 slide-in-from-bottom-3 fixed top-auto right-4 bottom-[calc(env(safe-area-inset-bottom)+5rem)] left-auto z-50 w-[min(calc(100vw-2rem),360px)] animate-in border border-border bg-background p-2.5 shadow-md duration-200 sm:bottom-5"
+      className={cn(
+        "fade-in-0 fixed right-4 left-auto z-[70] w-[min(calc(100vw-2rem),360px)] animate-in border border-border bg-background p-2.5 shadow-md duration-200",
+        placement === "top"
+          ? "slide-in-from-top-3 top-[calc(env(safe-area-inset-top)+1rem)] bottom-auto"
+          : "slide-in-from-bottom-3 top-auto bottom-[calc(env(safe-area-inset-bottom)+5rem)] sm:bottom-5",
+      )}
     >
       <div className="grid grid-cols-[46px_1fr_auto] items-center gap-3">
         <Link

@@ -2,13 +2,17 @@
 
 import { Minus, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import { type FormEvent, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { siteContent } from "@/content/site-content";
 import { addToCartAction } from "@/features/cart/actions";
-import { useBagStore } from "@/features/cart/bag-store";
+import {
+  type AddedItemToastPlacement,
+  useBagStore,
+} from "@/features/cart/bag-store";
 import { ProductSizeFinder } from "@/features/products/product-size-finder";
 import type {
   ProductDetailVariant,
@@ -24,6 +28,8 @@ type AddToCartFormProps = {
   sizeChart: ProductSizeChart | null;
   showStickyBar?: boolean;
   formId?: string;
+  toastPlacement?: AddedItemToastPlacement;
+  submitSideAction?: ReactNode;
 };
 
 type AddToBagContent = typeof siteContent.addToBag;
@@ -35,6 +41,8 @@ export function AddToCartForm({
   sizeChart,
   color,
   formId = "add-to-cart-form",
+  submitSideAction,
+  toastPlacement = "bottom",
   variants,
 }: AddToCartFormProps) {
   const content = siteContent.addToBag;
@@ -63,7 +71,7 @@ export function AddToCartForm({
       if (result.status === "success") {
         setMessage("");
         setCart(result.cart);
-        showAddedItem(result.addedItem);
+        showAddedItem(result.addedItem, toastPlacement);
         router.refresh();
         return;
       }
@@ -110,14 +118,17 @@ export function AddToCartForm({
           </p>
         ) : null}
 
-        <Button
-          type="submit"
-          disabled={!canSubmit}
-          size="lg"
-          className="mt-6 h-12 w-full rounded-none px-6 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
-        >
-          {isPending ? content.pendingLabel : content.submitLabel}
-        </Button>
+        <div className="mt-6 flex gap-3">
+          <Button
+            type="submit"
+            disabled={!canSubmit}
+            size="lg"
+            className="h-12 min-w-0 flex-1 rounded-none px-6 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
+          >
+            {isPending ? content.pendingLabel : content.submitLabel}
+          </Button>
+          {submitSideAction}
+        </div>
       </form>
 
       {showStickyBar ? (

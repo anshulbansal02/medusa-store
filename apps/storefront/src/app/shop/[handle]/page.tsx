@@ -22,6 +22,7 @@ import {
   type ProductListingSearchParams,
 } from "@/features/products/product-listing";
 import { ProductSizeChart } from "@/features/products/product-size-chart";
+import { WishlistButton } from "@/features/wishlist/wishlist-button";
 import { absoluteUrl } from "@/lib/config/site";
 import {
   getCategoryByHandle,
@@ -206,20 +207,22 @@ function ProductRouteContent({
               <h1 className="mt-3 min-w-0 break-words font-heading text-5xl leading-none sm:text-6xl [overflow-wrap:anywhere]">
                 {product.name}
               </h1>
-              <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-2">
-                <p className="font-medium text-2xl leading-tight">
-                  {product.price}
-                </p>
-                {product.compareAtPrice ? (
-                  <>
-                    <p className="text-muted-foreground text-sm line-through">
-                      {product.compareAtPrice}
-                    </p>
-                    <p className="border border-primary/20 bg-primary/5 px-2 py-1 font-medium text-primary text-xs uppercase">
-                      {getDiscountLabel(product)}
-                    </p>
-                  </>
-                ) : null}
+              <div className="mt-4 flex items-start justify-between gap-4">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+                  <p className="font-medium text-2xl leading-tight">
+                    {product.price}
+                  </p>
+                  {product.compareAtPrice ? (
+                    <>
+                      <p className="text-muted-foreground text-sm line-through">
+                        {product.compareAtPrice}
+                      </p>
+                      <p className="border border-primary/20 bg-primary/5 px-2 py-1 font-medium text-primary text-xs uppercase">
+                        {getDiscountLabel(product)}
+                      </p>
+                    </>
+                  ) : null}
+                </div>
               </div>
               {product.description ? (
                 <p className="mt-5 max-w-xl text-muted-foreground">
@@ -235,14 +238,22 @@ function ProductRouteContent({
               color={product.color}
               variants={product.variants}
               sizeChart={product.sizeChart}
+              submitSideAction={
+                <WishlistButton
+                  productId={product.id}
+                  productName={product.name}
+                  variant="outline"
+                  className="shrink-0"
+                />
+              }
             />
 
             <ProductAssuranceSection content={content} />
 
             {product.detailSections.length > 0 ? (
-              <div className="divide-y divide-border border-border border-t text-sm">
+              <div className="grid gap-5 border-border border-t py-6 text-sm">
                 {product.detailSections.map((section) => (
-                  <section key={section.key} className="flex gap-3 py-5">
+                  <section key={section.key} className="flex gap-3">
                     <ProductDetailIcon sectionKey={section.key} />
                     <div>
                       <h2 className="font-medium">{section.title}</h2>

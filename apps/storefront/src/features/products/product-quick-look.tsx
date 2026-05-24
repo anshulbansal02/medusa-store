@@ -75,6 +75,7 @@ export function ProductQuickLook({
               sizeChart={product.sizeChart}
               showStickyBar={false}
               formId={`quick-look-add-to-cart-${product.id}`}
+              toastPlacement="top"
             />
             {product.description ? (
               <p className="border-border border-t pt-4 text-muted-foreground text-sm leading-6">
