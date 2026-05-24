@@ -64,7 +64,8 @@ Registry API checks on 2026-05-24:
 ## Open Review Items
 
 - Confirm AWS provider `6.x` resource arguments for Lightsail snapshots and port rules before adding the Lightsail module.
-- Confirm Cloudflare provider `5.x` resources for Access, WAF/security baseline, Turnstile, R2 bucket, and media custom domain before adding Cloudflare resources.
+- Confirmed Cloudflare provider `5.19.1` exposes `cloudflare_dns_record`, `cloudflare_r2_bucket`, `cloudflare_r2_custom_domain`, `cloudflare_turnstile_widget`, and `cloudflare_web_analytics_site`. A validated module exists for those resources but is not wired to a live root until Cloudflare account/zone/domain inputs are available.
+- Cloudflare Access and WAF/ruleset resources exist in the provider, but remain under review because policy/ruleset shape is security-sensitive and depends on the final admin hostname, approved admin email allowlist, and Zero Trust account state.
 - Confirmed Upstash Terraform provider `2.1.0` uses `upstash_redis_database`; Regional Redis creation is rejected as deprecated, so use `region = "global"` with `primary_region = "ap-southeast-1"` for Singapore-primary databases. The Upstash API rejects budget values below `$20`.
 - Confirm Vercel env var resource mode and sensitive-value behavior before managing env vars.
 - Confirm Better Stack log source Terraform support. If unsupported or unstable, keep log source manual and document the reason.

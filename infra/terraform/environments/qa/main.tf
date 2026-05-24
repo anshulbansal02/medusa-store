@@ -41,6 +41,16 @@ module "medusa_postgres" {
   history_retention_seconds = var.neon_history_retention_seconds
 }
 
+resource "random_password" "medusa_jwt_secret" {
+  length  = 64
+  special = false
+}
+
+resource "random_password" "medusa_cookie_secret" {
+  length  = 64
+  special = false
+}
+
 module "medusa_ssm_config" {
   source = "../../modules/ssm-config"
 
@@ -58,6 +68,22 @@ module "medusa_ssm_config" {
       value       = "auto"
       description = "S3-compatible region value used by Cloudflare R2."
     }
+    STORE_CORS = {
+      value       = var.medusa_store_cors_origins
+      description = "Allowed storefront origins for the QA Medusa service."
+    }
+    ADMIN_CORS = {
+      value       = var.medusa_admin_cors_origins
+      description = "Allowed admin origins for the QA Medusa service."
+    }
+    AUTH_CORS = {
+      value       = var.medusa_auth_cors_origins
+      description = "Allowed auth origins for the QA Medusa service."
+    }
+    MEDUSA_BACKEND_URL = {
+      value       = var.medusa_backend_url
+      description = "Externally reachable QA Medusa backend URL."
+    }
   }
   secure_string_parameters = {
     DATABASE_URL = {
@@ -67,6 +93,14 @@ module "medusa_ssm_config" {
     REDIS_URL = {
       value       = module.medusa_redis.redis_url
       description = "Redis TLS URL for the QA Medusa service."
+    }
+    JWT_SECRET = {
+      value       = random_password.medusa_jwt_secret.result
+      description = "JWT signing secret for the QA Medusa service."
+    }
+    COOKIE_SECRET = {
+      value       = random_password.medusa_cookie_secret.result
+      description = "Cookie signing secret for the QA Medusa service."
     }
   }
   tags = local.tags

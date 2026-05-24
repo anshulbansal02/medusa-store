@@ -22,6 +22,11 @@ terraform {
       version = "= 0.13.0"
     }
 
+    random = {
+      source  = "hashicorp/random"
+      version = "= 3.7.2"
+    }
+
     vercel = {
       source  = "vercel/vercel"
       version = "= 5.3.0"

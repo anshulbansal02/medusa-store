@@ -115,3 +115,27 @@ variable "neon_history_retention_seconds" {
   type        = number
   default     = 21600
 }
+
+variable "medusa_store_cors_origins" {
+  description = "Comma-separated allowed storefront origins for QA Medusa."
+  type        = string
+  default     = "http://storefront.localhost,http://52.77.164.161,http://100.71.144.128"
+}
+
+variable "medusa_admin_cors_origins" {
+  description = "Comma-separated allowed admin origins for QA Medusa."
+  type        = string
+  default     = "http://localhost:29181,http://52.77.164.161,http://100.71.144.128"
+}
+
+variable "medusa_auth_cors_origins" {
+  description = "Comma-separated allowed auth origins for QA Medusa."
+  type        = string
+  default     = "http://localhost:29181,http://52.77.164.161,http://100.71.144.128"
+}
+
+variable "medusa_backend_url" {
+  description = "Externally reachable QA Medusa backend URL before domain setup."
+  type        = string
+  default     = "http://52.77.164.161"
+}

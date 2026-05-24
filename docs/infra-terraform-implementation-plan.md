@@ -221,7 +221,7 @@ Steps:
 
 6. Audit provider support:
    - AWS provider supports Lightsail instance, static IP, firewall/public ports, S3, SSM, IAM.
-   - Cloudflare provider supports DNS, R2 bucket, Access, WAF/security rules where needed, and Turnstile widget.
+   - Cloudflare provider supports DNS, R2 bucket/custom domain, Turnstile widget, and Web Analytics site. Access and WAF/ruleset resources require separate policy review before live wiring.
    - Upstash provider supports Redis database creation in Singapore.
    - Vercel provider supports project, domains, and environment variables without mixing incompatible env-var resource modes.
    - Better Stack provider supports uptime monitors and log/telemetry sources needed for v1.

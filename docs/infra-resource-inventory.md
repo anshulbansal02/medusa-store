@@ -13,7 +13,7 @@ Do not paste secrets, tokens, connection strings, private keys, or customer data
 | --- | --- | --- |
 | Vercel | pending | Inventory projects, domains, env vars, deploy hooks. |
 | Railway | pending | Replace/delete any app hosting, databases, Redis, variables, domains, and workflows if present. |
-| Cloudflare | pending | Inventory zone, DNS, R2 buckets, Access apps, Turnstile widgets, Web Analytics. |
+| Cloudflare | pending inputs | Terraform module support is prepared and validated for DNS, R2 bucket/custom domain, Turnstile, and Web Analytics. Live planning is blocked until Cloudflare API token, account ID, zone ID, production domain, QA hostnames, and admin email allowlist are provided. Access/WAF remain under review before wiring. |
 | AWS | in progress | Terraform state bucket created in `ap-southeast-1`; obsolete DynamoDB lock table removed after switching to native S3 lockfiles. Production Lightsail resources were removed after the QA-first sequencing decision. QA Lightsail, the first non-secret QA SSM runtime parameters, and GitHub Actions OIDC/QA SSM read IAM are Terraform-managed. Continue inventory for billing alerts. |
 | Neon | in progress | QA/prod project shell and QA branch/database/role/endpoint are Terraform-managed. Terraform uses the account-supported history retention limit of `21600` seconds and leaves endpoint suspend interval unset. Production migration remains deferred. |
 | Upstash | in progress | QA Redis is Terraform-managed as Upstash Global Redis with Singapore primary region. Production Redis is deferred until production setup. |
@@ -40,7 +40,7 @@ Classification values:
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Vercel | storefront project | QA/prod | global | pending | pending | Confirm whether existing project is correct. | Inventory project ID, domains, env vars. | no |
 | Railway | Medusa app/services | QA/prod | pending | pending | replace/delete | Railway production path is obsolete. | Confirm no production data or active traffic before deletion. | yes if data/traffic exists |
-| Cloudflare | production zone | prod | global | pending | pending | Cloudflare DNS is accepted target if zone owns the brand domain. | Inventory nameservers and DNS records. | yes for DNS cutover |
+| Cloudflare | production zone | prod | global | pending | pending | Cloudflare DNS is accepted target if zone owns the brand domain. | Provide Cloudflare API token, account ID, zone ID, domain name, existing DNS inventory, QA/prod hostname decisions, and admin email allowlist before Terraform wiring. | yes for DNS cutover |
 | AWS | `ecom-terraform-state-174766597237-ap-southeast-1` S3 bucket | shared | ap-southeast-1 | Terraform bootstrap | keep/import | Created by bootstrap for secret-bearing Terraform remote state. Versioning, AES256 encryption, public access block, and HTTPS-only policy verified. | Keep under bootstrap local state; use as prod/QA remote backend. | no |
 | AWS | `ecom-terraform-locks` DynamoDB table | shared | ap-southeast-1 | Terraform bootstrap | deleted | Created by the first bootstrap pass for Terraform state locking, but DynamoDB locking is deprecated for the S3 backend. | Removed by Terraform on 2026-05-24 after switching environment backends to `use_lockfile = true`. | no |
 | AWS | `ecom-prod-medusa` Lightsail instance | prod | ap-southeast-1a | Terraform prod | deleted | Production instantiation is deferred until QA is set up and tested. | Removed by Terraform on 2026-05-24. Recreate later by enabling production Lightsail in prod Terraform. | no |
