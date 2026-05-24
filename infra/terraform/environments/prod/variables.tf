@@ -32,6 +32,21 @@ variable "enable_medusa_runtime_config" {
   description = "Whether to write the full production Medusa runtime SSM config. Keep false until production data services and real values are approved."
   type        = bool
   default     = false
+
+  validation {
+    condition = !var.enable_medusa_runtime_config || (
+      var.production_storefront_domain != "www.example.com" &&
+      var.production_medusa_api_domain != "api.example.com" &&
+      var.production_medusa_admin_domain != "admin.example.com" &&
+      var.production_media_domain != "media.example.com" &&
+      var.production_media_bucket_name != "your-prod-media-bucket" &&
+      var.cloudflare_r2_account_id != "cloudflare-account-id" &&
+      length(var.medusa_store_cors_base_origins) == 0 &&
+      length(var.medusa_admin_cors_base_origins) == 0 &&
+      length(var.medusa_auth_cors_base_origins) == 0
+    )
+    error_message = "Before enabling production runtime config, replace placeholder production domains, media bucket, and Cloudflare R2 account ID. Keep production base CORS overrides empty unless explicitly reviewed."
+  }
 }
 
 variable "lightsail_availability_zone" {

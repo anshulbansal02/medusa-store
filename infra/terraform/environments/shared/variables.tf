@@ -145,7 +145,7 @@ variable "qa_media_domain" {
 variable "transactional_email_domain" {
   description = "Verified Resend transactional email sending subdomain."
   type        = string
-  default     = "mail.neonfold.com"
+  default     = "mail.example.com"
 }
 
 variable "resend_dns_enabled" {
@@ -163,6 +163,37 @@ variable "cloudflare_site_enabled" {
   description = "Whether to manage Cloudflare DNS and site resources for the storefront domain."
   type        = bool
   default     = false
+
+  validation {
+    condition = !var.cloudflare_site_enabled || (
+      var.cloudflare_account_id != null &&
+      var.cloudflare_zone_id != null &&
+      var.cloudflare_account_id != "cloudflare-account-id" &&
+      var.cloudflare_zone_id != "cloudflare-zone-id" &&
+      var.qa_medusa_static_ip != "203.0.113.10" &&
+      !contains([
+        var.production_apex_domain,
+        var.production_storefront_domain,
+        var.qa_storefront_domain,
+        var.qa_medusa_api_domain,
+        var.qa_medusa_admin_domain,
+        var.production_media_domain,
+        var.qa_media_domain,
+      ], "example.com") &&
+      alltrue([
+        for domain in [
+          var.production_apex_domain,
+          var.production_storefront_domain,
+          var.qa_storefront_domain,
+          var.qa_medusa_api_domain,
+          var.qa_medusa_admin_domain,
+          var.production_media_domain,
+          var.qa_media_domain,
+        ] : !endswith(domain, ".example.com")
+      ])
+    )
+    error_message = "When cloudflare_site_enabled is true, replace placeholder Cloudflare IDs, QA static IP, and example.com domains with real values through ignored tfvars or TF_VAR_*."
+  }
 }
 
 variable "cloudflare_account_id" {
@@ -181,6 +212,15 @@ variable "cloudflare_r2_media_enabled" {
   description = "Whether to create Cloudflare R2 media buckets and custom domains."
   type        = bool
   default     = false
+
+  validation {
+    condition = !var.cloudflare_r2_media_enabled || (
+      var.cloudflare_site_enabled &&
+      var.qa_media_bucket_name != "your-qa-media-bucket" &&
+      var.production_media_bucket_name != "your-prod-media-bucket"
+    )
+    error_message = "When cloudflare_r2_media_enabled is true, enable cloudflare_site_enabled and replace placeholder R2 bucket names."
+  }
 }
 
 variable "cloudflare_access_enabled" {
@@ -217,6 +257,11 @@ variable "cloudflare_web_analytics_enabled" {
   description = "Whether to create Cloudflare Web Analytics sites for storefront hostnames."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.cloudflare_web_analytics_enabled || var.cloudflare_site_enabled
+    error_message = "Enable cloudflare_site_enabled before enabling Cloudflare Web Analytics."
+  }
 }
 
 variable "qa_media_bucket_name" {
@@ -235,6 +280,11 @@ variable "better_stack_uptime_enabled" {
   description = "Whether to manage Better Stack Uptime monitors from the shared root."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.better_stack_uptime_enabled || var.better_stack_uptime_api_token != null
+    error_message = "Set better_stack_uptime_api_token through TF_VAR_* or BETTERUPTIME_API_TOKEN before enabling Better Stack Uptime monitors."
+  }
 }
 
 variable "better_stack_uptime_api_token" {

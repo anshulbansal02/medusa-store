@@ -1,4 +1,12 @@
-import { RefreshCw, ShieldCheck, Truck } from "lucide-react";
+import {
+  CreditCard,
+  RefreshCw,
+  Ruler,
+  ShieldCheck,
+  Shirt,
+  Truck,
+  UserRound,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -186,22 +194,34 @@ function ProductRouteContent({
               </span>
             </nav>
 
-            <div className="border-border border-b pb-6">
+            <section className="border-border border-b pb-7">
               <p className="text-muted-foreground text-sm">
                 {content.statusLabel}
               </p>
-              <div className="mt-3 flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-6">
-                <h1 className="min-w-0 break-words font-heading text-5xl leading-none sm:text-6xl [overflow-wrap:anywhere]">
-                  {product.name}
-                </h1>
-                <p className="shrink-0 pt-1 font-medium">{product.price}</p>
+              <h1 className="mt-3 min-w-0 break-words font-heading text-5xl leading-none sm:text-6xl [overflow-wrap:anywhere]">
+                {product.name}
+              </h1>
+              <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-2">
+                <p className="font-medium text-2xl leading-tight">
+                  {product.price}
+                </p>
+                {product.compareAtPrice ? (
+                  <>
+                    <p className="text-muted-foreground text-sm line-through">
+                      {product.compareAtPrice}
+                    </p>
+                    <p className="border border-primary/20 bg-primary/5 px-2 py-1 font-medium text-primary text-xs uppercase">
+                      {getDiscountLabel(product)}
+                    </p>
+                  </>
+                ) : null}
               </div>
               {product.description ? (
                 <p className="mt-5 max-w-xl text-muted-foreground">
                   {product.description}
                 </p>
               ) : null}
-            </div>
+            </section>
 
             <AddToCartForm
               key={product.id}
@@ -212,41 +232,13 @@ function ProductRouteContent({
               hasSizeChart={Boolean(product.sizeChart)}
             />
 
-            <div className="grid gap-4 border-border border-t pt-6 text-sm">
-              <div className="flex gap-3">
-                <Truck
-                  className="mt-0.5 size-4 shrink-0 stroke-icon text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <div>
-                  <h2 className="font-medium">{content.deliveryTitle}</h2>
-                  <p className="mt-1 text-muted-foreground">
-                    {content.deliveryText}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <RefreshCw
-                  className="mt-0.5 size-4 shrink-0 stroke-icon text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <div>
-                  <h2 className="font-medium">{content.returnsTitle}</h2>
-                  <p className="mt-1 text-muted-foreground">
-                    {content.returnsText}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <ProductAssuranceSection content={content} />
 
             {product.detailSections.length > 0 ? (
-              <div className="grid gap-4 border-border border-t pt-6 text-sm">
+              <div className="divide-y divide-border border-border border-t text-sm">
                 {product.detailSections.map((section) => (
-                  <section key={section.key} className="flex gap-3">
-                    <ShieldCheck
-                      className="mt-0.5 size-4 shrink-0 stroke-icon text-muted-foreground"
-                      aria-hidden="true"
-                    />
+                  <section key={section.key} className="flex gap-3 py-5">
+                    <ProductDetailIcon sectionKey={section.key} />
                     <div>
                       <h2 className="font-medium">{section.title}</h2>
                       <p className="mt-1 text-muted-foreground">
@@ -296,5 +288,82 @@ function ProductRouteContent({
 
       <SiteFooter />
     </main>
+  );
+}
+
+function getDiscountLabel(product: ProductDetail) {
+  if (!product.priceAmount || !product.compareAtPriceAmount) {
+    return "Sale";
+  }
+
+  const discountPercent = Math.round(
+    ((product.compareAtPriceAmount - product.priceAmount) /
+      product.compareAtPriceAmount) *
+      100,
+  );
+
+  return `${discountPercent}% off`;
+}
+
+function ProductAssuranceSection({
+  content,
+}: {
+  content: typeof siteContent.product;
+}) {
+  const items = [
+    {
+      title: content.deliveryTitle,
+      text: content.deliveryText,
+      icon: Truck,
+    },
+    {
+      title: content.returnsTitle,
+      text: content.returnsText,
+      icon: RefreshCw,
+    },
+    {
+      title: content.paymentTitle,
+      text: content.paymentText,
+      icon: CreditCard,
+    },
+  ];
+
+  return (
+    <section className="grid gap-4 border-border border-t py-6 text-sm sm:grid-cols-3">
+      {items.map((item) => {
+        const Icon = item.icon;
+
+        return (
+          <div key={item.title} className="flex gap-3">
+            <Icon
+              className="mt-0.5 size-5 shrink-0 stroke-icon text-muted-foreground"
+              aria-hidden="true"
+            />
+            <div>
+              <h2 className="font-medium">{item.title}</h2>
+              <p className="mt-1 text-muted-foreground">{item.text}</p>
+            </div>
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+function ProductDetailIcon({ sectionKey }: { sectionKey: string }) {
+  const icons = {
+    measurements: Ruler,
+    fit: Ruler,
+    fabric: Shirt,
+    care: ShieldCheck,
+    model: UserRound,
+  } satisfies Record<string, typeof ShieldCheck>;
+  const Icon = icons[sectionKey as keyof typeof icons] ?? ShieldCheck;
+
+  return (
+    <Icon
+      className="mt-0.5 size-5 shrink-0 stroke-icon text-muted-foreground"
+      aria-hidden="true"
+    />
   );
 }

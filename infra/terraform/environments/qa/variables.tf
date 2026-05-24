@@ -156,31 +156,31 @@ variable "resend_api_key" {
 variable "resend_from_email" {
   description = "Default sender identity for QA Medusa transactional emails."
   type        = string
-  default     = "Store Admin <admin@mail.neonfold.com>"
+  default     = "Store Admin <admin@mail.example.com>"
 }
 
 variable "admin_invite_from_email" {
   description = "Sender identity for QA Medusa Admin invite emails."
   type        = string
-  default     = "Store Admin <admin@mail.neonfold.com>"
+  default     = "Store Admin <admin@mail.example.com>"
 }
 
 variable "order_from_email" {
   description = "Sender identity for QA customer order emails."
   type        = string
-  default     = "Store Team <orders@mail.neonfold.com>"
+  default     = "Store Team <orders@mail.example.com>"
 }
 
 variable "owner_order_from_email" {
   description = "Sender identity for QA owner order notification emails."
   type        = string
-  default     = "Store Admin <admin@mail.neonfold.com>"
+  default     = "Store Admin <admin@mail.example.com>"
 }
 
 variable "transactional_reply_to_email" {
   description = "Reply-to mailbox for QA transactional email."
   type        = string
-  default     = "support@mail.neonfold.com"
+  default     = "support@mail.example.com"
 }
 
 variable "cloudflare_r2_account_id" {

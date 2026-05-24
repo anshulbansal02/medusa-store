@@ -29,8 +29,8 @@ cloudflare_r2_account_id = "cloudflare-account-id"
 
 # Export this optional secret with TF_VAR_* when QA email is enabled:
 # export TF_VAR_resend_api_key="..."
-resend_from_email             = "Store Admin <admin@mail.neonfold.com>"
-admin_invite_from_email       = "Store Admin <admin@mail.neonfold.com>"
-order_from_email              = "Store Team <orders@mail.neonfold.com>"
-owner_order_from_email        = "Store Admin <admin@mail.neonfold.com>"
-transactional_reply_to_email  = "support@mail.neonfold.com"
+resend_from_email             = "Store Admin <admin@mail.example.com>"
+admin_invite_from_email       = "Store Admin <admin@mail.example.com>"
+order_from_email              = "Store Team <orders@mail.example.com>"
+owner_order_from_email        = "Store Admin <admin@mail.example.com>"
+transactional_reply_to_email  = "support@mail.example.com"

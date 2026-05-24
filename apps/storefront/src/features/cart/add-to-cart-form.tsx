@@ -66,7 +66,7 @@ export function AddToCartForm({
 
   return (
     <>
-      <form id="add-to-cart-form" onSubmit={handleSubmit} className="py-6">
+      <form id="add-to-cart-form" onSubmit={handleSubmit} className="py-7">
         <input
           type="hidden"
           name="variant_title"

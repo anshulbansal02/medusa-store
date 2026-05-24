@@ -4,6 +4,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     env_file:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
     environment:
@@ -32,6 +34,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     env_file:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
     environment:
@@ -49,6 +53,8 @@ services:
       - migrate
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     env_file:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
     environment:

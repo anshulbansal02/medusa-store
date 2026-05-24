@@ -28,6 +28,7 @@ Evidence:
 Completed changes:
 
 - Replace real IPs, provider IDs, account IDs, ARNs, bucket names, preview URLs, and SSM paths in public docs/examples with placeholders.
+- Replace real-looking transactional email domains and local workstation paths in public docs/examples with placeholders.
 - Move real values to GitHub environment variables, SSM, local ignored tfvars, or private operator notes.
 - Keep committed Terraform examples generic; require operators to pass real values through ignored local files or `TF_VAR_*`.
 
@@ -168,5 +169,6 @@ Rotation plan:
 - SSM-to-dotenv rendering rejects invalid keys, duplicate keys, and multiline values before writing deploy env files.
 - Medusa container runs as the non-root `node` user.
 - Medusa Compose services set `no-new-privileges`.
+- Medusa Compose services drop all Linux capabilities.
 - Medusa container port is bound to localhost on the host; public exposure is through Caddy.
 - Razorpay frontend verification validates signature server-side and fetches Razorpay payment/order state before completing checkout.

@@ -27,7 +27,7 @@ production_medusa_api_domain  = "api.example.com"
 production_medusa_admin_domain = "admin.example.com"
 production_media_domain       = "media.example.com"
 qa_media_domain               = "qa-media.example.com"
-transactional_email_domain    = "mail.neonfold.com"
+transactional_email_domain    = "mail.example.com"
 resend_dns_enabled            = false
 qa_medusa_static_ip           = "203.0.113.10"
 

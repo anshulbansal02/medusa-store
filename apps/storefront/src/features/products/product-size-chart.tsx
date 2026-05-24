@@ -16,7 +16,7 @@ export function ProductSizeChart({ sizeChart }: ProductSizeChartProps) {
     <section
       id="size-chart"
       aria-labelledby="size-chart-title"
-      className="mt-5 border-border border-t pt-5"
+      className="border-border border-t pt-6"
     >
       <h2 id="size-chart-title" className="text-sm font-medium">
         {content.title}

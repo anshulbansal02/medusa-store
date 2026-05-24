@@ -201,7 +201,7 @@ R2:
 
 Resend:
 
-- QA transactional email sends from the verified subdomain `mail.neonfold.com`.
+- QA transactional email sends from the verified transactional subdomain, for example `mail.example.com` in public docs.
 - Cloudflare DNS for Resend DKIM, return-path MX, return-path SPF, and DMARC is Terraform-wired but disabled by default through `resend_dns_enabled = false`.
 - Enable `resend_dns_enabled` only when the Resend sender-domain values have been verified for the active account/domain.
 - DMARC is enforced on the sending subdomain with strict DKIM/SPF alignment and quarantine policy.

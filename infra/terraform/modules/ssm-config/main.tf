@@ -3,12 +3,12 @@ locals {
 }
 
 resource "aws_ssm_parameter" "string" {
-  for_each = var.string_parameters
+  for_each = nonsensitive(toset(keys(var.string_parameters)))
 
   name        = "${local.normalized_path_prefix}/${each.key}"
-  description = each.value.description
+  description = nonsensitive(var.string_parameters[each.key].description)
   type        = "String"
-  value       = each.value.value
+  value       = var.string_parameters[each.key].value
   tier        = "Standard"
   overwrite   = true
 
@@ -16,12 +16,12 @@ resource "aws_ssm_parameter" "string" {
 }
 
 resource "aws_ssm_parameter" "secure_string" {
-  for_each = var.secure_string_parameters
+  for_each = nonsensitive(toset(keys(var.secure_string_parameters)))
 
   name        = "${local.normalized_path_prefix}/${each.key}"
-  description = each.value.description
+  description = nonsensitive(var.secure_string_parameters[each.key].description)
   type        = "SecureString"
-  value       = each.value.value
+  value       = var.secure_string_parameters[each.key].value
   tier        = "Standard"
   overwrite   = true
 

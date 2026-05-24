@@ -96,4 +96,4 @@ Use official docs first when implementation depends on current platform behavior
 
 ## Local Reference Projects
 
-- `/Users/optimus/Developer/trenzura`: use as a storefront UX and component-structure reference only. Do not copy its backend/platform direction into this project.
+- Private local storefront reference repo: use as a storefront UX and component-structure reference only. Do not copy its backend/platform direction into this project.

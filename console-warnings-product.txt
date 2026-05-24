@@ -1,0 +1,5 @@
+Total messages: 11 (Errors: 0, Warnings: 1)
+Returning 1 messages for level "warning"
+
+[WARNING] Image with src "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=82" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading @ http://storefront.localhost:1355/_next/static/chunks/0z~b_next_dist_0zkszrj._.js:2477

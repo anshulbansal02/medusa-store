@@ -81,7 +81,7 @@ Then run:
 ```sh
 mise exec terraform@1.15.4 -- terraform -chdir=infra/terraform/environments/qa plan \
   -var='aws_profile=personal' \
-  -var='lightsail_ssh_public_key_path=/Users/optimus/.ssh/id_ed25519_ecom_lightsail.pub'
+  -var='lightsail_ssh_public_key_path=~/.ssh/id_ed25519_ecom_lightsail.pub'
 ```
 
 ## After Manual Token Updates

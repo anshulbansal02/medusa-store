@@ -16,6 +16,8 @@ import type {
 type StorefrontPrice = {
   formatted: string | null;
   amount: number | null;
+  compareAtFormatted: string | null;
+  compareAtAmount: number | null;
   currencyCode: string;
 };
 
@@ -32,12 +34,21 @@ function getProductImage(product: MedusaProduct) {
 function getVariantPriceInfo(variant: MedusaVariant | undefined) {
   const price = variant?.calculated_price;
   const amount = price?.calculated_amount ?? variant?.prices?.[0]?.amount;
+  const originalAmount = price?.original_amount;
   const currencyCode =
     price?.currency_code ?? variant?.prices?.[0]?.currency_code;
+  const hasCompareAtPrice =
+    typeof amount === "number" &&
+    typeof originalAmount === "number" &&
+    originalAmount > amount;
 
   return {
     formatted: formatStorePrice(amount, currencyCode),
     amount: typeof amount === "number" ? amount : null,
+    compareAtFormatted: hasCompareAtPrice
+      ? formatStorePrice(originalAmount, currencyCode)
+      : null,
+    compareAtAmount: hasCompareAtPrice ? originalAmount : null,
     currencyCode: currencyCode ?? "",
   } satisfies StorefrontPrice;
 }
@@ -164,6 +175,8 @@ export function toProductDetail(product: MedusaProduct): ProductDetail | null {
     description: product.description ?? "",
     price: price.formatted,
     priceAmount: price.amount,
+    compareAtPrice: price.compareAtFormatted,
+    compareAtPriceAmount: price.compareAtAmount,
     currencyCode: price.currencyCode,
     images,
     variants,

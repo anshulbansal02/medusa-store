@@ -9,6 +9,7 @@ export type MedusaImage = {
 
 export type MedusaPrice = {
   calculated_amount?: number;
+  original_amount?: number;
   currency_code?: string;
 };
 
@@ -84,6 +85,8 @@ export type ProductDetail = {
   description: string;
   price: string;
   priceAmount: number | null;
+  compareAtPrice: string | null;
+  compareAtPriceAmount: number | null;
   currencyCode: string;
   images: string[];
   variants: ProductDetailVariant[];
