@@ -1,6 +1,6 @@
 # Security Review
 
-Status: active review findings
+Status: active review findings with partial remediation
 Last reviewed: 2026-05-24
 
 Scope: committed repository content, current working tree, CI/CD workflows, Terraform configuration, deploy scripts, Medusa backend integration code, storefront server actions, and dependency audit output. This review records verified findings only. Do not paste real secrets, IPs, account IDs, provider IDs, customer data, or token values into this file.
@@ -10,6 +10,8 @@ Decision: fix the verified security findings before production launch. QA may co
 ## Findings
 
 ### Public Repo Exposes Real Infrastructure Metadata
+
+Remediation status: committed docs and Terraform examples now use placeholders for the high-signal infrastructure identifiers found in the review. Because the values were previously committed, public-repo safety still requires history rewrite or repository replacement plus rotation of any credentials that were used alongside the exposed metadata.
 
 Real environment-specific infrastructure metadata is committed in docs and Terraform examples. This includes QA origin endpoints, private network endpoints, AWS account and role metadata, Terraform state bucket naming, provider organization/project/resource IDs, QA preview URLs, and SSM secret path structure.
 
@@ -23,7 +25,7 @@ Evidence:
 - `infra/terraform/environments/qa/terraform.tfvars.example`
 - `infra/terraform/environments/{qa,prod,shared}/backend.tf`
 
-Fix plan:
+Completed changes:
 
 - Replace real IPs, provider IDs, account IDs, ARNs, bucket names, preview URLs, and SSM paths in public docs/examples with placeholders.
 - Move real values to GitHub environment variables, SSM, local ignored tfvars, or private operator notes.
@@ -37,6 +39,8 @@ Scrub and rotation plan:
 
 ### QA Medusa Is Exposed Over Plain HTTP
 
+Remediation status: committed deploy/config defaults require HTTPS Medusa hostnames and no longer include raw public/private IP CORS origins. Cloudflare Access for the admin hostname remains deferred and is still required before real operator/customer data is used through QA Admin.
+
 The deploy script configures Caddy to proxy public port 80 directly to Medusa. QA Terraform defaults also include raw HTTP origins for Medusa backend, admin, and auth CORS.
 
 Evidence:
@@ -45,12 +49,15 @@ Evidence:
 - `infra/terraform/environments/qa/variables.tf`
 - `infra/terraform/environments/qa/terraform.tfvars.example`
 
-Fix plan:
+Completed changes:
 
 - Put QA API/admin behind HTTPS hostnames, for example `qa-api` and `qa-admin`.
-- Protect the admin hostname with Cloudflare Access before using it for real operator login.
 - Remove raw IP and private network origins from committed defaults and from live CORS once domain setup is complete.
 - Keep Store API and Admin on separate hostnames so CORS and access policies stay clean.
+
+Remaining fix:
+
+- Protect the admin hostname with Cloudflare Access before using it for real operator login.
 
 Rotation plan:
 
@@ -103,6 +110,8 @@ Rotation plan:
 
 ### Bootstrap Runs A Remote Shell Script As Root
 
+Remediation status: fixed in `infra/scripts/bootstrap-lightsail.sh`; Vector installs from a pinned `.deb` version instead of executing the remote setup script through root shell.
+
 The Lightsail bootstrap script executes the Vector setup script fetched over HTTPS directly through `bash` while running as root.
 
 Evidence:
@@ -123,6 +132,8 @@ Rotation plan:
 - If the bootstrap was run during a known upstream compromise window, rebuild the host from a clean image and rotate host-level deploy credentials.
 
 ### Deploy Failure Can Print Backend Logs Into GitHub Actions
+
+Remediation status: fixed in `infra/scripts/deploy-medusa-host.sh`; failed deploys print service status only and leave detailed logs on the host/private log sink.
 
 On deployment health-check failure, the deploy script prints the last 200 Medusa server log lines to GitHub Actions stderr. Runtime logs can contain customer, payment, webhook, or config details depending on the failure.
 

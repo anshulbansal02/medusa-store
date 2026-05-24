@@ -28,7 +28,7 @@ Needed when we resume security/analytics:
 - Add permission to create/manage Cloudflare Zero Trust Access applications.
 - Add permission to create/manage Cloudflare Web Analytics/RUM sites. The failed
   endpoint is account-level RUM site creation, not zone DNS.
-- Keep scope limited to the current account and `neonfold.com` zone where
+- Keep scope limited to the current account and `example.com` zone where
   Cloudflare allows that.
 
 After updating `.env`, the agent should store the new token in SSM:
@@ -64,8 +64,8 @@ Better Stack Telemetry API. Its source token is stored in AWS SSM at
 
 Current QA error-tracking applications are also API-managed:
 
-- `ecom-qa-storefront-errors`, application ID `2461839`
-- `ecom-qa-medusa-errors`, application ID `2461845`
+- `ecom-qa-storefront-errors`, application ID `application-id`
+- `ecom-qa-medusa-errors`, application ID `application-id`
 
 The storefront browser token is configured in the QA Vercel project. The Medusa
 DSN is stored in AWS SSM at `/ecom/qa/medusa/BETTER_STACK_ERRORS_DSN`.
@@ -93,7 +93,7 @@ RAZORPAY_PROD_WEBHOOK_SECRET=
 
 Dashboard setup needed:
 
-- QA webhook URL: `https://qa-api.neonfold.com/hooks/payment/razorpay_razorpay`
+- QA webhook URL: `https://qa-api.example.com/hooks/payment/razorpay_razorpay`
 - Events: `order.paid`, `payment.captured`, `payment.authorized`,
   `payment.failed`
 - Automatic capture enabled for QA.

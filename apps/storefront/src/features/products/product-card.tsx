@@ -34,7 +34,7 @@ export function ProductCard({
               fill
               loading={eager ? "eager" : "lazy"}
               fetchPriority={eager ? "high" : "auto"}
-              sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
+              sizes="(min-width: 1024px) 25vw, 50vw"
               className={cn(
                 "object-cover transition duration-700 ease-out group-hover:scale-[1.03] motion-reduce:transition-none",
                 hoverImage ? "group-hover:opacity-0" : "",
@@ -46,7 +46,7 @@ export function ProductCard({
                 alt=""
                 fill
                 loading="lazy"
-                sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
+                sizes="(min-width: 1024px) 25vw, 50vw"
                 className="object-cover opacity-0 transition duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100 motion-reduce:transition-none"
               />
             ) : null}
@@ -79,26 +79,21 @@ export function ProductCard({
         />
       </div>
 
-      <Link href={product.href} prefetch={false} className="block">
-        <div className="mt-3 flex items-start justify-between gap-4">
+      <div className="mt-2 flex flex-col gap-1 sm:mt-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <Link href={product.href} prefetch={false} className="block min-w-0">
           <div>
             {categoryName ? (
               <p className="mb-1 text-micro uppercase tracking-label-wide text-muted-foreground">
                 {categoryName}
               </p>
             ) : null}
-            <h3 className="text-base font-medium leading-snug">
+            <h3 className="text-sm font-medium leading-snug sm:text-base">
               {product.name}
             </h3>
-            {product.note ? (
-              <p className="mt-1 text-muted-foreground text-sm">
-                {product.note}
-              </p>
-            ) : null}
           </div>
-          <p className="text-sm font-medium">{product.price}</p>
-        </div>
-      </Link>
+        </Link>
+        <p className="shrink-0 text-sm font-medium">{product.price}</p>
+      </div>
     </article>
   );
 }

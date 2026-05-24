@@ -147,14 +147,14 @@ Accounts:
 
 Domain:
 
-- Final brand domain name later. Interim domain is `neonfold.com`.
+- Final brand domain name later. Interim domain is `example.com`.
 - Current interim hostnames:
-  - `neonfold.com`
-  - `www.neonfold.com`
-  - `qa.neonfold.com`
-  - `qa-api.neonfold.com`
-  - `media.neonfold.com`
-  - `qa-media.neonfold.com`
+  - `example.com`
+  - `www.example.com`
+  - `qa.example.com`
+  - `qa-api.example.com`
+  - `media.example.com`
+  - `qa-media.example.com`
 - Later hostname decisions still needed for production `api`, `admin`, and optional QA admin.
 
 Access identities:
@@ -374,7 +374,7 @@ Terraform-managed:
   - Add real `SecureString` secrets only after the provider/state write workflow is reviewed.
 - IAM policies/users/roles needed for local Terraform and deploy-time SSM reads:
   - GitHub Actions uses OIDC and short-lived AWS credentials, not long-lived AWS access keys.
-  - QA deploy role trust is scoped to `repo:anshulbansal02/medusa-store:environment:qa`.
+  - QA deploy role trust is scoped to `repo:your-github-owner/your-github-repo:environment:qa`.
   - QA deploy role may read only `/ecom/qa/medusa/*`.
 - Billing/usage alerts where AWS supports them cleanly.
 
@@ -434,22 +434,22 @@ Manual:
 
 Current status:
 
-- Cloudflare is authoritative for interim domain `neonfold.com`.
-- Terraform manages DNS for `neonfold.com`, `www.neonfold.com`, `qa.neonfold.com`, `qa-api.neonfold.com`, and `qa-admin.neonfold.com`.
-- Terraform manages R2 buckets `ecom-qa-media` and `ecom-prod-media`.
-- Terraform manages R2 custom domains `qa-media.neonfold.com` and `media.neonfold.com`; ownership and SSL are active.
+- Cloudflare is authoritative for interim domain `example.com`.
+- Terraform manages DNS for `example.com`, `www.example.com`, `qa.example.com`, `qa-api.example.com`, and `qa-admin.example.com`.
+- Terraform manages R2 buckets `your-qa-media-bucket` and `your-prod-media-bucket`.
+- Terraform manages R2 custom domains `qa-media.example.com` and `media.example.com`; ownership and SSL are active.
 - Terraform manages QA Medusa non-secret R2 runtime SSM parameters for `S3_FILE_URL`, `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION`.
 - QA R2 S3 credentials are stored in SSM `SecureString` and Medusa upload/read has been smoke tested.
 - Shared operator/provider credentials and setup config are stored in SSM under `/ecom/shared/operator/*` so local `.env` files are not the long-term source of truth.
 - Production `api`, production `admin`, production R2 S3 credentials, Cloudflare Access, WAF/ruleset baseline, Turnstile, and Web Analytics activation remain pending.
-- `qa-api.neonfold.com` and `qa-admin.neonfold.com` route to the QA Lightsail Medusa service; `qa-admin.neonfold.com` is proxied through Cloudflare while Access is deferred.
+- `qa-api.example.com` and `qa-admin.example.com` route to the QA Lightsail Medusa service; `qa-admin.example.com` is proxied through Cloudflare while Access is deferred.
 - Web Analytics Terraform wiring exists but is disabled until the Cloudflare API token has Web Analytics/RUM write permission.
 
 Rules:
 
 - Do not enable global Bot Fight Mode at launch.
 - Do not add aggressive country blocks or broad API challenges at launch.
-- Cloudflare Access is deferred as a later security layer. Medusa Admin auth remains required, and `qa-admin.neonfold.com` is already proxied through Cloudflare.
+- Cloudflare Access is deferred as a later security layer. Medusa Admin auth remains required, and `qa-admin.example.com` is already proxied through Cloudflare.
 - Turnstile tokens must be verified server-side in app code.
 
 Verification:
@@ -539,16 +539,16 @@ Terraform-managed where provider support is reliable:
 
 Current state:
 
-- The existing storefront project was imported into shared Terraform and renamed to `medusa-store-storefront-qa`.
-- The production storefront project is `medusa-store-storefront-prod`.
+- The existing storefront project was imported into shared Terraform and renamed to `your-storefront-qa-project`.
+- The production storefront project is `your-storefront-prod-project`.
 - Both projects are not linked to GitHub so Vercel does not auto-deploy from Git pushes.
 - Default Vercel Function region is `sin1`, matching the Singapore Medusa/data tier. Use `bom1` only if backend/data move to India or measurement proves the user-facing benefit outweighs backend round-trip latency.
-- Interim domains use `neonfold.com`: `www.neonfold.com` for production storefront, `neonfold.com` as a 308 redirect to `www`, `qa.neonfold.com` for QA storefront, and `qa-api.neonfold.com` for QA Medusa API.
-- Vercel project domains `neonfold.com` and `www.neonfold.com` are managed on the production project. `qa.neonfold.com` is managed on the QA project.
-- QA `NEXT_PUBLIC_SITE_URL`, `MEDUSA_BACKEND_URL`, and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as QA project production environment variables. `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com`.
+- Interim domains use `example.com`: `www.example.com` for production storefront, `example.com` as a 308 redirect to `www`, `qa.example.com` for QA storefront, and `qa-api.example.com` for QA Medusa API.
+- Vercel project domains `example.com` and `www.example.com` are managed on the production project. `qa.example.com` is managed on the QA project.
+- QA `NEXT_PUBLIC_SITE_URL`, `MEDUSA_BACKEND_URL`, and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as QA project production environment variables. `MEDUSA_BACKEND_URL` targets `https://qa-api.example.com`.
 - Production `NEXT_PUBLIC_SITE_URL` is managed by Terraform as a production project environment variable.
 - `NEXT_PUBLIC_IMAGE_HOSTNAMES` is Terraform-managed for both projects and is derived from the configured media hostnames.
-- QA Vercel env keys and `qa.neonfold.com` domain were verified through the Vercel API, and the latest QA deployment is ready.
+- QA Vercel env keys and `qa.example.com` domain were verified through the Vercel API, and the latest QA deployment is ready.
 - The storefront deploy workflow pins Vercel CLI `54.2.0`; newer `54.4.1` is too fresh for the repo's minimum-release-age policy on 2026-05-24.
 - Remaining Vercel app environment variables are deferred until final browser-safe public values exist. Move stable Vercel app env vars into Terraform-managed Vercel resources when values are known and state sensitivity has been reviewed.
 
@@ -578,10 +578,10 @@ Goal: configure monitoring, alerts, logs, and error tracking.
 
 Current status:
 
-- Terraform manages Better Stack Uptime monitors for `qa.neonfold.com`, `qa-admin.neonfold.com`, `qa-api.neonfold.com/health`, `qa-api.neonfold.com/ready`, and paused `www.neonfold.com`.
+- Terraform manages Better Stack Uptime monitors for `qa.example.com`, `qa-admin.example.com`, `qa-api.example.com/health`, `qa-api.example.com/ready`, and paused `www.example.com`.
 - The shared root has been verified with `better_stack_uptime_enabled=true` and reports no changes after apply.
 - Better Stack is the v1 observability provider for uptime, logs, alerts, and error tracking. Sentry is deferred unless Better Stack proves insufficient after QA or early production usage.
-- Better Stack Telemetry source `ecom-qa-medusa-logs` exists with source ID `2461802`; its token is stored in SSM `/ecom/qa/host/BETTER_STACK_SOURCE_TOKEN`.
+- Better Stack Telemetry source `ecom-qa-medusa-logs` exists with source ID `resource-id`; its token is stored in SSM `/ecom/qa/host/BETTER_STACK_SOURCE_TOKEN`.
 - Vector is configured on QA with the Better Stack-generated Ubuntu/Docker config. Docker log collection requires the `vector` service user to be in the `docker` group, and host log file access uses the `adm` group.
 - QA `ADMIN_PATH=/app` is stored in SSM. Medusa `admin.path = "/"` is not used for QA because it made API `/health` and `/ready` return Admin HTML; instead Caddy redirects the dedicated admin hostname root to `/app`.
 - Better Stack health/readiness monitors use keyword checks (`OK` and `"ready":true`) instead of status-only checks, so Admin fallback HTML cannot satisfy API health monitoring.

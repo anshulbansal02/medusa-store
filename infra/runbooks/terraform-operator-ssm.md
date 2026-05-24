@@ -36,8 +36,8 @@ Then run:
 ```sh
 mise exec terraform@1.15.4 -- terraform -chdir=infra/terraform/environments/shared plan \
   -var='aws_profile=personal' \
-  -var='github_owner=anshulbansal02' \
-  -var='github_repo=medusa-store' \
+  -var='github_owner=your-github-owner' \
+  -var='github_repo=your-github-repo' \
   -var='cloudflare_site_enabled=true' \
   -var='cloudflare_r2_media_enabled=true' \
   -var='cloudflare_web_analytics_enabled=false'

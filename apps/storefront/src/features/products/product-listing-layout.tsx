@@ -67,7 +67,7 @@ export function ProductListingLayout({
         <aside
           aria-hidden={!desktopFiltersOpen}
           className={cn(
-            "hidden min-w-0 overflow-hidden transition-opacity duration-200 lg:block",
+            "hidden min-w-0 overflow-hidden transition-opacity duration-200 lg:sticky lg:top-28 lg:block lg:h-[calc(100svh-8rem)] lg:self-start",
             desktopFiltersOpen
               ? "pointer-events-auto opacity-100"
               : "pointer-events-none opacity-0",

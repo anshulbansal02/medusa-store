@@ -61,7 +61,7 @@ Registry API checks on 2026-05-24:
 ## Open Review Items
 
 - Confirm AWS provider `6.x` resource arguments for Lightsail snapshots and port rules before adding the Lightsail module.
-- Confirmed Cloudflare provider `5.19.1` exposes `cloudflare_dns_record`, `cloudflare_r2_bucket`, `cloudflare_r2_custom_domain`, `cloudflare_zero_trust_access_application`, `cloudflare_turnstile_widget`, and `cloudflare_web_analytics_site`. DNS and R2 bucket/custom-domain resources are wired in the shared root for the interim `neonfold.com` domain.
+- Confirmed Cloudflare provider `5.19.1` exposes `cloudflare_dns_record`, `cloudflare_r2_bucket`, `cloudflare_r2_custom_domain`, `cloudflare_zero_trust_access_application`, `cloudflare_turnstile_widget`, and `cloudflare_web_analytics_site`. DNS and R2 bucket/custom-domain resources are wired in the shared root for the interim `example.com` domain.
 - Cloudflare Access is intentionally deferred as a later security layer. A trial apply failed with Cloudflare API `403 Authentication error` even though the token verifies as active, so the local `CLOUDFLARE_API_TOKEN` needs Zero Trust Access application write permission before Terraform can manage Access apps. WAF/ruleset resources remain under review because their policy shape is security-sensitive and depends on final traffic behavior.
 - Confirmed Upstash Terraform provider `2.1.0` uses `upstash_redis_database`; Regional Redis creation is rejected as deprecated, so use `region = "global"` with `primary_region = "ap-southeast-1"` for Singapore-primary databases. The Upstash API rejects budget values below `$20`.
 - Confirm Vercel env var resource mode and sensitive-value behavior before managing env vars.

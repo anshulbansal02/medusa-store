@@ -306,18 +306,18 @@ Do not provision dedicated search infrastructure in the initial infra build. Kee
 Use subdomains for separate services.
 
 ```txt
-www.neonfold.com     production storefront
-neonfold.com         redirect to www.neonfold.com
+www.example.com     production storefront
+example.com         redirect to www.example.com
 admin.brand.com      Medusa Admin
 api.brand.com        Medusa API
-media.neonfold.com   production R2 media
-qa.neonfold.com      QA storefront
-qa-api.neonfold.com  QA API
-qa-media.neonfold.com QA R2 media
+media.example.com   production R2 media
+qa.example.com      QA storefront
+qa-api.example.com  QA API
+qa-media.example.com QA R2 media
 qa-admin.brand.com   QA Admin, only if hosted QA backend exists
 ```
 
-Manage DNS in Cloudflare for `neonfold.com`. This is an interim launch domain and can be replaced with the final brand domain later by changing the explicit QA and production Terraform domain variables and reapplying.
+Manage DNS in Cloudflare for `example.com`. This is an interim launch domain and can be replaced with the final brand domain later by changing the explicit QA and production Terraform domain variables and reapplying.
 
 Keep this service-separated domain layout for v1. Do not mount Medusa API or Admin under storefront paths.
 

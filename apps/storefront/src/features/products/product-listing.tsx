@@ -148,7 +148,9 @@ export function ProductListing({
     appliedFilters.length + (activeCategoryFilter ? 1 : 0);
   const clearFiltersHref = hiddenParams?.q
     ? buildProductListingHref(actionPath, hiddenParams, {})
-    : actionPath;
+    : categoryMode === "path"
+      ? "/shop"
+      : actionPath;
   const categoryLinks = [
     {
       href:
