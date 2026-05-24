@@ -27,4 +27,13 @@ module "vercel_storefront" {
 
   project_name     = var.vercel_storefront_project_name
   function_regions = var.vercel_storefront_function_regions
+  environment_variables = {
+    qa_medusa_backend_url = {
+      key       = "MEDUSA_BACKEND_URL"
+      value     = var.vercel_storefront_qa_medusa_backend_url
+      target    = ["preview"]
+      sensitive = false
+      comment   = "QA Medusa backend URL for manually dispatched Vercel preview deployments."
+    }
+  }
 }

@@ -32,3 +32,16 @@ variable "preview_deployments_disabled" {
   type        = bool
   default     = false
 }
+
+variable "environment_variables" {
+  description = "Vercel project environment variables keyed by stable Terraform identifiers. Do not use inline project environment config with this module."
+  type = map(object({
+    key        = string
+    value      = string
+    target     = set(string)
+    sensitive  = bool
+    comment    = optional(string)
+    git_branch = optional(string)
+  }))
+  default = {}
+}

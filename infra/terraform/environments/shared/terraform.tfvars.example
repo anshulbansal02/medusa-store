@@ -9,3 +9,5 @@ vercel_api_token = "vercel-token"
 
 vercel_storefront_project_name     = "medusa-store-storefront"
 vercel_storefront_function_regions = ["sin1"]
+
+vercel_storefront_qa_medusa_backend_url = "http://52.77.164.161"

@@ -43,3 +43,9 @@ variable "vercel_storefront_function_regions" {
   type        = set(string)
   default     = ["sin1"]
 }
+
+variable "vercel_storefront_qa_medusa_backend_url" {
+  description = "QA Medusa backend URL configured on Vercel preview deployments."
+  type        = string
+  default     = "http://52.77.164.161"
+}

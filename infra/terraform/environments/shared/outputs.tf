@@ -22,3 +22,8 @@ output "vercel_storefront_project_name" {
   description = "Terraform-managed Vercel storefront project name."
   value       = module.vercel_storefront.project_name
 }
+
+output "vercel_storefront_environment_variable_ids" {
+  description = "Terraform-managed Vercel storefront environment variable IDs."
+  value       = module.vercel_storefront.environment_variable_ids
+}
