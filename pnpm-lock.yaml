@@ -23,6 +23,9 @@ importers:
       '@medusajs/caching':
         specifier: 2.15.1
         version: 2.15.1(@medusajs/framework@2.15.1(@medusajs/cli@2.15.1(@types/node@24.12.4))(@types/node@24.12.4)(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.4)(lightningcss@1.32.0))(zod@4.2.0))(awilix@8.0.1)
+      '@medusajs/caching-redis':
+        specifier: 2.15.1
+        version: 2.15.1(@medusajs/framework@2.15.1(@medusajs/cli@2.15.1(@types/node@24.12.4))(@types/node@24.12.4)(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.4)(lightningcss@1.32.0))(zod@4.2.0))
       '@medusajs/cli':
         specifier: 2.15.1
         version: 2.15.1(@types/node@24.12.4)
@@ -32,15 +35,24 @@ importers:
       '@medusajs/draft-order':
         specifier: 2.15.1
         version: 2.15.1(@medusajs/admin-sdk@2.15.1)(@medusajs/cli@2.15.1(@types/node@24.12.4))(@medusajs/framework@2.15.1(@medusajs/cli@2.15.1(@types/node@24.12.4))(@types/node@24.12.4)(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.4)(lightningcss@1.32.0))(zod@4.2.0))(@medusajs/icons@2.15.1(react@18.3.1))(@medusajs/test-utils@2.15.1)(@medusajs/ui@4.1.11(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      '@medusajs/event-bus-redis':
+        specifier: 2.15.1
+        version: 2.15.1(@medusajs/framework@2.15.1(@medusajs/cli@2.15.1(@types/node@24.12.4))(@types/node@24.12.4)(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.4)(lightningcss@1.32.0))(zod@4.2.0))
       '@medusajs/framework':
         specifier: 2.15.1
         version: 2.15.1(@medusajs/cli@2.15.1(@types/node@24.12.4))(@types/node@24.12.4)(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.4)(lightningcss@1.32.0))(zod@4.2.0)
+      '@medusajs/locking-redis':
+        specifier: 2.15.1
+        version: 2.15.1(@medusajs/framework@2.15.1(@medusajs/cli@2.15.1(@types/node@24.12.4))(@types/node@24.12.4)(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.4)(lightningcss@1.32.0))(zod@4.2.0))
       '@medusajs/medusa':
         specifier: 2.15.1
         version: 2.15.1(@medusajs/admin-sdk@2.15.1)(@medusajs/cli@2.15.1(@types/node@24.12.4))(@medusajs/framework@2.15.1(@medusajs/cli@2.15.1(@types/node@24.12.4))(@types/node@24.12.4)(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.4)(lightningcss@1.32.0))(zod@4.2.0))(@medusajs/icons@2.15.1(react@18.3.1))(@medusajs/test-utils@2.15.1)(@medusajs/ui@4.1.11(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@swc/core@1.15.33)(@types/node@24.12.4)(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(awilix@8.0.1)(lightningcss@1.32.0)(picomatch@4.0.4)(posthog-node@5.34.0(rxjs@7.8.2))(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(yalc@1.0.0-pre.53)
       '@medusajs/ui':
         specifier: 4.1.11
         version: 4.1.11(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
+      '@medusajs/workflow-engine-redis':
+        specifier: 2.15.1
+        version: 2.15.1(@medusajs/framework@2.15.1(@medusajs/cli@2.15.1(@types/node@24.12.4))(@types/node@24.12.4)(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.4)(lightningcss@1.32.0))(zod@4.2.0))
       '@tanstack/react-query':
         specifier: 5.64.2
         version: 5.64.2(react@18.3.1)
