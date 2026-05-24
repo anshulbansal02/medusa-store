@@ -585,7 +585,8 @@ Current status:
 - Vector is configured on QA with the Better Stack-generated Ubuntu/Docker config. Docker log collection requires the `vector` service user to be in the `docker` group, and host log file access uses the `adm` group.
 - QA `ADMIN_PATH=/app` is stored in SSM. Medusa `admin.path = "/"` is not used for QA because it made API `/health` and `/ready` return Admin HTML; instead Caddy redirects the dedicated admin hostname root to `/app`.
 - Better Stack health/readiness monitors use keyword checks (`OK` and `"ready":true`) instead of status-only checks, so Admin fallback HTML cannot satisfy API health monitoring.
-- Alert delivery test and error-tracking applications remain pending.
+- Better Stack alert delivery was tested with an email-only test incident and immediate API resolve.
+- Better Stack Errors applications exist for QA storefront and QA Medusa. The storefront uses the Better Stack browser tag behind one local component and Vercel env config; Medusa uses a small Sentry-compatible adapter and Medusa's documented error-handler hook. The Sentry account/vendor remains deferred.
 
 Terraform-managed where stable:
 
@@ -595,7 +596,7 @@ Terraform-managed where stable:
   - admin hostname/access path where appropriate
   - SSL/domain expiry checks where supported
 - Better Stack telemetry/log source.
-- Better Stack error-tracking applications if provider support is stable; otherwise manual setup.
+- Better Stack error-tracking applications remain manual/API-managed until provider support is stable.
 
 Manual bootstrap:
 

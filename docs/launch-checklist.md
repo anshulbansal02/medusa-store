@@ -211,7 +211,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Medusa Admin root path is verified on the dedicated admin hostname before unpausing the Better Stack admin monitor.
 - Better Stack email/mobile push alerts are tested.
 - Better Stack Terraform-managed monitors are reviewed where provider support is used.
-- Better Stack error tracking configured for storefront and Medusa backend if included before launch.
+- Better Stack error tracking configured for storefront and Medusa backend.
 - No Google Analytics.
 - No Meta/ads pixels.
 - No customer/payment/order data sent to analytics.

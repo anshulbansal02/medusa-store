@@ -62,8 +62,13 @@ Current QA log source `ecom-qa-medusa-logs` has been created through the
 Better Stack Telemetry API. Its source token is stored in AWS SSM at
 `/ecom/qa/host/BETTER_STACK_SOURCE_TOKEN`.
 
-Non-blocking for core QA: log shipping is now configured for QA; alert delivery
-and Better Stack error tracking still need separate verification.
+Current QA error-tracking applications are also API-managed:
+
+- `ecom-qa-storefront-errors`, application ID `2461839`
+- `ecom-qa-medusa-errors`, application ID `2461845`
+
+The storefront browser token is configured in the QA Vercel project. The Medusa
+DSN is stored in AWS SSM at `/ecom/qa/medusa/BETTER_STACK_ERRORS_DSN`.
 
 ### Razorpay
 
