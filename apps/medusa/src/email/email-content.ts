@@ -1,20 +1,20 @@
 export const emailContent = {
   brand: {
-    name: "The Label",
-    adminName: "The Label Admin",
+    name: "Neonfold",
+    adminName: "Neonfold",
   },
   userInvited: {
-    heading: "Admin invite",
-    introPrefix: "You have been invited to manage",
-    introSuffix: "in Medusa Admin.",
+    heading: "You are invited to manage the Neonfold store",
+    introPrefix: "You are invited to manage the",
+    introSuffix: "store. Use this secure invite to set up your access and start working in store administration.",
     action: "Accept invite",
     expiry:
-      "For security, this invite link may expire. Ask the store owner to resend the invite if it no longer works.",
+      "For security, this invite link may expire. Ask the store owner to send a new invite if this one no longer works.",
     support:
       "If you were not expecting this invite, you can ignore this email.",
-    preview: "Accept your Medusa Admin invite.",
-    subject: "Your Store Admin invite",
-    textFallback: "You have been invited to Medusa Admin: {inviteUrl}",
+    preview: "Set up your Neonfold store admin access.",
+    subject: "You are invited to manage the Neonfold store",
+    textFallback: "You are invited to manage the Neonfold store. Accept the invite here: {inviteUrl}",
   },
   orderPlaced: {
     customer: {
@@ -25,8 +25,8 @@ export const emailContent = {
       support:
         "For support, reply to this email with your order number.",
       previewPrefix: "confirmed. Total",
-      subjectWithOrder: "Your The Label order {orderNumber} is confirmed",
-      subjectFallback: "Your The Label order is confirmed",
+      subjectWithOrder: "Your Neonfold order {orderNumber} is confirmed",
+      subjectFallback: "Your Neonfold order is confirmed",
       textFallback:
         "Thank you for your order{orderNumber}. Total: {orderTotal}.",
     },
@@ -39,8 +39,8 @@ export const emailContent = {
       guestCustomer: "guest customer",
       previewPrefix: "New order",
       previewFrom: "from",
-      subjectWithOrder: "New The Label order {orderNumber}",
-      subjectFallback: "New The Label order",
+      subjectWithOrder: "New Neonfold order {orderNumber}",
+      subjectFallback: "New Neonfold order",
       textFallback:
         "New order{orderNumber} for {orderTotal} from {customerEmail}.",
     },

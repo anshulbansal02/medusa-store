@@ -31,34 +31,34 @@ const inviteEmailTailwindConfig = {
     extend: {
       colors: {
         email: {
-          accent: "#9f2d3d",
-          accentDark: "#7f2431",
-          background: "#f7f1ee",
-          border: "#e6d8d1",
+          accent: "#111111",
+          background: "#ffffff",
+          border: "#dedede",
           buttonText: "#ffffff",
-          faint: "#9a8a83",
-          panel: "#fffaf7",
-          text: "#2a211e",
-          muted: "#776760",
+          faint: "#767676",
+          panel: "#ffffff",
+          text: "#171717",
+          muted: "#555555",
+          subtle: "#f6f6f6",
         },
       },
       fontFamily: {
-        body: ["Arial", "sans-serif"],
-        heading: ["Georgia", "serif"],
+        body: ["Helvetica", "Arial", "sans-serif"],
+        heading: ["Helvetica", "Arial", "sans-serif"],
       },
       fontSize: {
         emailTiny: "12px",
         emailBase: "14px",
         emailBody: "15px",
-        emailTitle: "34px",
+        emailTitle: "28px",
       },
       letterSpacing: {
-        emailBrand: "2.2px",
+        emailBrand: "1.8px",
       },
       lineHeight: {
         emailBody: "22px",
         emailButton: "44px",
-        emailTitle: "38px",
+        emailTitle: "34px",
       },
     },
   },
@@ -71,43 +71,43 @@ export function UserInvitedEmail({ inviteUrl, email }: UserInvitedEmailProps) {
       <Preview>{emailContent.userInvited.preview}</Preview>
       <Tailwind config={inviteEmailTailwindConfig}>
         <Body className="m-0 bg-email-background font-body text-email-text">
-          <Container className="mx-auto max-w-[600px] px-4 py-7">
-            <Section className="border border-email-border bg-email-panel p-[30px]">
-              <Text className="m-0 mb-[18px] font-bold text-emailTiny text-email-accent uppercase tracking-emailBrand">
+          <Container className="mx-auto max-w-[600px] px-4 py-8">
+            <Section className="border border-email-border bg-email-panel p-[32px]">
+              <Text className="m-0 mb-[22px] font-bold text-emailTiny text-email-accent uppercase tracking-emailBrand">
                 {emailContent.brand.adminName}
               </Text>
               <Heading
                 as="h1"
-                className="m-0 font-heading font-normal text-emailTitle leading-emailTitle text-email-text"
+                className="m-0 font-heading font-bold text-emailTitle leading-emailTitle text-email-text"
               >
                 {emailContent.userInvited.heading}
               </Heading>
-              <Text className="m-0 mt-4 text-emailBase leading-emailBody text-email-muted">
+              <Text className="m-0 mt-5 text-emailBody leading-emailBody text-email-muted">
                 {emailContent.userInvited.introPrefix}{" "}
                 {emailContent.brand.name} {emailContent.userInvited.introSuffix}
               </Text>
               {email ? (
-                <Text className="m-0 mt-3 text-emailBase leading-emailBody text-email-muted">
+                <Text className="m-0 mt-4 border border-email-border bg-email-subtle px-4 py-3 text-emailBase leading-emailBody text-email-muted">
                   This invite was sent to {email}.
                 </Text>
               ) : null}
 
-              <Section className="mt-[24px]">
+              <Section className="mt-[28px]">
                 <Button
                   href={inviteUrl}
-                  className="inline-block bg-email-accentDark px-[22px] font-bold text-emailBase text-email-buttonText leading-emailButton no-underline"
+                  className="inline-block bg-email-accent px-[22px] font-bold text-emailBase text-email-buttonText leading-emailButton no-underline"
                 >
                   {emailContent.userInvited.action}
                 </Button>
               </Section>
 
-              <Text className="m-0 mt-5 text-emailBase leading-emailBody text-email-muted">
+              <Text className="m-0 mt-6 text-emailBase leading-emailBody text-email-muted">
                 {emailContent.userInvited.expiry}
               </Text>
 
               <Hr className="my-7 border-email-border" />
 
-              <Text className="m-0 text-emailBase leading-emailBody text-email-muted">
+              <Text className="m-0 text-emailTiny leading-emailBody text-email-faint">
                 {emailContent.userInvited.support}
               </Text>
             </Section>
