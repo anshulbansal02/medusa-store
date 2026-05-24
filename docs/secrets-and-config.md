@@ -103,6 +103,7 @@ Current shared operator parameters:
 - `/ecom/shared/operator/cloudflare/access/qa_admin_allowed_emails`
 - `/ecom/shared/operator/vercel/api_token`
 - `/ecom/shared/operator/neon/api_key`
+- `/ecom/shared/operator/neon/org_id`
 - `/ecom/shared/operator/upstash/email`
 - `/ecom/shared/operator/upstash/api_key`
 - `/ecom/shared/operator/tailscale/oauth_client_id`

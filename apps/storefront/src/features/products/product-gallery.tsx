@@ -1,10 +1,18 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
+import { Expand, X } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  type CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import {
   Dialog,
   DialogClose,
@@ -24,19 +32,37 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const content = siteContent.product.gallery;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [viewerApi, setViewerApi] = useState<CarouselApi>();
   const activeImage = images[activeIndex] ?? images[0];
   const hasThumbnails = images.length > 1;
 
+  useEffect(() => {
+    if (!viewerApi) {
+      return;
+    }
+
+    const syncSelectedImage = () => {
+      setActiveIndex(viewerApi.selectedScrollSnap());
+    };
+
+    syncSelectedImage();
+    viewerApi.on("select", syncSelectedImage);
+
+    return () => {
+      viewerApi.off("select", syncSelectedImage);
+    };
+  }, [viewerApi]);
+
+  useEffect(() => {
+    if (!isViewerOpen || !viewerApi) {
+      return;
+    }
+
+    viewerApi.scrollTo(activeIndex, true);
+  }, [activeIndex, isViewerOpen, viewerApi]);
+
   if (!activeImage) {
     return null;
-  }
-
-  function goToPreviousImage() {
-    setActiveIndex((index) => (index === 0 ? images.length - 1 : index - 1));
-  }
-
-  function goToNextImage() {
-    setActiveIndex((index) => (index === images.length - 1 ? 0 : index + 1));
   }
 
   return (
@@ -110,7 +136,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         {isViewerOpen ? (
           <DialogContent
             showCloseButton={false}
-            className="h-svh max-w-none rounded-none bg-background p-0 ring-0 sm:max-w-none"
+            className="h-[calc(100svh-1rem)] max-w-[calc(100vw-1rem)] rounded-none bg-transparent p-0 ring-0 sm:h-[calc(100svh-2rem)] sm:max-w-[calc(100vw-2rem)] sm:max-w-none"
           >
             <DialogTitle className="sr-only">
               {productName} {content.dialogTitleSuffix}
@@ -121,65 +147,60 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute top-4 right-4 z-20 size-11 rounded-none border border-border bg-background/95 text-foreground shadow-sm hover:bg-muted"
+                  className="absolute top-3 right-3 z-20 size-10 rounded-none bg-background/95 text-foreground shadow-sm hover:bg-background sm:top-4 sm:right-4"
                 />
               }
             >
               <X className="size-5 stroke-icon" aria-hidden="true" />
             </DialogClose>
 
-            <div className="flex h-full min-h-0 flex-col">
-              <div className="flex h-14 shrink-0 items-center border-border border-b px-4 pr-20">
-                <p className="truncate text-sm font-medium">{productName}</p>
-              </div>
+            <div className="flex h-full min-h-0 flex-col justify-center gap-3">
+              <Carousel
+                setApi={setViewerApi}
+                opts={{
+                  align: "center",
+                  loop: hasThumbnails,
+                  startIndex: activeIndex,
+                }}
+                className="min-h-0"
+              >
+                <CarouselContent className="ml-0">
+                  {images.map((image, index) => (
+                    <CarouselItem key={image} className="pl-0">
+                      <div className="relative h-[calc(100svh-8rem)] max-h-[780px] min-h-[360px] w-full">
+                        <Image
+                          src={image}
+                          alt={
+                            index === activeIndex
+                              ? `${productName} ${content.fullImageAltSuffix}`
+                              : ""
+                          }
+                          fill
+                          loading="lazy"
+                          sizes="100vw"
+                          className="object-contain"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
 
-              <div className="relative flex min-h-0 flex-1 items-center justify-center bg-muted/35 px-4 py-5 sm:px-16 sm:py-8">
                 {hasThumbnails ? (
                   <>
-                    <Button
-                      type="button"
+                    <CarouselPrevious
                       variant="ghost"
-                      size="icon"
-                      aria-label="Previous image"
-                      onClick={goToPreviousImage}
-                      className="absolute left-3 z-10 size-10 rounded-none border border-border bg-background/95 shadow-sm hover:bg-muted sm:left-5 sm:size-11"
-                    >
-                      <ChevronLeft
-                        className="size-5 stroke-icon"
-                        aria-hidden="true"
-                      />
-                    </Button>
-                    <Button
-                      type="button"
+                      className="left-2 size-10 rounded-none bg-background/95 text-foreground shadow-sm hover:bg-background disabled:opacity-30 sm:left-4 sm:size-11"
+                    />
+                    <CarouselNext
                       variant="ghost"
-                      size="icon"
-                      aria-label="Next image"
-                      onClick={goToNextImage}
-                      className="absolute right-3 z-10 size-10 rounded-none border border-border bg-background/95 shadow-sm hover:bg-muted sm:right-5 sm:size-11"
-                    >
-                      <ChevronRight
-                        className="size-5 stroke-icon"
-                        aria-hidden="true"
-                      />
-                    </Button>
+                      className="right-2 size-10 rounded-none bg-background/95 text-foreground shadow-sm hover:bg-background disabled:opacity-30 sm:right-4 sm:size-11"
+                    />
                   </>
                 ) : null}
-
-                <div className="relative h-full max-h-[calc(100svh-9.5rem)] w-full max-w-5xl">
-                  <Image
-                    key={activeImage}
-                    src={activeImage}
-                    alt={`${productName} ${content.fullImageAltSuffix}`}
-                    fill
-                    loading="lazy"
-                    sizes="100vw"
-                    className="object-contain"
-                  />
-                </div>
-              </div>
+              </Carousel>
 
               {hasThumbnails ? (
-                <div className="flex shrink-0 gap-2 overflow-x-auto border-border border-t bg-background px-4 py-3 sm:justify-center">
+                <div className="flex shrink-0 justify-center gap-2 overflow-x-auto px-4 pb-1">
                   {images.map((image, index) => (
                     <Button
                       key={image}
@@ -190,10 +211,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                       aria-pressed={activeIndex === index}
                       onClick={() => setActiveIndex(index)}
                       className={cn(
-                        "relative aspect-[4/5] h-16 w-13 shrink-0 overflow-hidden rounded-none border bg-muted p-0 transition hover:bg-muted sm:h-20 sm:w-16",
+                        "relative aspect-[4/5] h-14 w-11 shrink-0 overflow-hidden rounded-none border bg-muted p-0 transition hover:bg-muted sm:h-16 sm:w-13",
                         activeIndex === index
-                          ? "border-foreground"
-                          : "border-transparent hover:border-border",
+                          ? "border-background"
+                          : "border-transparent opacity-65 hover:border-background/70 hover:opacity-100",
                       )}
                     >
                       <Image

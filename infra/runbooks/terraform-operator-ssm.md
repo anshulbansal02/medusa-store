@@ -70,6 +70,7 @@ ssm_value() {
 }
 
 export TF_VAR_neon_api_key="$(ssm_value /ecom/shared/operator/neon/api_key)"
+export TF_VAR_neon_org_id="$(ssm_value /ecom/shared/operator/neon/org_id)"
 export TF_VAR_upstash_email="$(ssm_value /ecom/shared/operator/upstash/email)"
 export TF_VAR_upstash_api_key="$(ssm_value /ecom/shared/operator/upstash/api_key)"
 export TF_VAR_cloudflare_r2_account_id="$(ssm_value /ecom/shared/operator/cloudflare/account_id)"
