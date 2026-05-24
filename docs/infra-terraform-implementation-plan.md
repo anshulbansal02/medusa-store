@@ -537,7 +537,7 @@ Current state:
 - The project is not linked to GitHub so Vercel does not auto-deploy from Git pushes.
 - Default Vercel Function region is `sin1`, matching the Singapore Medusa/data tier. Use `bom1` only if backend/data move to India or measurement proves the user-facing benefit outweighs backend round-trip latency.
 - Domains are deferred until the production domain and exact QA/prod hostnames are known.
-- QA preview `MEDUSA_BACKEND_URL` is managed by Terraform as a Vercel project environment variable.
+- QA preview `MEDUSA_BACKEND_URL` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as Vercel project environment variables.
 - Remaining Vercel app environment variables are deferred until final browser-safe public values exist. Move stable Vercel app env vars into Terraform-managed Vercel resources when values are known and state sensitivity has been reviewed.
 
 GitHub Actions-managed:

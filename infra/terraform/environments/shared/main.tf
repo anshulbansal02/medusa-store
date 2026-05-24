@@ -35,5 +35,12 @@ module "vercel_storefront" {
       sensitive = false
       comment   = "QA Medusa backend URL for manually dispatched Vercel preview deployments."
     }
+    qa_medusa_publishable_key = {
+      key       = "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY"
+      value     = var.vercel_storefront_qa_medusa_publishable_key
+      target    = ["preview"]
+      sensitive = false
+      comment   = "QA Medusa publishable API key for storefront preview deployments."
+    }
   }
 }

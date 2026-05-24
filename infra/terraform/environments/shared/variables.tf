@@ -49,3 +49,9 @@ variable "vercel_storefront_qa_medusa_backend_url" {
   type        = string
   default     = "http://52.77.164.161"
 }
+
+variable "vercel_storefront_qa_medusa_publishable_key" {
+  description = "QA Medusa publishable API key configured on Vercel preview deployments. This is browser-safe."
+  type        = string
+  default     = "pk_8c1d080d0113830ac1d39a30dfa86c7927b475e1413899f479b408a95bb39b85"
+}
