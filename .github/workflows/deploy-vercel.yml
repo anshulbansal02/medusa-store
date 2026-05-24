@@ -39,6 +39,7 @@ jobs:
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
         run: |
+          set -euo pipefail
           if [ -z "$VERCEL_TOKEN" ]; then
             echo "::notice::Skipping storefront QA deploy because VERCEL_TOKEN is not configured yet."
             exit 0
@@ -48,8 +49,7 @@ jobs:
             echo "Set VERCEL_ORG_ID and VERCEL_PROJECT_ID as qa environment variables."
             exit 1
           fi
-          args=(--yes --prod --cwd ./apps/storefront --token "$VERCEL_TOKEN")
-          vercel deploy "${args[@]}"
+          vercel deploy --yes --prod --cwd ./apps/storefront
 
   deploy-production:
     if: github.event.inputs.target == 'production' && github.ref == 'refs/heads/main'
@@ -77,6 +77,7 @@ jobs:
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
         run: |
+          set -euo pipefail
           if [ -z "$VERCEL_TOKEN" ]; then
             echo "::notice::Skipping storefront production deploy because VERCEL_TOKEN is not configured yet."
             exit 0
@@ -86,5 +87,4 @@ jobs:
             echo "Set VERCEL_ORG_ID and VERCEL_PROJECT_ID as production environment variables."
             exit 1
           fi
-          args=(--yes --prod --cwd ./apps/storefront --token "$VERCEL_TOKEN")
-          vercel deploy "${args[@]}"
+          vercel deploy --yes --prod --cwd ./apps/storefront

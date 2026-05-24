@@ -40,8 +40,13 @@ mise exec terraform@1.15.4 -- terraform -chdir=infra/terraform/environments/shar
   -var='github_repo=your-github-repo' \
   -var='cloudflare_site_enabled=true' \
   -var='cloudflare_r2_media_enabled=true' \
+  -var='cloudflare_access_enabled=false' \
   -var='cloudflare_web_analytics_enabled=false'
 ```
+
+Set `cloudflare_access_enabled=true` only after the Cloudflare token has Zero
+Trust Access write permission and `cloudflare_access_admin_emails` contains the
+approved admin allowlist.
 
 Set `cloudflare_web_analytics_enabled=true` only after the Cloudflare token has
 Web Analytics/RUM write permission.

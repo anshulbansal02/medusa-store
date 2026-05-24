@@ -5,7 +5,7 @@ Use this after Terraform creates the QA or production Lightsail host.
 Current QA host:
 
 - instance: `ecom-qa-medusa`
-- public IP: `203.0.113.10`
+- public IP: keep the live value in private operator notes.
 - Tailscale IP: keep the live value in private operator notes.
 - SSH user: `ubuntu`
 - SSH key: `~/.ssh/id_ed25519_ecom_lightsail`
@@ -15,14 +15,14 @@ Current QA host:
 Copy and run the committed bootstrap script:
 
 ```sh
-scp -i ~/.ssh/id_ed25519_ecom_lightsail infra/scripts/bootstrap-lightsail.sh ubuntu@203.0.113.10:/tmp/bootstrap-lightsail.sh
-ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@203.0.113.10 'sudo bash /tmp/bootstrap-lightsail.sh'
+scp -i ~/.ssh/id_ed25519_ecom_lightsail infra/scripts/bootstrap-lightsail.sh ubuntu@<qa-public-ip>:/tmp/bootstrap-lightsail.sh
+ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'sudo bash /tmp/bootstrap-lightsail.sh'
 ```
 
 Then connect the host to Tailscale:
 
 ```sh
-ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@203.0.113.10 'sudo tailscale up --ssh --hostname=ecom-qa-medusa'
+ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'sudo tailscale up --ssh --hostname=ecom-qa-medusa'
 ```
 
 Open the Tailscale login URL printed by the command and approve the device.
@@ -30,12 +30,12 @@ Open the Tailscale login URL printed by the command and approve the device.
 ## Verify
 
 ```sh
-ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@203.0.113.10 'docker --version'
-ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@203.0.113.10 'docker compose version'
-ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@203.0.113.10 'systemctl is-active caddy'
-ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@203.0.113.10 'tailscale status'
-ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@203.0.113.10 'swapon --show'
-ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@203.0.113.10 'cat /proc/sys/vm/swappiness'
+ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'docker --version'
+ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'docker compose version'
+ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'systemctl is-active caddy'
+ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'tailscale status'
+ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'swapon --show'
+ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'cat /proc/sys/vm/swappiness'
 ```
 
 After Tailscale SSH is verified from the operator machine, public SSH must be closed:

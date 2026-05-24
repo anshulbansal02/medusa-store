@@ -2,22 +2,22 @@ export const policyPages = {
   about: {
     metadataTitle: "About | Neonfold",
     eyebrow: "About",
-    title: "The store.",
-    description: "About Neonfold and the launch collection.",
+    title: "About Neonfold.",
+    description: "Occasionwear for dressed-up plans across India.",
     intro:
-      "Neonfold is a single-brand fashion storefront for premium western occasion wear in India.",
+      "Neonfold makes limited-run western occasionwear for dinners, celebrations, launches, and after-hours plans.",
     sections: [
       {
         title: "Point of view",
-        body: "The first edit is planned around visual appeal, newer silhouettes, and easy occasion dressing for dinners, wedding functions, launches, and dressed-up weekends.",
+        body: "Each collection is built around pieces that feel dressed-up without being difficult to wear.",
       },
       {
-        title: "Catalog",
-        body: "Launch inventory is intentionally small, about 20 to 25 styles, so product pages can stay focused on fit, fabric, images, and size support.",
+        title: "Launch collection",
+        body: "The first collection is intentionally focused, with about 20 to 25 styles across dresses, co-ords, tops, and occasionwear.",
       },
       {
-        title: "Operations",
-        body: "Orders, fulfillment, and customer support are handled by the store team, with clear updates from checkout through dispatch.",
+        title: "Order care",
+        body: "Orders are packed carefully, with updates from checkout through dispatch.",
       },
     ],
   },
@@ -49,19 +49,19 @@ export const policyPages = {
     title: "Refunds.",
     description: "Refund and cancellation policy for Neonfold.",
     intro:
-      "Refund and cancellation rules are kept explicit so order support stays clear after payment.",
+      "Refunds and cancellations depend on payment status and how far the order has moved toward dispatch.",
     sections: [
       {
         title: "Cancellations",
-        body: "Cancellation eligibility depends on fulfillment status. Orders that have already been packed, dispatched, or handed to a courier may not be cancellable through the standard flow.",
+        body: "Cancellation eligibility depends on order status. Orders that have already been packed, dispatched, or handed to a courier may not be cancellable.",
       },
       {
         title: "Refund mode",
-        body: "Approved refunds should be returned to the original prepaid payment method through the payment provider. Processing timelines can depend on Razorpay, the bank, or the payment instrument.",
+        body: "Approved refunds are returned to the original prepaid payment method. Processing timelines can depend on Razorpay, the bank, or the payment app.",
       },
       {
         title: "Failed payments",
-        body: "If payment fails or remains incomplete, the order should not be treated as paid. Customers should retry checkout or contact support with payment and order details.",
+        body: "If payment fails or remains incomplete, the order is not treated as paid. Retry checkout or contact support with payment and order details.",
       },
     ],
   },
@@ -71,19 +71,19 @@ export const policyPages = {
     title: "Terms.",
     description: "Terms and conditions for using Neonfold storefront.",
     intro:
-      "These terms describe expected use of the storefront and how orders are handled.",
+      "These terms explain how orders, product information, and store use are handled.",
     sections: [
       {
         title: "Store use",
-        body: "Customers should use accurate contact, shipping, and payment information while placing an order. The store may contact the customer if order details need clarification.",
+        body: "Use accurate contact, shipping, and payment information while placing an order. We may contact you if any order details need clarification.",
       },
       {
         title: "Product information",
-        body: "Product imagery, colors, fabric notes, prices, and availability are maintained by the store team. Small differences can occur due to photography, screen settings, and fabric behavior.",
+        body: "Product images, colors, fabric notes, prices, and availability are kept as accurate as possible. Small differences can occur due to photography, screen settings, and fabric behavior.",
       },
       {
         title: "Orders",
-        body: "An order is processed only after the required prepaid payment and order checks are complete. The store may cancel or contact the customer if an order cannot be fulfilled.",
+        body: "An order is processed after prepaid payment and order checks are complete. We may cancel or contact you if an order cannot be fulfilled.",
       },
     ],
   },
@@ -93,19 +93,19 @@ export const policyPages = {
     title: "Privacy.",
     description: "Privacy policy for Neonfold storefront.",
     intro:
-      "The storefront should collect only the information needed to browse, checkout, deliver orders, and support customers.",
+      "Neonfold collects only the information needed to process orders, deliver purchases, and support customers.",
     sections: [
       {
         title: "Information collected",
-        body: "Checkout can require contact details, shipping address, order details, and payment status information. Payment credentials are handled by the payment provider and should not be stored in storefront code.",
+        body: "Checkout can require contact details, shipping address, order details, and payment status information. Payment credentials are handled by the payment provider; Neonfold does not store card or UPI credentials.",
       },
       {
         title: "Usage",
-        body: "Customer information is used for order processing, delivery, transactional email, support, fraud prevention, and required operational records.",
+        body: "Customer information is used for order processing, delivery, order emails, support, fraud prevention, and required records.",
       },
       {
         title: "Analytics",
-        body: "The storefront uses basic website analytics to understand browsing behavior. Payment details and order contents are not used for analytics reporting.",
+        body: "The site uses basic website analytics to understand browsing behavior. Payment details and order contents are not used for analytics reports.",
       },
     ],
   },
@@ -114,7 +114,7 @@ export const policyPages = {
     eyebrow: "Help",
     title: "FAQ.",
     description: "Common questions about shopping from Neonfold.",
-    intro: "A compact help page for common pre-purchase questions.",
+    intro: "Quick answers before you place an order.",
     sections: [
       {
         title: "Where do you ship?",

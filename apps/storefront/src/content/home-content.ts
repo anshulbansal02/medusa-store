@@ -2,32 +2,32 @@ export const homeContent = {
   metadata: {
     title: "Neonfold | Occasion wear for evenings out",
     description:
-      "Premium western occasion wear for India, built around newness, visual appeal, and a low-friction shopping flow.",
+      "Limited-run occasion wear for dinners, celebrations, and after-hours plans across India.",
   },
   hero: {
     imageAltSuffix: "styled on a model",
     productEyebrow: "Featured style",
-    eyebrow: "The first edit",
+    eyebrow: "Launch collection",
     title: "Designed to be noticed.",
     description:
       "Limited-run western occasion pieces for dinners, wedding functions, launches, and dressed-up weekends.",
     primaryAction: "Shop new arrivals",
-    emptyTitle: "The first edit is being prepared.",
+    emptyTitle: "The launch collection is being prepared.",
     emptyDescription:
       "The launch collection will appear here as soon as the first pieces are available.",
   },
   valueStrip: [
     {
-      title: "Small catalog, sharper edit.",
-      text: "About 20-25 pieces at launch.",
+      title: "A focused launch collection.",
+      text: "About 20-25 styles, selected with intention.",
     },
     {
-      title: "Premium price confidence.",
-      text: "Fit notes and size support stay close to purchase decisions.",
+      title: "Fit notes before you buy.",
+      text: "Measurements and fit details are shown before you add to bag.",
     },
     {
-      title: "India-first checkout.",
-      text: "Prepaid flow with clear shipping details before payment.",
+      title: "Prepaid delivery across India.",
+      text: "Add your address, choose shipping, then pay securely.",
     },
   ],
   newArrivals: {
@@ -40,16 +40,16 @@ export const homeContent = {
       "The latest pieces will appear here as soon as they are available.",
   },
   occasionEdit: {
-    title: "Occasion edit",
+    title: "Occasionwear",
     description:
-      "Shop by plan, not by trend. A tighter selection for dressed-up moments.",
-    action: "View the edit",
+      "Styles for dinners, wedding functions, launches, and weekends that call for more polish.",
+    action: "Shop occasionwear",
   },
   fitSupport: {
     eyebrow: "Size and fit first",
     title: "Dressy should still feel easy.",
     description:
-      "Measurements, fabric, care, and fit notes stay close to the add-to-bag flow, so customers can decide with confidence.",
+      "Check measurements, fabric, care, and fit notes before choosing a size.",
     primaryAction: "Shop new arrivals",
   },
 } as const;

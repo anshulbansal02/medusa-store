@@ -2,18 +2,19 @@ export const supportContent = {
   contact: {
     metadata: {
       title: "Contact | Neonfold",
-      description: "Contact the store team for order and product help.",
+      description:
+        "Get help with orders, sizing, delivery, or product details.",
     },
     eyebrow: "Contact",
-    title: "Store help.",
+    title: "How can we help?",
     sections: [
       {
         title: "Orders and styling",
-        text: "Share the product name, size, and your question. The store team can confirm availability, sizing, and order status.",
+        text: "Share the product name, size, and your question. We can help with availability, fit, and order status.",
       },
       {
         title: "Response time",
-        text: "The store team replies during business hours and prioritizes active orders first.",
+        text: "We reply during business hours and prioritize active orders first.",
       },
     ],
   },
@@ -31,7 +32,7 @@ export const supportContent = {
       },
       {
         title: "Courier details",
-        text: "Dispatch timelines and tracking details are shared after the order is packed and handed to the courier.",
+        text: "Dispatch timelines and tracking details are shared after your order is packed and handed to the courier.",
       },
     ],
   },

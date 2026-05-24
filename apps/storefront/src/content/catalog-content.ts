@@ -3,10 +3,10 @@ export const catalogContent = {
     metadata: {
       title: "Shop New Arrivals | Neonfold",
       description:
-        "Shop premium western occasion wear, dresses, co-ords, and statement tops for India.",
+        "Shop dresses, co-ords, tops, and occasionwear from Neonfold.",
     },
     eyebrow: "New arrivals",
-    title: "Shop the edit.",
+    title: "Shop new arrivals.",
     description:
       "Dresses, co-ords, and sharper tops for dinners, wedding functions, launches, and weekends that need more polish.",
     allCategoryLabel: "All",
@@ -14,29 +14,28 @@ export const catalogContent = {
     countLabel: "styles",
     emptyTitle: "The shop is being prepared.",
     emptyDescription:
-      "The launch edit will appear here as soon as styles are available.",
+      "New arrivals will appear here as soon as they are available.",
     valueStrip: [
       {
-        title: "Size notes close by.",
-        text: "Product pages keep fit and measurements near size selection.",
+        title: "Size notes before checkout.",
+        text: "Fit and measurements are shown before you choose a size.",
       },
       {
         title: "Prepaid checkout.",
-        text: "Payment is available after address and shipping are saved.",
+        text: "Pay securely after your address and delivery option are confirmed.",
       },
       {
         title: "India shipping.",
-        text: "Dispatch and return details stay visible before purchase.",
+        text: "Delivery and return details are easy to find before purchase.",
       },
     ],
   },
   collection: {
-    fallbackDescription:
-      "A focused edit of available styles from the current collection.",
+    fallbackDescription: "Available styles from the current collection.",
     metadataDescriptionPrefix: "Shop",
-    emptyTitle: "This edit is being prepared.",
+    emptyTitle: "This collection is coming soon.",
     emptyDescription:
-      "Styles from this edit will appear here as soon as they are available.",
+      "Styles from this collection will appear here as soon as they are available.",
     allProductsAction: "View all",
     countLabel: "styles",
   },
@@ -46,11 +45,11 @@ export const catalogContent = {
     applyFiltersLabel: "Apply",
     clearFiltersLabel: "Clear all",
     filterPanelTitle: "Filters",
-    filterPanelDescription: "Refine the shop by size, color, price, and sort.",
+    filterPanelDescription: "Choose size, color, price, and sort options.",
     openFiltersLabel: "Open filters",
     closeFiltersLabel: "Close filters",
     selectedFiltersLabel: "Selected filters",
-    filtersUpdateLabel: "Filters update from this panel",
+    filtersUpdateLabel: "Use filters to refine products",
     countSingular: "style",
     countPlural: "styles",
     filters: {
@@ -87,13 +86,12 @@ export const catalogContent = {
     },
     statusLabel: "New arrival",
     deliveryTitle: "Delivery",
-    deliveryText: "India shipping with prepaid checkout.",
+    deliveryText: "Prepaid delivery across India.",
     returnsTitle: "Returns",
-    returnsText:
-      "Eligible items can be requested for return or exchange according to the store policy.",
+    returnsText: "Returns and exchanges follow the store policy.",
     relatedEyebrowFallback: "Keep browsing",
-    relatedTitle: "More from this edit",
-    relatedAction: "View edit",
+    relatedTitle: "You may also like",
+    relatedAction: "Shop all",
     breadcrumbLabel: "Breadcrumb",
     shopBreadcrumbLabel: "Shop",
     notFoundTitle: "Product not found | Neonfold",
@@ -130,11 +128,11 @@ export const catalogContent = {
     clearAction: "Clear",
     browseAction: "Browse shop",
     emptyTitle: "No styles found.",
-    emptyDescription: "Try a broader search, or browse the current edit.",
+    emptyDescription: "Try another search, or browse new arrivals.",
     dialogTitle: "Search products",
     dialogDescription:
       "Search product names, categories, colors, and product notes.",
-    editsLabel: "Edits",
+    editsLabel: "Collections",
     matchingLabel: "Matching styles",
     latestLabel: "Latest styles",
     viewAllAction: "View all",

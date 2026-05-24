@@ -3,15 +3,15 @@ export const orderContent = {
     metadata: {
       title: "Track Order | Neonfold",
       description:
-        "Open your order details using the order ID or confirmation link from Neonfold.",
+        "View your Neonfold order using the order ID and checkout email.",
     },
     eyebrow: "Order support",
     title: "Track order.",
     description:
-      "Use the order ID or confirmation link from your email to reopen the order details page.",
+      "Use the order ID or confirmation link from your email to view your order.",
     formTitle: "Find your order",
     formDescription:
-      "This page does not create an account or ask for a password. It only opens the order page for the reference you provide.",
+      "No account or password needed. Enter the order details from your confirmation email.",
     missingEmailLead: "Missing the order email?",
     contactAction: "Contact support",
     helpItems: [
@@ -23,7 +23,7 @@ export const orderContent = {
       {
         icon: "packageSearch",
         title: "No account required",
-        text: "The lookup opens the order page directly from the store system.",
+        text: "Use the order email and reference to view the matching order.",
       },
       {
         icon: "badgeCheck",
@@ -52,8 +52,7 @@ export const orderContent = {
       descriptionPrefix: "Order confirmation for",
     },
     title: "Order placed.",
-    emailLead:
-      "We have received the order. A confirmation email will be sent to",
+    emailLead: "We received your order. A confirmation email will be sent to",
     emailSuffix: "with the order details.",
     itemsTitle: "Items",
     quantityLabel: "Qty",

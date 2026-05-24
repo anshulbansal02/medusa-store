@@ -64,7 +64,7 @@ export const checkoutContent = {
         "Payment is temporarily unavailable. Please contact support.",
       detailsRequired: "Add address and shipping before payment.",
       preparing: "Preparing secure payment.",
-      ready: "Secure prepaid checkout powered by Razorpay.",
+      ready: "Secure payment with Razorpay.",
       scriptNotReady: "Payment is not ready yet.",
       startError: "Payment could not be started. Try again.",
       loadError: "Payment could not be loaded. Try again.",
@@ -73,9 +73,9 @@ export const checkoutContent = {
       detailsMissing: "Add the address and choose shipping before payment.",
       expiredSession: "Your bag session has expired.",
       sessionMismatch:
-        "Payment verification did not match this checkout session.",
+        "We could not verify this payment for the current checkout.",
       confirmationError:
-        "Payment was received but the order could not be confirmed.",
+        "Payment was received, but the order could not be confirmed. Contact support with your payment details.",
     },
     addressFormMessages: {
       validationError: "Check the highlighted fields and try again.",

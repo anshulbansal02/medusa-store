@@ -2,7 +2,7 @@ export const globalContent = {
   brand: {
     name: "Neonfold",
     footerDescription:
-      "Premium western occasion wear for India, built around newness, visual appeal, and a low-friction shopping flow.",
+      "Limited-run occasion wear for dinners, celebrations, and after-hours plans across India.",
   },
   header: {
     announcement: {
@@ -14,13 +14,14 @@ export const globalContent = {
     primaryNavigationItems: [
       { href: "/shop", label: "Shop" },
       { href: "/shop?sort=newest", label: "New Arrivals" },
-      { href: "/shop/occasion-edit", label: "Occasion Edit" },
+      { href: "/shop/occasion-edit", label: "Occasionwear" },
       { href: "/about", label: "About" },
     ],
     primaryNavigationLabel: "Primary navigation",
     mobileMenu: {
       title: "Menu",
-      description: "Shop the current edit and store support.",
+      description:
+        "Shop new arrivals, track orders, or get help with fit and delivery.",
       searchLabel: "Search",
       openLabel: "Open menu",
       closeLabel: "Close menu",
@@ -37,9 +38,9 @@ export const globalContent = {
   footer: {
     newsletter: {
       eyebrow: "Newsletter",
-      title: "Subscribe for new drops and private offers.",
+      title: "Get first look at new drops.",
       description:
-        "Be first to know when limited occasion pieces, styling notes, and store updates go live.",
+        "New arrivals, restocks, styling notes, and private offers, sent only when there is something worth sharing.",
       emailLabel: "Email address",
       emailPlaceholder: "Email",
       submitLabel: "Subscribe",
@@ -48,17 +49,17 @@ export const globalContent = {
       {
         icon: "shield",
         title: "Secure prepaid checkout",
-        text: "Pay safely with Razorpay after your address and shipping details are confirmed.",
+        text: "Pay safely with Razorpay after your address and delivery option are confirmed.",
       },
       {
         icon: "truck",
         title: "India-wide delivery",
-        text: "Trackable dispatch updates from our store team once your order is on its way.",
+        text: "Clear dispatch and tracking updates once your order is on its way.",
       },
       {
         icon: "ruler",
         title: "Fit and size support",
-        text: "Measurements and fit notes stay close to each style so you can choose with confidence.",
+        text: "Measurements and fit notes are shown with each style so you can choose carefully.",
       },
     ],
     sections: [
@@ -69,7 +70,7 @@ export const globalContent = {
           { href: "/shop/dresses", label: "Dresses" },
           { href: "/shop/co-ords", label: "Co-ords" },
           { href: "/shop/tops", label: "Tops" },
-          { href: "/shop/occasion-edit", label: "Occasion Edit" },
+          { href: "/shop/occasion-edit", label: "Occasionwear" },
         ],
       },
       {
