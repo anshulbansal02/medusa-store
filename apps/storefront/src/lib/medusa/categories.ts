@@ -2,6 +2,11 @@ import "server-only";
 
 import { medusaFetch } from "@/lib/medusa/client";
 
+const categoryCache = {
+  revalidate: 300,
+  tags: ["medusa-categories"],
+};
+
 export type MedusaProductCategory = {
   id: string;
   name: string;
@@ -48,7 +53,7 @@ export async function getProductCategories(
   });
   const data = await medusaFetch<MedusaProductCategoriesResponse>(
     `/store/product-categories?${searchParams.toString()}`,
-    { cache: "no-store" },
+    { next: categoryCache },
   );
 
   return (
@@ -68,7 +73,7 @@ export async function getCategoryByHandle(
 
   const data = await medusaFetch<MedusaProductCategoriesResponse>(
     `/store/product-categories?${searchParams.toString()}`,
-    { cache: "no-store" },
+    { next: categoryCache },
   );
   const category = data?.product_categories?.[0];
 

@@ -108,7 +108,7 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
         </div>
 
         <div className="min-h-0 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
-          <div className="grid min-w-0 gap-7 lg:grid-cols-[220px_minmax(0,1fr)]">
+          <div className="grid min-w-0 gap-7">
             <SearchCategoryLinks
               categories={categoryResults}
               content={content}
@@ -194,21 +194,21 @@ function SearchCategoryLinks({
   }
 
   return (
-    <aside className="min-w-0">
+    <div className="min-w-0">
       <p className="text-muted-foreground text-sm">{content.editsLabel}</p>
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:grid lg:overflow-visible lg:pb-0">
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
         {categories.map((category) => (
           <Link
             key={category.id}
             href={`/shop/${category.handle}`}
             prefetch={false}
-            className="shrink-0 border border-border px-3 py-2 text-sm transition hover:border-foreground lg:w-full"
+            className="shrink-0 border border-border px-3 py-2 text-sm transition hover:border-foreground"
           >
             {category.name}
           </Link>
         ))}
       </div>
-    </aside>
+    </div>
   );
 }
 
@@ -224,7 +224,7 @@ function SearchProductResults({
   }
 
   return (
-    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+    <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-3">
       {products.map((product, index) => (
         <SearchProductResult
           key={product.id}
@@ -249,7 +249,7 @@ function SearchProductResult({
     <Link
       href={product.href}
       prefetch={false}
-      className="group grid min-w-0 grid-cols-[76px_minmax(0,1fr)] gap-3 border border-border p-2 transition hover:border-foreground"
+      className="group block min-w-0 transition"
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-muted">
         <Image
@@ -259,18 +259,15 @@ function SearchProductResult({
           preload={eager}
           loading={eager ? "eager" : "lazy"}
           fetchPriority={eager ? "high" : "auto"}
-          sizes="72px"
+          sizes="(min-width: 1024px) 260px, (min-width: 640px) 30vw, 45vw"
           className="object-cover transition duration-300 ease-out group-hover:scale-[1.03]"
         />
       </div>
-      <div className="min-w-0 self-center py-1">
-        <p className="truncate font-medium text-sm">{product.name}</p>
-        {product.note ? (
-          <p className="mt-1 line-clamp-2 text-muted-foreground text-sm">
-            {product.note}
-          </p>
-        ) : null}
-        <p className="mt-2 text-sm font-medium">{product.price}</p>
+      <div className="mt-2 min-w-0">
+        <p className="line-clamp-2 font-medium text-sm leading-snug">
+          {product.name}
+        </p>
+        <p className="mt-1 text-sm">{product.price}</p>
       </div>
     </Link>
   );

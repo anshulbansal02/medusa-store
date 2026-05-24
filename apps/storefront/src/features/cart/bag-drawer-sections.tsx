@@ -1,4 +1,4 @@
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -50,9 +50,9 @@ export function BagDrawerHeader({
   setCloseButton,
 }: BagDrawerHeaderProps) {
   return (
-    <div className="flex items-start justify-between gap-5 border-border border-b px-5 py-5">
+    <div className="flex items-start justify-between gap-5 border-border border-b px-4 py-4 sm:px-5 sm:py-5">
       <div>
-        <DrawerTitle className="font-heading text-3xl leading-none">
+        <DrawerTitle className="font-heading text-3xl leading-none sm:text-4xl">
           {content.title}
         </DrawerTitle>
         <DrawerDescription className="mt-1 text-muted-foreground text-sm">
@@ -65,7 +65,7 @@ export function BagDrawerHeader({
       <DrawerClose
         ref={setCloseButton}
         aria-label={content.closeLabel}
-        className="inline-flex size-9 cursor-pointer items-center justify-center text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex size-10 cursor-pointer items-center justify-center text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <X className="size-4 stroke-icon" aria-hidden="true" />
       </DrawerClose>
@@ -81,8 +81,8 @@ export function BagDrawerItems({
   onUpdateQuantity,
 }: BagDrawerItemsProps) {
   return (
-    <div className="flex-1 overflow-y-auto px-5 py-5">
-      <div className="grid gap-5">
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
+      <div className="grid gap-4">
         {cart.items.map((item) => (
           <BagDrawerLineItem
             key={item.id}
@@ -106,7 +106,7 @@ function BagDrawerLineItem({
   onUpdateQuantity,
 }: BagDrawerLineItemProps) {
   return (
-    <article className="grid grid-cols-[88px_1fr] gap-4">
+    <article className="grid min-w-0 grid-cols-[104px_minmax(0,1fr)] gap-4 border-border border-b pb-4 last:border-b-0 sm:grid-cols-[112px_minmax(0,1fr)]">
       <Link
         href={item.href}
         prefetch={false}
@@ -118,7 +118,7 @@ function BagDrawerLineItem({
             src={item.image}
             alt={item.name}
             fill
-            sizes="88px"
+            sizes="112px"
             className="object-cover"
           />
         ) : null}
@@ -131,20 +131,21 @@ function BagDrawerLineItem({
               href={item.href}
               prefetch={false}
               onClick={closeBag}
-              className="block truncate text-sm font-medium hover:underline hover:underline-offset-4"
+              className="line-clamp-2 text-sm font-medium leading-snug hover:underline hover:underline-offset-4"
             >
               {item.name}
             </Link>
             {item.variant ? (
-              <p className="mt-1 text-muted-foreground text-xs">
+              <p className="mt-1 line-clamp-2 text-muted-foreground text-xs">
                 {item.variant}
               </p>
             ) : null}
           </div>
-          <p className="shrink-0 text-sm font-medium">{item.total}</p>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <p className="mt-3 text-sm font-medium">{item.total}</p>
+
+        <div className="mt-3 flex items-center justify-between gap-3">
           <BagLineQuantityControl
             isPending={isPending}
             item={item}
@@ -152,13 +153,14 @@ function BagDrawerLineItem({
           />
           <Button
             type="button"
-            variant="link"
-            size="xs"
+            variant="ghost"
+            size="icon-sm"
             disabled={isPending}
             onClick={() => onRemoveItem(item.id)}
-            className="h-auto rounded-none px-0 text-muted-foreground text-xs hover:text-foreground"
+            aria-label={`${content.removeAction} ${item.name}`}
+            className="rounded-none text-muted-foreground hover:text-foreground"
           >
-            {content.removeAction}
+            <Trash2 className="size-4 stroke-icon" aria-hidden="true" />
           </Button>
         </div>
       </div>
@@ -210,7 +212,7 @@ export function BagDrawerFooter({
   message,
 }: BagDrawerFooterProps) {
   return (
-    <div className="border-border border-t px-5 py-5">
+    <div className="border-border border-t bg-background px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-5 sm:pt-5 sm:pb-5">
       <div className="grid gap-2 border-border border-b pb-4 text-sm">
         <div className="flex justify-between gap-4 text-muted-foreground">
           <span>{content.subtotalLabel}</span>
@@ -262,7 +264,7 @@ export function BagDrawerFooter({
 
 export function EmptyBagDrawer({ closeBag }: EmptyBagDrawerProps) {
   return (
-    <div className="flex flex-1 items-center justify-center px-6 py-12 text-center">
+    <div className="flex min-h-0 flex-1 items-center justify-center px-6 py-12 text-center">
       <div>
         <p className="font-heading text-4xl leading-none">
           {content.emptyDrawerTitle}

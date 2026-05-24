@@ -14,7 +14,10 @@ type MedusaRegionsResponse = {
 
 export const getDefaultRegionId = cache(async () => {
   const data = await medusaFetch<MedusaRegionsResponse>("/store/regions", {
-    cache: "no-store",
+    next: {
+      revalidate: 3600,
+      tags: ["medusa-regions"],
+    },
   });
 
   return data?.regions?.[0]?.id ?? null;

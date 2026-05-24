@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -237,10 +238,8 @@ export function ProductListing({
                   prefetch={false}
                   className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
                 >
-                  <span>
-                    {activeCategoryFilter.label}{" "}
-                    <span aria-hidden="true">x</span>
-                  </span>
+                  <span>{activeCategoryFilter.label}</span>
+                  <X className="size-3 stroke-icon" aria-hidden="true" />
                   <LinkPendingIndicator />
                 </Link>
               ) : null}
@@ -255,9 +254,9 @@ export function ProductListing({
                 >
                   <span>
                     {getAppliedFilterLabel(filter.key)}:{" "}
-                    {getAppliedFilterValue(filter.key, filter.value)}{" "}
-                    <span aria-hidden="true">x</span>
+                    {getAppliedFilterValue(filter.key, filter.value)}
                   </span>
+                  <X className="size-3 stroke-icon" aria-hidden="true" />
                   <LinkPendingIndicator />
                 </Link>
               ))}

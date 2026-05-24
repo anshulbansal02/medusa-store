@@ -19,9 +19,16 @@ export function getMedusaConfig() {
   return { backendUrl, publishableKey };
 }
 
+type MedusaFetchInit = RequestInit & {
+  next?: {
+    revalidate?: false | 0 | number;
+    tags?: string[];
+  };
+};
+
 export async function medusaFetch<T>(
   path: string,
-  init: RequestInit = {},
+  init: MedusaFetchInit = {},
 ): Promise<T | null> {
   const config = getMedusaConfig();
 
@@ -53,7 +60,7 @@ export async function medusaFetch<T>(
 export async function medusaPostJson<T>(
   path: string,
   body?: unknown,
-  init: RequestInit = {},
+  init: MedusaFetchInit = {},
 ) {
   const headers = new Headers(init.headers);
   headers.set("content-type", "application/json");
@@ -67,7 +74,10 @@ export async function medusaPostJson<T>(
   });
 }
 
-export async function medusaDelete<T>(path: string, init: RequestInit = {}) {
+export async function medusaDelete<T>(
+  path: string,
+  init: MedusaFetchInit = {},
+) {
   return medusaFetch<T>(path, {
     ...init,
     method: "DELETE",

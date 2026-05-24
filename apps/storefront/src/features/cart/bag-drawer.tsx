@@ -90,7 +90,7 @@ export function BagDrawer({ initialCart, initialItemCount }: BagDrawerProps) {
           ) : null}
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-dvh w-full max-w-md rounded-none border-border bg-background text-foreground data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:sm:max-w-md">
+      <DrawerContent className="h-dvh w-full rounded-none border-border bg-background text-foreground data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:sm:max-w-[440px]">
         <BagDrawerHeader
           cart={cart}
           setCloseButton={(button) => {

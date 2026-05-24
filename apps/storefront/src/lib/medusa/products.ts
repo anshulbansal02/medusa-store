@@ -59,13 +59,18 @@ const productDetailFields = [
   "*variants.options.option",
 ].join(",");
 
+const productCache = {
+  revalidate: 60,
+  tags: ["medusa-products"],
+};
+
 function buildProductsPath(searchParams: URLSearchParams) {
   return `/store/products?${searchParams.toString()}`;
 }
 
 async function fetchProducts(searchParams: URLSearchParams) {
   return medusaFetch<MedusaProductsResponse>(buildProductsPath(searchParams), {
-    cache: "no-store",
+    next: productCache,
   });
 }
 

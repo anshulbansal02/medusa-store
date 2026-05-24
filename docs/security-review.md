@@ -161,6 +161,11 @@ Rotation plan:
 - No committed private keys, real `.env` files, Terraform state files, or obvious live API tokens were found in tracked files.
 - Local secret-bearing files and Terraform state are ignored by `.gitignore`.
 - GitHub Actions AWS access uses OIDC and an SSM read-only policy scoped to the configured environment path.
+- Deploy workflow checkouts do not persist Git credentials after checkout.
+- QA deploy SSH/SCP requires strict host key checking against pinned known hosts.
+- Generated Medusa runtime env files are copied to Lightsail with restrictive permissions and are not committed.
+- SSM-to-dotenv rendering rejects invalid keys, duplicate keys, and multiline values before writing deploy env files.
 - Medusa container runs as the non-root `node` user.
+- Medusa Compose services set `no-new-privileges`.
 - Medusa container port is bound to localhost on the host; public exposure is through Caddy.
 - Razorpay frontend verification validates signature server-side and fetches Razorpay payment/order state before completing checkout.
