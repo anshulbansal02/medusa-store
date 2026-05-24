@@ -75,7 +75,7 @@ export function ProductCard({
         <WishlistButton
           productId={product.id}
           productName={product.name}
-          className="absolute top-3 right-3 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100 data-[saved=true]:opacity-100"
+          className="absolute top-2 right-2 opacity-100 transition sm:top-3 sm:right-3 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100 data-[saved=true]:opacity-100"
         />
       </div>
 

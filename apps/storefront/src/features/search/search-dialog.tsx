@@ -256,7 +256,6 @@ function SearchProductResult({
           src={product.image}
           alt={`${product.name} ${content.imageAltSuffix}`}
           fill
-          preload={eager}
           loading={eager ? "eager" : "lazy"}
           fetchPriority={eager ? "high" : "auto"}
           sizes="(min-width: 1024px) 260px, (min-width: 640px) 30vw, 45vw"

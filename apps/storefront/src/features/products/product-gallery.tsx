@@ -89,7 +89,6 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             alt={`${productName} ${content.imageAltSuffix} ${activeIndex + 1}`}
             fill
             loading="eager"
-            preload
             fetchPriority="high"
             sizes="(min-width: 1024px) 52vw, 100vw"
             className="object-cover transition duration-300 ease-out group-hover:scale-[1.015]"

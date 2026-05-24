@@ -53,6 +53,7 @@ Completed changes:
 
 - Put QA API/admin behind HTTPS hostnames, for example `qa-api` and `qa-admin`.
 - Remove raw IP and private network origins from committed defaults and from live CORS once domain setup is complete.
+- Keep deployed QA CORS defaults limited to derived QA HTTPS domains; local development origins must be added only through an explicit operator override if ever needed.
 - Keep Store API and Admin on separate hostnames so CORS and access policies stay clean.
 - Wire Cloudflare Access for QA Medusa Admin through `infra/terraform/environments/shared` with an explicit admin email allowlist.
 
@@ -91,11 +92,11 @@ Rotation plan:
 
 ### Production Dependency Audit Fails
 
-Remediation status: fixed. Medusa packages were updated to `2.15.3` and patched transitive dependency versions are enforced through root `pnpm-workspace.yaml` overrides. `pnpm audit --prod` now reports no known vulnerabilities.
+Remediation status: partially fixed. Medusa packages were updated to `2.15.3` and patched transitive dependency versions are enforced through root `pnpm-workspace.yaml` overrides. The remaining production audit finding is `GHSA-cfw5-68c4-ffqp` in `@mikro-orm/knex`; directly overriding MikroORM to `6.6.14` is incompatible with the current Medusa stack, so this stays as a production-launch gate until Medusa validates a compatible dependency update.
 
-`pnpm audit --prod` reports production vulnerabilities in the current dependency graph. The high-severity findings are in Medusa transitive dependencies. The storefront also reports a moderate PostCSS advisory through Next.
+`pnpm audit --prod` currently reports one high-severity production vulnerability in `@mikro-orm/knex` through Medusa transitive dependencies. Earlier Medusa, telemetry, lodash, and PostCSS advisories have been reduced or patched through package upgrades and narrow root overrides.
 
-Verified high-severity packages reported by audit:
+Verified high-severity packages reported by the original audit:
 
 - `lodash`
 - `@mikro-orm/knex`
@@ -104,10 +105,10 @@ Verified high-severity packages reported by audit:
 
 Completed changes:
 
-- Upgrade Medusa packages and Next/PostCSS to versions whose transitive dependency graph satisfies the advisories.
-- Regenerate lockfiles.
-- Rerun `pnpm audit --prod` at the root and for both apps.
+- Upgrade Medusa packages and Next/PostCSS to reduce the vulnerable transitive dependency graph.
+- Regenerate lockfiles from the committed package manifests.
 - Use narrow root overrides for patched transitive packages where upstream Medusa/Next ranges have not yet moved.
+- Keep the MikroORM advisory open instead of forcing an incompatible override.
 
 Rotation plan:
 
@@ -161,7 +162,7 @@ Rotation plan:
 - No committed private keys, real `.env` files, Terraform state files, or obvious live API tokens were found in tracked files.
 - Local secret-bearing files and Terraform state are ignored by `.gitignore`.
 - GitHub Actions AWS access uses OIDC and an SSM read-only policy scoped to the configured environment path.
-- Deploy workflow checkouts do not persist Git credentials after checkout.
+- CI and deploy workflow checkouts do not persist Git credentials after checkout.
 - QA deploy SSH/SCP requires strict host key checking against pinned known hosts.
 - Generated Medusa runtime env files are copied to Lightsail with restrictive permissions and are not committed.
 - SSM-to-dotenv rendering rejects invalid keys, duplicate keys, and multiline values before writing deploy env files.

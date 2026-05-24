@@ -191,17 +191,17 @@ variable "cloudflare_r2_account_id" {
 variable "medusa_store_cors_base_origins" {
   description = "Base allowed storefront origins for QA Medusa before derived public domain origins are added."
   type        = list(string)
-  default     = ["http://storefront.localhost"]
+  default     = []
 }
 
 variable "medusa_admin_cors_base_origins" {
   description = "Base allowed admin origins for QA Medusa before derived public domain origins are added."
   type        = list(string)
-  default     = ["http://localhost:29181"]
+  default     = []
 }
 
 variable "medusa_auth_cors_base_origins" {
   description = "Base allowed auth origins for QA Medusa before derived public domain origins are added."
   type        = list(string)
-  default     = ["http://localhost:29181"]
+  default     = []
 }
