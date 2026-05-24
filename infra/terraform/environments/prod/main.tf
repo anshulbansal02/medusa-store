@@ -20,3 +20,44 @@ module "medusa_lightsail" {
   automatic_snapshot_time = var.lightsail_automatic_snapshot_time
   tags                    = local.tags
 }
+
+resource "random_password" "medusa_jwt_secret" {
+  length  = 64
+  special = false
+}
+
+resource "random_password" "medusa_cookie_secret" {
+  length  = 64
+  special = false
+}
+
+module "medusa_ssm_config" {
+  source = "../../modules/ssm-config"
+
+  path_prefix = "/${var.project}/${var.environment}/medusa"
+  string_parameters = {
+    NODE_ENV = {
+      value       = "production"
+      description = "Node runtime mode for the production Medusa service."
+    }
+    MEDUSA_WORKER_MODE = {
+      value       = "shared"
+      description = "Default production Medusa worker mode before dedicated scaling is introduced."
+    }
+    S3_REGION = {
+      value       = "auto"
+      description = "S3-compatible region value used by Cloudflare R2."
+    }
+  }
+  secure_string_parameters = {
+    JWT_SECRET = {
+      value       = random_password.medusa_jwt_secret.result
+      description = "JWT signing secret for the production Medusa service."
+    }
+    COOKIE_SECRET = {
+      value       = random_password.medusa_cookie_secret.result
+      description = "Cookie signing secret for the production Medusa service."
+    }
+  }
+  tags = local.tags
+}

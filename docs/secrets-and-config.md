@@ -130,6 +130,7 @@ Expected secret/config groups:
 Database:
 
 - Production `DATABASE_URL` points to Neon Postgres in Singapore.
+- Production SSM scaffolding currently contains only no-cost baseline parameters: `NODE_ENV`, `MEDUSA_WORKER_MODE`, `S3_REGION`, `JWT_SECRET`, and `COOKIE_SECRET`.
 - Prefer Neon pooled runtime connection strings unless Medusa or Neon guidance requires direct connections for a specific command.
 - QA/staging must use a separate Neon branch with separate credentials and must not write to production data.
 

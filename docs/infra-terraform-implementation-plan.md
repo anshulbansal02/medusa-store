@@ -356,6 +356,13 @@ Verification:
 
 Goal: create QA Lightsail and AWS support resources first, while keeping production instantiation deferred until QA is set up and tested.
 
+Current state:
+
+- QA Lightsail, QA runtime SSM parameters, and QA deploy IAM are Terraform-managed.
+- Production Lightsail remains disabled and deleted until explicit production compute approval.
+- Production no-cost SSM scaffolding exists for `NODE_ENV`, `MEDUSA_WORKER_MODE`, `S3_REGION`, `JWT_SECRET`, and `COOKIE_SECRET` under `/ecom/prod/medusa`.
+- Production database, Redis, domain/CORS, media credentials, Razorpay, and Resend parameters are intentionally not created until their backing services and real values exist.
+
 Terraform-managed:
 
 - QA Lightsail instance in Singapore, defaulting to a 2 GB bundle for QA cost control.
@@ -396,6 +403,7 @@ Verification:
 - Snapshot setting enabled.
 - SSM paths exist.
 - QA non-secret SSM parameters exist at `/ecom/qa/medusa/NODE_ENV`, `/ecom/qa/medusa/MEDUSA_WORKER_MODE`, and `/ecom/qa/medusa/S3_REGION`.
+- Production no-cost scaffold parameters exist at `/ecom/prod/medusa/NODE_ENV`, `/ecom/prod/medusa/MEDUSA_WORKER_MODE`, `/ecom/prod/medusa/S3_REGION`, `/ecom/prod/medusa/JWT_SECRET`, and `/ecom/prod/medusa/COOKIE_SECRET`.
 - GitHub Actions QA deploy IAM role exists and can only read `/ecom/qa/medusa/*`.
 - State reflects resources.
 
