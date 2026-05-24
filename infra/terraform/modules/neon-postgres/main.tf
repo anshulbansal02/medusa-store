@@ -51,5 +51,5 @@ resource "neon_database" "qa" {
 }
 
 locals {
-  qa_database_url = "postgresql://${urlencode(neon_role.qa.name)}:${urlencode(neon_role.qa.password)}@${neon_endpoint.qa.host}/${urlencode(neon_database.qa.name)}?sslmode=require"
+  qa_database_url = "postgresql://${urlencode(neon_role.qa.name)}:${urlencode(neon_role.qa.password)}@${neon_endpoint.qa.host}/${urlencode(neon_database.qa.name)}?sslmode=verify-full"
 }
