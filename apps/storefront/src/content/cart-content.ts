@@ -1,7 +1,7 @@
 export const cartContent = {
   bag: {
     metadata: {
-      title: "Bag | The Label",
+      title: "Bag | Neonfold",
       description: "Review selected styles before checkout.",
     },
     eyebrow: "Your edit",

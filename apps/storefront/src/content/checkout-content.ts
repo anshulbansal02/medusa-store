@@ -1,7 +1,7 @@
 export const checkoutContent = {
   checkout: {
     metadata: {
-      title: "Checkout | The Label",
+      title: "Checkout | Neonfold",
       description: "Add delivery details and choose shipping for your order.",
     },
     emptyTitle: "Your bag is empty.",
@@ -57,7 +57,7 @@ export const checkoutContent = {
       errorMessage: "Shipping method could not be saved. Try again.",
     },
     payment: {
-      storeName: "The Label",
+      storeName: "Neonfold",
       processingLabel: "Processing...",
       buttonLabel: "Pay securely",
       unavailable:

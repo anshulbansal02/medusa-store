@@ -169,6 +169,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Cloudflare Tunnel is not required for v1 public ingress.
 - Vercel, Lightsail/deploy, and any remaining platform deploy secrets are stored only in approved secret stores and injected at runtime.
 - AWS SSM Parameter Store paths exist for Medusa QA runtime config/secrets; production paths are created before production deploy.
+- Production Medusa runtime SSM config is enabled only after production Neon, Upstash, R2 credentials, and production domains are approved; required secret values are supplied through ignored tfvars or `TF_VAR_*`, never committed.
 - Terraform remote state bucket is encrypted, versioned, public-access-blocked, and access-restricted because state may contain secrets.
 - Terraform backend bootstrap was created through `infra/terraform/bootstrap`.
 - Terraform production/QA applies are run locally with S3 remote state and native S3 lockfiles.

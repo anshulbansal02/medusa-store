@@ -1,9 +1,9 @@
 export const orderContent = {
   trackOrder: {
     metadata: {
-      title: "Track Order | The Label",
+      title: "Track Order | Neonfold",
       description:
-        "Open your order details using the order ID or confirmation link from The Label.",
+        "Open your order details using the order ID or confirmation link from Neonfold.",
     },
     eyebrow: "Order support",
     title: "Track order.",
@@ -48,7 +48,7 @@ export const orderContent = {
   },
   orderConfirmation: {
     metadata: {
-      title: "Order Confirmation | The Label",
+      title: "Order Confirmation | Neonfold",
       descriptionPrefix: "Order confirmation for",
     },
     title: "Order placed.",

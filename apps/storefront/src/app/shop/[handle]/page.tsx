@@ -49,7 +49,7 @@ export async function generateMetadata({
 
     if (category) {
       return {
-        title: `${category.name} | The Label`,
+        title: `${category.name} | Neonfold`,
         description:
           category.description ||
           `${siteContent.collection.metadataDescriptionPrefix} ${category.name}.`,
@@ -62,13 +62,13 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${product.name} | The Label`,
+    title: `${product.name} | Neonfold`,
     description: product.description,
     alternates: {
       canonical: absoluteUrl(`/shop/${product.handle}`),
     },
     openGraph: {
-      title: `${product.name} | The Label`,
+      title: `${product.name} | Neonfold`,
       description: product.description,
       url: absoluteUrl(`/shop/${product.handle}`),
       images: product.images[0] ? [{ url: product.images[0] }] : undefined,

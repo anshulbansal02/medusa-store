@@ -1,6 +1,6 @@
 export const homeContent = {
   metadata: {
-    title: "The Label | Occasion wear for evenings out",
+    title: "Neonfold | Occasion wear for evenings out",
     description:
       "Premium western occasion wear for India, built around newness, visual appeal, and a low-friction shopping flow.",
   },

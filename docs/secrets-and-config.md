@@ -110,6 +110,16 @@ Current shared operator parameters:
 - `/ecom/shared/operator/medusa/qa_admin_email`
 - `/ecom/shared/operator/medusa/qa_admin_password`
 
+QA Medusa email parameters managed under `/ecom/qa/medusa/*`:
+
+- `RESEND_API_KEY` as `SecureString`.
+- `RESEND_FROM_EMAIL`.
+- `ADMIN_INVITE_FROM_EMAIL`.
+- `ORDER_FROM_EMAIL`.
+- `OWNER_ORDER_FROM_EMAIL`.
+- `TRANSACTIONAL_REPLY_TO_EMAIL`.
+- `STOREFRONT_URL`.
+
 QA Medusa deploy requires these GitHub `qa` environment values:
 
 - Variables:
@@ -153,7 +163,9 @@ Expected secret/config groups:
 Database:
 
 - Production `DATABASE_URL` points to Neon Postgres in Singapore.
-- Production SSM scaffolding currently contains only no-cost baseline parameters: `NODE_ENV`, `MEDUSA_WORKER_MODE`, `S3_REGION`, `JWT_SECRET`, and `COOKIE_SECRET`.
+- Production SSM always contains the no-cost baseline parameters: `NODE_ENV`, `MEDUSA_WORKER_MODE`, `S3_REGION`, `JWT_SECRET`, and `COOKIE_SECRET`.
+- Full production Medusa runtime SSM config is Terraform-wired but gated by `enable_medusa_runtime_config = true` in `infra/terraform/environments/prod`. Enable it only after production data services, media credentials, and real domains are approved.
+- When production runtime config is enabled, pass `production_database_url`, `production_redis_url`, `production_r2_access_key_id`, and `production_r2_secret_access_key` through ignored tfvars or `TF_VAR_*`; do not commit them.
 - Prefer Neon pooled runtime connection strings unless Medusa or Neon guidance requires direct connections for a specific command.
 - QA/staging must use a separate Neon branch with separate credentials and must not write to production data.
 
@@ -171,6 +183,14 @@ R2:
 - R2 S3 access credentials are created manually in Cloudflare.
 - Store R2 access key ID and secret access key in SSM `SecureString` parameters.
 - Rotate R2 credentials through a documented manual runbook.
+
+Resend:
+
+- QA transactional email sends from the verified subdomain `mail.neonfold.com`.
+- Cloudflare DNS is Terraform-managed for Resend DKIM, return-path MX, return-path SPF, and DMARC.
+- DMARC is enforced on the sending subdomain with strict DKIM/SPF alignment and quarantine policy.
+- Do not enable click/open tracking for admin invites or v1 transactional email unless there is a clear operational need.
+- Keep invite tokens out of logs, tags, headers, and docs. Invite tokens may appear only in the intended recipient's invite URL.
 
 QA/staging compute:
 

@@ -1,11 +1,11 @@
 export const policyPages = {
   about: {
-    metadataTitle: "About | The Label",
+    metadataTitle: "About | Neonfold",
     eyebrow: "About",
     title: "The store.",
-    description: "About The Label and the launch collection.",
+    description: "About Neonfold and the launch collection.",
     intro:
-      "The Label is a single-brand fashion storefront for premium western occasion wear in India.",
+      "Neonfold is a single-brand fashion storefront for premium western occasion wear in India.",
     sections: [
       {
         title: "Point of view",
@@ -22,10 +22,10 @@ export const policyPages = {
     ],
   },
   returns: {
-    metadataTitle: "Returns | The Label",
+    metadataTitle: "Returns | Neonfold",
     eyebrow: "Help",
     title: "Returns.",
-    description: "Returns and exchanges policy for The Label.",
+    description: "Returns and exchanges policy for Neonfold.",
     intro:
       "Return and exchange requests are reviewed with the order details, item condition, and delivery status in mind.",
     sections: [
@@ -44,10 +44,10 @@ export const policyPages = {
     ],
   },
   refundCancellation: {
-    metadataTitle: "Refunds and Cancellations | The Label",
+    metadataTitle: "Refunds and Cancellations | Neonfold",
     eyebrow: "Policy",
     title: "Refunds.",
-    description: "Refund and cancellation policy for The Label.",
+    description: "Refund and cancellation policy for Neonfold.",
     intro:
       "Refund and cancellation rules are kept explicit so order support stays clear after payment.",
     sections: [
@@ -66,10 +66,10 @@ export const policyPages = {
     ],
   },
   terms: {
-    metadataTitle: "Terms and Conditions | The Label",
+    metadataTitle: "Terms and Conditions | Neonfold",
     eyebrow: "Legal",
     title: "Terms.",
-    description: "Terms and conditions for using The Label storefront.",
+    description: "Terms and conditions for using Neonfold storefront.",
     intro:
       "These terms describe expected use of the storefront and how orders are handled.",
     sections: [
@@ -88,10 +88,10 @@ export const policyPages = {
     ],
   },
   privacy: {
-    metadataTitle: "Privacy Policy | The Label",
+    metadataTitle: "Privacy Policy | Neonfold",
     eyebrow: "Legal",
     title: "Privacy.",
-    description: "Privacy policy for The Label storefront.",
+    description: "Privacy policy for Neonfold storefront.",
     intro:
       "The storefront should collect only the information needed to browse, checkout, deliver orders, and support customers.",
     sections: [
@@ -110,10 +110,10 @@ export const policyPages = {
     ],
   },
   faq: {
-    metadataTitle: "FAQ | The Label",
+    metadataTitle: "FAQ | Neonfold",
     eyebrow: "Help",
     title: "FAQ.",
-    description: "Common questions about shopping from The Label.",
+    description: "Common questions about shopping from Neonfold.",
     intro: "A compact help page for common pre-purchase questions.",
     sections: [
       {

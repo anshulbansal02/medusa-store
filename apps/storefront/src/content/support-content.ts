@@ -1,7 +1,7 @@
 export const supportContent = {
   contact: {
     metadata: {
-      title: "Contact | The Label",
+      title: "Contact | Neonfold",
       description: "Contact the store team for order and product help.",
     },
     eyebrow: "Contact",
@@ -19,7 +19,7 @@ export const supportContent = {
   },
   shipping: {
     metadata: {
-      title: "Shipping | The Label",
+      title: "Shipping | Neonfold",
       description: "Shipping and delivery notes for India orders.",
     },
     eyebrow: "Delivery",
@@ -37,8 +37,8 @@ export const supportContent = {
   },
   wishlist: {
     metadata: {
-      title: "Wishlist | The Label",
-      description: "Review the styles you saved while browsing The Label.",
+      title: "Wishlist | Neonfold",
+      description: "Review the styles you saved while browsing Neonfold.",
     },
     eyebrow: "Saved styles",
     title: "Wishlist",

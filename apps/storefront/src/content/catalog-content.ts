@@ -1,7 +1,7 @@
 export const catalogContent = {
   shop: {
     metadata: {
-      title: "Shop New Arrivals | The Label",
+      title: "Shop New Arrivals | Neonfold",
       description:
         "Shop premium western occasion wear, dresses, co-ords, and statement tops for India.",
     },
@@ -96,7 +96,7 @@ export const catalogContent = {
     relatedAction: "View edit",
     breadcrumbLabel: "Breadcrumb",
     shopBreadcrumbLabel: "Shop",
-    notFoundTitle: "Product not found | The Label",
+    notFoundTitle: "Product not found | Neonfold",
     detailSectionLabels: {
       fabric: "Fabric",
       fit: "Fit",
@@ -119,7 +119,7 @@ export const catalogContent = {
   },
   search: {
     metadata: {
-      title: "Search | The Label",
+      title: "Search | Neonfold",
       description: "Search dresses, co-ords, tops, and occasion wear.",
     },
     eyebrow: "Search",

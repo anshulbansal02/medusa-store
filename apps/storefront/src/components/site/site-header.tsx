@@ -69,7 +69,7 @@ export async function SiteHeader() {
 
         <Link
           href="/"
-          className="font-heading text-2xl leading-none tracking-normal"
+          className="font-heading text-3xl leading-none tracking-normal"
         >
           {siteContent.brand.name}
         </Link>

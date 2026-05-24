@@ -354,7 +354,8 @@ Current state:
 - QA Lightsail, QA runtime SSM parameters, and QA deploy IAM are Terraform-managed.
 - Production Lightsail remains disabled and deleted until explicit production compute approval.
 - Production no-cost SSM scaffolding exists for `NODE_ENV`, `MEDUSA_WORKER_MODE`, `S3_REGION`, `JWT_SECRET`, and `COOKIE_SECRET` under `/ecom/prod/medusa`.
-- Production database, Redis, domain/CORS, media credentials, Razorpay, and Resend parameters are intentionally not created until their backing services and real values exist.
+- Production domain/CORS, database, Redis, and R2 runtime SSM parameters are Terraform-wired behind `enable_medusa_runtime_config = true`; keep the flag disabled until the backing services and real values are approved.
+- Production Razorpay and Resend runtime parameters remain gated by their integration runbooks and must use separate live values before production launch.
 
 Terraform-managed:
 

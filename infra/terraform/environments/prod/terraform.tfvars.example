@@ -2,6 +2,7 @@ aws_region  = "ap-southeast-1"
 aws_profile = "your-aws-profile"
 
 enable_medusa_lightsail = false
+enable_medusa_runtime_config = false
 
 # Set enable_medusa_lightsail = true only when production compute is approved.
 lightsail_availability_zone       = "ap-southeast-1a"
@@ -10,3 +11,21 @@ lightsail_bundle_id               = "medium_3_0"
 lightsail_ssh_public_key_path     = "~/.ssh/id_ed25519_ecom_lightsail.pub"
 lightsail_temporary_ssh_cidrs     = []
 lightsail_automatic_snapshot_time = "20:00"
+
+# Set enable_medusa_runtime_config = true only after production data services,
+# media credentials, and production domain decisions are approved.
+production_storefront_domain    = "www.example.com"
+production_medusa_api_domain    = "api.example.com"
+production_medusa_admin_domain  = "admin.example.com"
+production_media_domain         = "media.example.com"
+production_media_bucket_name    = "your-prod-media-bucket"
+cloudflare_r2_account_id        = "cloudflare-account-id"
+medusa_store_cors_base_origins  = []
+medusa_admin_cors_base_origins  = []
+medusa_auth_cors_base_origins   = []
+
+# Export secret values with TF_VAR_* or store them in ignored tfvars instead of committing them:
+# export TF_VAR_production_database_url="..."
+# export TF_VAR_production_redis_url="..."
+# export TF_VAR_production_r2_access_key_id="..."
+# export TF_VAR_production_r2_secret_access_key="..."

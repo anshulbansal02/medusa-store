@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "The Label",
+  name: "Neonfold",
   url: (
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://storefront.localhost"
   ).replace(/\/$/, ""),

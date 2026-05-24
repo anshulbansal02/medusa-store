@@ -1,6 +1,6 @@
 export const globalContent = {
   brand: {
-    name: "The Label",
+    name: "Neonfold",
     footerDescription:
       "Premium western occasion wear for India, built around newness, visual appeal, and a low-friction shopping flow.",
   },
@@ -30,6 +30,15 @@ export const globalContent = {
     },
   },
   footer: {
+    newsletter: {
+      eyebrow: "Newsletter",
+      title: "Subscribe for new drops and private offers.",
+      description:
+        "Be first to know when limited occasion pieces, styling notes, and store updates go live.",
+      emailLabel: "Email address",
+      emailPlaceholder: "Email",
+      submitLabel: "Subscribe",
+    },
     trustItems: [
       {
         icon: "shield",
