@@ -20,6 +20,16 @@ module "medusa_lightsail" {
   tags                    = local.tags
 }
 
+module "medusa_redis" {
+  source = "../../modules/upstash-redis"
+
+  database_name = "${var.project}-${var.environment}-medusa"
+  region        = var.upstash_redis_region
+  budget        = var.upstash_redis_budget
+  eviction      = false
+  auto_scale    = false
+}
+
 module "medusa_ssm_config" {
   source = "../../modules/ssm-config"
 
@@ -36,6 +46,12 @@ module "medusa_ssm_config" {
     S3_REGION = {
       value       = "auto"
       description = "S3-compatible region value used by Cloudflare R2."
+    }
+  }
+  secure_string_parameters = {
+    REDIS_URL = {
+      value       = module.medusa_redis.redis_url
+      description = "Redis TLS URL for the QA Medusa service."
     }
   }
   tags = local.tags

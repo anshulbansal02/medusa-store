@@ -28,3 +28,23 @@ output "medusa_ssm_string_parameter_names" {
   description = "QA Medusa non-secret SSM String parameter names."
   value       = module.medusa_ssm_config.string_parameter_names
 }
+
+output "medusa_ssm_secure_string_parameter_names" {
+  description = "QA Medusa secret SSM SecureString parameter names."
+  value       = module.medusa_ssm_config.secure_string_parameter_names
+}
+
+output "medusa_redis_database_id" {
+  description = "QA Medusa Upstash Redis database ID."
+  value       = module.medusa_redis.database_id
+}
+
+output "medusa_redis_database_name" {
+  description = "QA Medusa Upstash Redis database name."
+  value       = module.medusa_redis.database_name
+}
+
+output "medusa_redis_endpoint" {
+  description = "QA Medusa Upstash Redis endpoint."
+  value       = module.medusa_redis.endpoint
+}

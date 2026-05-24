@@ -9,3 +9,10 @@ output "string_parameter_names" {
     for key, parameter in aws_ssm_parameter.string : key => parameter.name
   }
 }
+
+output "secure_string_parameter_names" {
+  description = "Names of secret SSM SecureString parameters."
+  value = {
+    for key, parameter in aws_ssm_parameter.secure_string : key => parameter.name
+  }
+}

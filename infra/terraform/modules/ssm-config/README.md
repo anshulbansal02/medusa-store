@@ -1,8 +1,10 @@
 # SSM Config Module
 
-Creates environment-specific AWS SSM Parameter Store `String` parameters for
-non-secret runtime configuration.
+Creates environment-specific AWS SSM Parameter Store parameters for Medusa
+runtime configuration.
 
-Secret values are intentionally not managed by this module yet. Add real
-`SecureString` handling only after the first secret write/update workflow is
-reviewed with the target provider version and state behavior.
+Non-secret values use `String`. Secret values use `SecureString`.
+
+`SecureString` values are still present in Terraform state when managed through
+this module. Use only with the approved S3 remote state backend and treat state
+as secret-bearing.

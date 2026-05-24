@@ -7,3 +7,7 @@ lightsail_bundle_id               = "small_3_0"
 lightsail_ssh_public_key_path     = "~/.ssh/id_ed25519_ecom_lightsail.pub"
 lightsail_temporary_ssh_cidrs     = []
 lightsail_automatic_snapshot_time = "20:00"
+
+upstash_email        = "you@example.com"
+upstash_redis_region = "ap-southeast-1"
+upstash_redis_budget = 5

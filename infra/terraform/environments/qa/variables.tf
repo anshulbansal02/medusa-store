@@ -56,3 +56,26 @@ variable "lightsail_automatic_snapshot_time" {
   type        = string
   default     = "20:00"
 }
+
+variable "upstash_email" {
+  description = "Upstash account email for the Terraform provider. Prefer TF_VAR_upstash_email."
+  type        = string
+}
+
+variable "upstash_api_key" {
+  description = "Upstash API key for the Terraform provider. Prefer TF_VAR_upstash_api_key."
+  type        = string
+  sensitive   = true
+}
+
+variable "upstash_redis_region" {
+  description = "Upstash Redis region for QA."
+  type        = string
+  default     = "ap-southeast-1"
+}
+
+variable "upstash_redis_budget" {
+  description = "Monthly budget guardrail for QA Upstash Redis in USD."
+  type        = number
+  default     = 5
+}

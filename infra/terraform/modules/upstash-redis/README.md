@@ -1,4 +1,11 @@
-# upstash-redis
+# Upstash Redis Module
 
-Placeholder for separate production and QA Upstash Redis databases.
+Creates one Upstash Redis database for a single environment.
 
+Defaults are conservative for v1:
+
+- Singapore region: `ap-southeast-1`
+- TLS enabled
+- eviction disabled
+- auto-scale disabled
+- low monthly budget guardrail
