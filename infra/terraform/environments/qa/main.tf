@@ -111,6 +111,30 @@ module "medusa_ssm_config" {
       value       = local.medusa_r2_endpoint
       description = "Cloudflare R2 S3-compatible endpoint for QA Medusa media."
     }
+    STOREFRONT_URL = {
+      value       = "https://${var.qa_storefront_domain}"
+      description = "Canonical QA storefront URL used in transactional email links."
+    }
+    RESEND_FROM_EMAIL = {
+      value       = var.resend_from_email
+      description = "Default sender identity for QA Medusa transactional emails."
+    }
+    ADMIN_INVITE_FROM_EMAIL = {
+      value       = var.admin_invite_from_email
+      description = "Sender identity for QA Medusa Admin invite emails."
+    }
+    ORDER_FROM_EMAIL = {
+      value       = var.order_from_email
+      description = "Sender identity for QA customer order emails."
+    }
+    OWNER_ORDER_FROM_EMAIL = {
+      value       = var.owner_order_from_email
+      description = "Sender identity for QA owner order notification emails."
+    }
+    TRANSACTIONAL_REPLY_TO_EMAIL = {
+      value       = var.transactional_reply_to_email
+      description = "Reply-to mailbox for QA transactional email."
+    }
   }
   secure_string_parameters = {
     DATABASE_URL = {
@@ -128,6 +152,10 @@ module "medusa_ssm_config" {
     COOKIE_SECRET = {
       value       = random_password.medusa_cookie_secret.result
       description = "Cookie signing secret for the QA Medusa service."
+    }
+    RESEND_API_KEY = {
+      value       = var.resend_api_key
+      description = "Resend API key used by the QA Medusa notification provider."
     }
   }
   tags = local.tags

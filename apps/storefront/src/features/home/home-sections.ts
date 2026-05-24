@@ -4,4 +4,3 @@ export {
   NewArrivalsSection,
   OccasionEditSection,
 } from "@/features/home/home-product-sections";
-export { TrustStrip } from "@/features/home/home-trust-strip";

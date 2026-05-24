@@ -26,3 +26,11 @@ qa_medusa_admin_domain = "qa-admin.example.com"
 qa_media_domain        = "qa-media.example.com"
 qa_media_bucket_name   = "your-qa-media-bucket"
 cloudflare_r2_account_id = "cloudflare-account-id"
+
+# Export secret values with TF_VAR_* instead of committing them:
+# export TF_VAR_resend_api_key="..."
+resend_from_email             = "Store Admin <admin@mail.neonfold.com>"
+admin_invite_from_email       = "Store Admin <admin@mail.neonfold.com>"
+order_from_email              = "Store Team <orders@mail.neonfold.com>"
+owner_order_from_email        = "Store Admin <admin@mail.neonfold.com>"
+transactional_reply_to_email  = "support@mail.neonfold.com"

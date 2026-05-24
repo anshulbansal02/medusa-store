@@ -25,16 +25,27 @@ export async function SiteHeader() {
       label: category.name,
     })),
   ];
+  const announcement = siteContent.header.announcement;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-30 border-border/70 border-b bg-background/92 backdrop-blur-sm">
-      <div className="border-border/70 border-b px-4 py-2 text-micro uppercase tracking-label text-muted-foreground sm:px-6 sm:tracking-label-wide lg:px-8">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
-          {siteContent.header.announcementItems.map((item) => (
-            <span key={item}>{item}</span>
-          ))}
+    <header className="fixed inset-x-0 top-0 z-30 border-border/70 border-b bg-background/96 backdrop-blur-sm">
+      {announcement.enabled ? (
+        <div className="bg-announcement px-4 py-2 text-center text-micro font-medium uppercase tracking-label text-announcement-foreground sm:px-6 sm:tracking-label-wide lg:px-8">
+          <Link
+            href={announcement.href}
+            prefetch={false}
+            className="mx-auto flex max-w-[1440px] items-center justify-center gap-2 whitespace-nowrap"
+          >
+            <span>{announcement.label}</span>
+            <span className="hidden sm:inline" aria-hidden="true">
+              ·
+            </span>
+            <span className="hidden underline-offset-4 hover:underline sm:inline">
+              {announcement.linkLabel}
+            </span>
+          </Link>
         </div>
-      </div>
+      ) : null}
       <div className="mx-auto grid h-16 max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center lg:hidden">
           <MobileMenu navItems={navItems} />

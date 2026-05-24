@@ -14,15 +14,15 @@ resource "vercel_project" "storefront" {
 }
 
 resource "vercel_project_environment_variable" "variable" {
-  for_each = var.environment_variables
+  for_each = toset(keys(nonsensitive(var.environment_variables)))
 
   project_id = vercel_project.storefront.id
-  key        = each.value.key
-  value      = each.value.value
-  target     = each.value.target
-  sensitive  = each.value.sensitive
-  comment    = each.value.comment
-  git_branch = each.value.git_branch
+  key        = var.environment_variables[each.key].key
+  value      = var.environment_variables[each.key].value
+  target     = var.environment_variables[each.key].target
+  sensitive  = var.environment_variables[each.key].sensitive
+  comment    = var.environment_variables[each.key].comment
+  git_branch = var.environment_variables[each.key].git_branch
 }
 
 locals {

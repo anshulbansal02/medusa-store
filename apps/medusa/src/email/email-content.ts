@@ -3,6 +3,19 @@ export const emailContent = {
     name: "The Label",
     adminName: "The Label Admin",
   },
+  userInvited: {
+    heading: "Admin invite",
+    introPrefix: "You have been invited to manage",
+    introSuffix: "in Medusa Admin.",
+    action: "Accept invite",
+    expiry:
+      "For security, this invite link may expire. Ask the store owner to resend the invite if it no longer works.",
+    support:
+      "If you were not expecting this invite, you can ignore this email.",
+    preview: "Accept your Medusa Admin invite.",
+    subject: "Your Store Admin invite",
+    textFallback: "You have been invited to Medusa Admin: {inviteUrl}",
+  },
   orderPlaced: {
     customer: {
       heading: "Order confirmed",

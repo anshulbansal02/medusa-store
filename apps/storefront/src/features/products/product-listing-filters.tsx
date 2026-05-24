@@ -37,19 +37,19 @@ type ProductListingFiltersProps = {
 
 const content = siteContent.productListing;
 const allSelectValue = "__all";
-const colorSwatches = new Map(
+const colorSwatchClasses = new Map(
   [
-    ["black", "#201615"],
-    ["blush", "#e8b8b2"],
-    ["champagne", "#d8c3a6"],
-    ["cocoa", "#6d5044"],
-    ["emerald", "#0f6f55"],
-    ["ivory", "#f4eee4"],
-    ["midnight", "#16213d"],
-    ["pearl", "#efe9df"],
-    ["sage", "#a9b69f"],
-    ["sand", "#d8c7ad"],
-    ["wine", "#6f1f33"],
+    ["black", "bg-swatch-black"],
+    ["blush", "bg-swatch-blush"],
+    ["champagne", "bg-swatch-champagne"],
+    ["cocoa", "bg-swatch-cocoa"],
+    ["emerald", "bg-swatch-emerald"],
+    ["ivory", "bg-swatch-ivory"],
+    ["midnight", "bg-swatch-midnight"],
+    ["pearl", "bg-swatch-pearl"],
+    ["sage", "bg-swatch-sage"],
+    ["sand", "bg-swatch-sand"],
+    ["wine", "bg-swatch-wine"],
   ].map(([name, value]) => [name, value]),
 );
 
@@ -263,8 +263,10 @@ function FilterColor({
       )}
     >
       <span
-        className="size-4 shrink-0 border border-border"
-        style={{ backgroundColor: getColorSwatch(label) }}
+        className={cn(
+          "size-4 shrink-0 border border-border",
+          getColorSwatchClass(label),
+        )}
         aria-hidden="true"
       />
       <span className="min-w-0 truncate">{label}</span>
@@ -272,6 +274,8 @@ function FilterColor({
   );
 }
 
-function getColorSwatch(color: string) {
-  return colorSwatches.get(color.trim().toLowerCase()) ?? "#ded8cf";
+function getColorSwatchClass(color: string) {
+  return (
+    colorSwatchClasses.get(color.trim().toLowerCase()) ?? "bg-swatch-default"
+  );
 }

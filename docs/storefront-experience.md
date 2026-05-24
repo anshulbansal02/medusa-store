@@ -1,7 +1,7 @@
 # Storefront Experience
 
 Status: canonical v1 storefront direction
-Last reviewed: 2026-05-15
+Last reviewed: 2026-05-24
 
 ## Brand And Audience
 
@@ -22,13 +22,13 @@ Design defaults:
 - Clean sans-serif for body/UI.
 - Brand-controlled light theme only.
 - Tailwind CSS v4 design tokens for colors, typography, spacing, radius, and layout.
-- Warm white / soft black base.
+- White page canvas with soft black type.
 - One or two muted accents from brand colors.
 - Spacious but not empty layouts.
 - Large product imagery.
 - Thin borders and restrained dividers.
 - Refined product cards.
-- Compact trust/announcement strip when it carries useful operational promises.
+- Compact single-message announcement strip when it carries useful operational promises; do not use it as a generic trust checklist.
 - Product-led editorial hero with live catalog imagery, not decorative illustration.
 - Calm, polished forms and checkout.
 - `lucide-react` outline icons for UI actions, inheriting `currentColor` with consistent refined stroke width.

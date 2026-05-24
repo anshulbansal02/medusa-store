@@ -45,7 +45,8 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
 
     const notifications = transform({ orders }, ({ orders }) => {
       const order = orders[0];
-      const ownerEmail = getEmailConfig().ownerOrderEmail;
+      const emailConfig = getEmailConfig();
+      const ownerEmail = emailConfig.ownerOrderEmail;
       const baseNotification = {
         channel: "email",
         data: {
@@ -66,6 +67,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
                   email_idempotency_key: `order-placed-customer-${order.id}`,
                 },
                 to: order.email,
+                from: emailConfig.orderFrom,
                 template: transactionalEmailTemplates.orderPlaced,
                 idempotency_key: `order-placed-customer-${order.id}`,
               },
@@ -80,6 +82,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
                   email_idempotency_key: `order-placed-owner-${order.id}`,
                 },
                 to: ownerEmail,
+                from: emailConfig.ownerOrderFrom ?? emailConfig.adminInviteFrom,
                 template: transactionalEmailTemplates.ownerOrderPlaced,
                 idempotency_key: `order-placed-owner-${order.id}`,
               },

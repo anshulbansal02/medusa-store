@@ -52,23 +52,6 @@ export const homeContent = {
       "Measurements, fabric, care, and fit notes stay close to the add-to-bag flow, so customers can decide with confidence.",
     primaryAction: "Shop new arrivals",
   },
-  trustItems: [
-    {
-      icon: "shield",
-      title: "Secure prepaid checkout",
-      text: "Razorpay-powered payment after address and shipping.",
-    },
-    {
-      icon: "truck",
-      title: "India shipping",
-      text: "Simple dispatch updates from the store team.",
-    },
-    {
-      icon: "ruler",
-      title: "Size support",
-      text: "Fit notes and product-level size details where available.",
-    },
-  ],
 } as const;
 
 export type HomeContent = typeof homeContent;

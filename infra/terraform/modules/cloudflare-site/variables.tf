@@ -11,12 +11,13 @@ variable "zone_id" {
 variable "dns_records" {
   description = "DNS records to manage in the Cloudflare zone."
   type = map(object({
-    name    = string
-    type    = string
-    content = string
-    proxied = optional(bool)
-    ttl     = optional(number, 1)
-    comment = optional(string)
+    name     = string
+    type     = string
+    content  = string
+    proxied  = optional(bool)
+    priority = optional(number)
+    ttl      = optional(number, 1)
+    comment  = optional(string)
   }))
   default = {}
 }

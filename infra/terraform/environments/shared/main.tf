@@ -136,7 +136,7 @@ module "vercel_storefront_qa" {
       }
       qa_medusa_publishable_key = {
         key       = "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY"
-        value     = var.vercel_storefront_qa_medusa_publishable_key
+        value     = nonsensitive(var.vercel_storefront_qa_medusa_publishable_key)
         target    = ["production"]
         sensitive = false
         comment   = "QA Medusa publishable API key for storefront deployments."
@@ -258,6 +258,35 @@ module "cloudflare_site" {
       content = var.qa_medusa_static_ip
       proxied = true
       comment = "QA Medusa Admin on AWS Lightsail. Terraform-managed."
+    }
+    resend_transactional_dkim = {
+      name    = "resend._domainkey.${var.transactional_email_domain}"
+      type    = "TXT"
+      content = "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCl+kQJNEHJ+F72Apedb4L/h/9KQ1ePUVLnFM5EzkKBTps6XD2KIdWbZ/yvrjxV35hDJsTrtssbLUXG/EaXbIKRDT6DxFLWgKqYVVh1bgLeihpUPouxrTZG4yPg8eTaNmtnKDRjr9p5jZ7nvZpC0i4pna73w8hcv/RcRnbMLVxiQIDAQAB"
+      proxied = false
+      comment = "Resend DKIM public key for transactional email. Terraform-managed."
+    }
+    resend_transactional_return_path_mx = {
+      name     = "send.${var.transactional_email_domain}"
+      type     = "MX"
+      content  = "feedback-smtp.ap-northeast-1.amazonses.com"
+      priority = 10
+      proxied  = false
+      comment  = "Resend return-path MX for transactional email bounces. Terraform-managed."
+    }
+    resend_transactional_return_path_spf = {
+      name    = "send.${var.transactional_email_domain}"
+      type    = "TXT"
+      content = "v=spf1 include:amazonses.com ~all"
+      proxied = false
+      comment = "Resend SPF authorization for transactional email return path. Terraform-managed."
+    }
+    resend_transactional_dmarc = {
+      name    = "_dmarc.${var.transactional_email_domain}"
+      type    = "TXT"
+      content = "v=DMARC1; p=quarantine; adkim=s; aspf=s; pct=100"
+      proxied = false
+      comment = "DMARC enforcement for the Resend transactional email subdomain. Terraform-managed."
     }
   }
   r2_buckets          = local.cloudflare_r2_buckets

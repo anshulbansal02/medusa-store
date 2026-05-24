@@ -164,7 +164,10 @@ export function getR2Config(env: BackendEnv = process.env): R2Config {
 
 export function getEmailConfig(env: BackendEnv = process.env) {
   return {
+    adminInviteFrom: readConfigured(env.ADMIN_INVITE_FROM_EMAIL),
     ownerOrderEmail: readConfigured(env.OWNER_ORDER_EMAIL),
+    ownerOrderFrom: readConfigured(env.OWNER_ORDER_FROM_EMAIL),
+    orderFrom: readConfigured(env.ORDER_FROM_EMAIL),
     storefrontUrl: readConfigured(env.STOREFRONT_URL ?? env.NEXT_PUBLIC_SITE_URL),
     replyTo: readConfigured(
       env.TRANSACTIONAL_REPLY_TO_EMAIL ?? env.RESEND_REPLY_TO_EMAIL,

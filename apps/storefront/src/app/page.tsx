@@ -8,7 +8,6 @@ import {
   HeroSection,
   NewArrivalsSection,
   OccasionEditSection,
-  TrustStrip,
 } from "@/features/home/home-sections";
 import { absoluteUrl } from "@/lib/config/site";
 import { getHomeProducts } from "@/lib/medusa/products";
@@ -58,7 +57,6 @@ export default async function Home() {
       <NewArrivalsSection content={content} products={newArrivalProducts} />
       <OccasionEditSection content={content} products={occasionProducts} />
       <FitSupportSection content={content} product={fitSupportProduct} />
-      <TrustStrip content={content} />
       <SiteFooter />
     </main>
   );

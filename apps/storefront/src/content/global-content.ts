@@ -5,7 +5,12 @@ export const globalContent = {
       "Premium western occasion wear for India, built around newness, visual appeal, and a low-friction shopping flow.",
   },
   header: {
-    announcementItems: ["India shipping", "Prepaid checkout", "Size support"],
+    announcement: {
+      enabled: true,
+      label: "New drops ship across India",
+      href: "/shipping",
+      linkLabel: "Shipping details",
+    },
     primaryShopLabel: "New Arrivals",
     primaryNavigationLabel: "Primary navigation",
     mobileMenu: {
@@ -25,6 +30,23 @@ export const globalContent = {
     },
   },
   footer: {
+    trustItems: [
+      {
+        icon: "shield",
+        title: "Secure prepaid checkout",
+        text: "Pay safely with Razorpay after your address and shipping details are confirmed.",
+      },
+      {
+        icon: "truck",
+        title: "India-wide delivery",
+        text: "Trackable dispatch updates from our store team once your order is on its way.",
+      },
+      {
+        icon: "ruler",
+        title: "Fit and size support",
+        text: "Measurements and fit notes stay close to each style so you can choose with confidence.",
+      },
+    ],
     sections: [
       {
         title: "Shop",

@@ -1,13 +1,14 @@
 resource "cloudflare_dns_record" "record" {
   for_each = var.dns_records
 
-  zone_id = var.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  content = each.value.content
-  proxied = each.value.proxied
-  ttl     = each.value.ttl
-  comment = each.value.comment
+  zone_id  = var.zone_id
+  name     = each.value.name
+  type     = each.value.type
+  content  = each.value.content
+  proxied  = each.value.proxied
+  priority = each.value.priority
+  ttl      = each.value.ttl
+  comment  = each.value.comment
 }
 
 resource "cloudflare_r2_bucket" "bucket" {

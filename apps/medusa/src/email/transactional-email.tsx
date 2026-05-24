@@ -7,6 +7,10 @@ import {
   type OrderPlacedEmailData,
   OwnerOrderPlacedEmail,
 } from "./templates/order-placed";
+import {
+  UserInvitedEmail,
+  type UserInvitedEmailData,
+} from "./templates/user-invited";
 import { transactionalEmailTemplates } from "./template-ids";
 import { getEmailConfig } from "../config/env";
 import { emailContent } from "./email-content";
@@ -36,6 +40,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isOrderPlacedEmailData(value: unknown): value is OrderPlacedEmailData {
   return isRecord(value);
+}
+
+function isUserInvitedEmailData(value: unknown): value is UserInvitedEmailData {
+  return (
+    isRecord(value) &&
+    typeof value.invite_url === "string" &&
+    value.invite_url.length > 0
+  );
 }
 
 function getSiteUrl() {
@@ -93,6 +105,19 @@ function createOrderMetadata({
       { name: "audience", value: audience },
       { name: "order_id", value: toTagValue(order.id) },
       { name: "currency", value: toTagValue(order.currency_code ?? "inr") },
+    ],
+  };
+}
+
+function createUserInvitedMetadata() {
+  return {
+    headers: {
+      "X-Entity-Ref-ID": "admin-invite",
+      "X-The-Label-Template": transactionalEmailTemplates.userInvited,
+    },
+    tags: [
+      { name: "template", value: transactionalEmailTemplates.userInvited },
+      { name: "audience", value: "admin" },
     ],
   };
 }
@@ -193,10 +218,40 @@ async function buildOwnerOrderPlacedEmail(
   };
 }
 
+async function buildUserInvitedEmail(
+  invite: UserInvitedEmailData,
+): Promise<TransactionalEmailContent> {
+  const inviteUrl = invite.invite_url!;
+  const { html, text } = await renderEmail(
+    <UserInvitedEmail inviteUrl={inviteUrl} email={invite.email} />,
+  );
+  const textFallback = interpolateEmailText(
+    emailContent.userInvited.textFallback,
+    {
+      inviteUrl,
+    },
+  );
+
+  return {
+    subject: emailContent.userInvited.subject,
+    html,
+    text: text || textFallback,
+    replyTo: getReplyTo(),
+    ...createUserInvitedMetadata(),
+  };
+}
+
 export async function renderTransactionalEmail({
   template,
   data,
 }: TransactionalEmailInput): Promise<TransactionalEmailContent | null> {
+  if (
+    template === transactionalEmailTemplates.userInvited &&
+    isUserInvitedEmailData(data)
+  ) {
+    return buildUserInvitedEmail(data);
+  }
+
   const order = data?.order;
 
   if (!isOrderPlacedEmailData(order)) {

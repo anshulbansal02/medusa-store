@@ -136,6 +136,12 @@ variable "qa_media_domain" {
   default     = "qa-media.example.com"
 }
 
+variable "transactional_email_domain" {
+  description = "Verified Resend transactional email sending subdomain."
+  type        = string
+  default     = "mail.neonfold.com"
+}
+
 variable "qa_medusa_static_ip" {
   description = "QA Medusa Lightsail static public IP used for Cloudflare DNS. Pass the real value through ignored tfvars or TF_VAR_qa_medusa_static_ip."
   type        = string
