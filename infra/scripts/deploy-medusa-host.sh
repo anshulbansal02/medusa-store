@@ -58,20 +58,11 @@ url_to_host() {
   fi
 }
 
-caddy_sites=()
-for url in "$(read_env_value MEDUSA_BACKEND_URL)" "$(read_env_value MEDUSA_ADMIN_URL)"; do
-  host="$(url_to_host "${url}")"
-  if [[ -n "${host}" && ! " ${caddy_sites[*]} " =~ " ${host} " ]]; then
-    caddy_sites+=("${host}")
-  fi
-done
-
-caddy_site=":80"
-if [[ "${#caddy_sites[@]}" -gt 0 ]]; then
-  caddy_site="${caddy_sites[0]}"
-  for ((i = 1; i < ${#caddy_sites[@]}; i++)); do
-    caddy_site="${caddy_site}, ${caddy_sites[$i]}"
-  done
+backend_host="$(url_to_host "$(read_env_value MEDUSA_BACKEND_URL)")"
+admin_host="$(url_to_host "$(read_env_value MEDUSA_ADMIN_URL)")"
+admin_path="$(read_env_value ADMIN_PATH)"
+if [[ -z "${admin_path}" ]]; then
+  admin_path="/app"
 fi
 
 docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" --profile migrate run --rm medusa-migrate
@@ -82,12 +73,34 @@ sudo tee /etc/caddy/Caddyfile >/dev/null <<'EOF'
   admin localhost:2019
 }
 EOF
-sudo tee -a /etc/caddy/Caddyfile >/dev/null <<EOF
 
-${caddy_site} {
+if [[ -n "${backend_host}" ]]; then
+  sudo tee -a /etc/caddy/Caddyfile >/dev/null <<EOF
+
+${backend_host} {
   reverse_proxy 127.0.0.1:29181
 }
 EOF
+fi
+
+if [[ -n "${admin_host}" && "${admin_host}" != "${backend_host}" ]]; then
+  sudo tee -a /etc/caddy/Caddyfile >/dev/null <<EOF
+
+${admin_host} {
+  redir / ${admin_path} 308
+  reverse_proxy 127.0.0.1:29181
+}
+EOF
+fi
+
+if [[ -z "${backend_host}" && -z "${admin_host}" ]]; then
+  sudo tee -a /etc/caddy/Caddyfile >/dev/null <<'EOF'
+
+:80 {
+  reverse_proxy 127.0.0.1:29181
+}
+EOF
+fi
 sudo caddy fmt --overwrite /etc/caddy/Caddyfile
 sudo caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl reload caddy

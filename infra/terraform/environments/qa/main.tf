@@ -96,8 +96,8 @@ module "medusa_ssm_config" {
       description = "Externally reachable QA Medusa Admin URL."
     }
     ADMIN_PATH = {
-      value       = "/"
-      description = "Medusa Admin UI path for the dedicated QA admin hostname."
+      value       = "/app"
+      description = "Medusa Admin UI path. Caddy redirects the dedicated admin hostname root to this path."
     }
     S3_FILE_URL = {
       value       = local.medusa_r2_file_url

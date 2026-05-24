@@ -583,7 +583,7 @@ Current status:
 - Better Stack is the v1 observability provider for uptime, logs, alerts, and error tracking. Sentry is deferred unless Better Stack proves insufficient after QA or early production usage.
 - Better Stack Telemetry source `ecom-qa-medusa-logs` exists with source ID `2461802`; its token is stored in SSM `/ecom/qa/host/BETTER_STACK_SOURCE_TOKEN`.
 - Vector is configured on QA with the Better Stack-generated Ubuntu/Docker config. Docker log collection requires the `vector` service user to be in the `docker` group, and host log file access uses the `adm` group.
-- QA `ADMIN_PATH=/` is stored in SSM and Medusa config supports `admin.path`; the root-path Admin change takes effect after the next QA Medusa image build/deploy.
+- QA `ADMIN_PATH=/app` is stored in SSM. Medusa `admin.path = "/"` is not used for QA because it made API `/health` and `/ready` return Admin HTML; instead Caddy redirects the dedicated admin hostname root to `/app`.
 - Alert delivery test and error-tracking applications remain pending.
 
 Terraform-managed where stable:
