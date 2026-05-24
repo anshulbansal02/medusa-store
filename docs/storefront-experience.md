@@ -381,6 +381,15 @@ Required:
 - Skeletons or stable placeholders for loading.
 - Inline, specific form errors.
 
+Loading-state rules:
+
+- Use Next.js App Router `loading.tsx` segment fallbacks for route transitions.
+- Keep loading UI server-rendered unless an interaction specifically needs a client boundary.
+- Match the destination layout closely enough to avoid jumpy transitions.
+- Use the shadcn Skeleton primitive and brand tokens rather than custom spinners.
+- Keep shared-looking storefront chrome lightweight in fallbacks; do not block loading UI on Medusa cart/search data.
+- Use subtle inline pending hints for non-prefetched links only when they do not change layout.
+
 ## Accessibility
 
 - Use semantic HTML and landmarks.

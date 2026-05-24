@@ -50,7 +50,7 @@ Rules:
 
 ## Medusa Runtime Access Controls
 
-Production Medusa compute runs on AWS Lightsail. GitHub Actions fetches runtime config/secrets from AWS SSM Parameter Store and writes runtime env files during deploy.
+When production Medusa compute is enabled, it runs on AWS Lightsail. GitHub Actions fetches runtime config/secrets from AWS SSM Parameter Store and writes runtime env files during deploy.
 
 Rules:
 
@@ -110,9 +110,9 @@ Current shared operator parameters:
 - `/ecom/shared/operator/medusa/qa_admin_email`
 - `/ecom/shared/operator/medusa/qa_admin_password`
 
-QA Medusa email parameters managed under `/ecom/qa/medusa/*`:
+QA Medusa email parameters managed under `/ecom/qa/medusa/*` when QA email is enabled:
 
-- `RESEND_API_KEY` as `SecureString`.
+- `RESEND_API_KEY` as `SecureString` when `resend_api_key` is provided.
 - `RESEND_FROM_EMAIL`.
 - `ADMIN_INVITE_FROM_EMAIL`.
 - `ORDER_FROM_EMAIL`.
@@ -128,6 +128,21 @@ QA Medusa deploy requires these GitHub `qa` environment values:
   - `QA_LIGHTSAIL_SSH_KNOWN_HOSTS`: pinned SSH known-hosts line for the QA host.
 - Secrets:
   - `QA_LIGHTSAIL_SSH_PRIVATE_KEY`: private key matching the QA Lightsail authorized public key.
+  - `TS_OAUTH_CLIENT_ID`: Tailscale federated identity client ID.
+  - `TS_AUDIENCE`: Tailscale federated identity audience.
+
+Production Medusa deploy is not enabled while production compute is deferred.
+The production AWS deploy role is also disabled by default in shared Terraform
+through `create_prod_deploy_role = false`. When production compute and runtime
+config are explicitly approved, enable that role and add a separate protected
+production deploy path that uses these GitHub `production` environment values:
+
+- Variables:
+  - `AWS_DEPLOY_ROLE_ARN`: `arn:aws:iam::123456789012:role/ecom-prod-github-actions-deploy`.
+  - `PROD_LIGHTSAIL_TAILSCALE_HOST`: production host Tailscale IP or MagicDNS name.
+  - `PROD_LIGHTSAIL_SSH_KNOWN_HOSTS`: pinned SSH known-hosts line for the production host.
+- Secrets:
+  - `PROD_LIGHTSAIL_SSH_PRIVATE_KEY`: private key matching the production Lightsail authorized public key.
   - `TS_OAUTH_CLIENT_ID`: Tailscale federated identity client ID.
   - `TS_AUDIENCE`: Tailscale federated identity audience.
 
@@ -187,7 +202,8 @@ R2:
 Resend:
 
 - QA transactional email sends from the verified subdomain `mail.neonfold.com`.
-- Cloudflare DNS is Terraform-managed for Resend DKIM, return-path MX, return-path SPF, and DMARC.
+- Cloudflare DNS for Resend DKIM, return-path MX, return-path SPF, and DMARC is Terraform-wired but disabled by default through `resend_dns_enabled = false`.
+- Enable `resend_dns_enabled` only when the Resend sender-domain values have been verified for the active account/domain.
 - DMARC is enforced on the sending subdomain with strict DKIM/SPF alignment and quarantine policy.
 - Do not enable click/open tracking for admin invites or v1 transactional email unless there is a clear operational need.
 - Keep invite tokens out of logs, tags, headers, and docs. Invite tokens may appear only in the intended recipient's invite URL.
@@ -195,8 +211,8 @@ Resend:
 QA/staging compute:
 
 - QA Medusa runs on a separate QA Lightsail instance during the QA-first setup.
-- QA containers must stay stopped by default.
-- QA must use separate secrets from production even when sharing compute.
+- Stop or delete QA compute when not actively testing; do not keep QA running as a substitute for production.
+- QA must use separate secrets from production.
 
 ## Rotation
 

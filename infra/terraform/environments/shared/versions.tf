@@ -12,11 +12,6 @@ terraform {
       version = "= 5.19.1"
     }
 
-    upstash = {
-      source  = "upstash/upstash"
-      version = "= 2.1.0"
-    }
-
     vercel = {
       source  = "vercel/vercel"
       version = "= 5.3.0"

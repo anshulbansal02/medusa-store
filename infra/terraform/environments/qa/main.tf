@@ -136,27 +136,31 @@ module "medusa_ssm_config" {
       description = "Reply-to mailbox for QA transactional email."
     }
   }
-  secure_string_parameters = {
-    DATABASE_URL = {
-      value       = module.medusa_postgres.qa_database_url
-      description = "PostgreSQL URL for the QA Medusa service."
-    }
-    REDIS_URL = {
-      value       = module.medusa_redis.redis_url
-      description = "Redis TLS URL for the QA Medusa service."
-    }
-    JWT_SECRET = {
-      value       = random_password.medusa_jwt_secret.result
-      description = "JWT signing secret for the QA Medusa service."
-    }
-    COOKIE_SECRET = {
-      value       = random_password.medusa_cookie_secret.result
-      description = "Cookie signing secret for the QA Medusa service."
-    }
-    RESEND_API_KEY = {
-      value       = var.resend_api_key
-      description = "Resend API key used by the QA Medusa notification provider."
-    }
-  }
+  secure_string_parameters = merge(
+    {
+      DATABASE_URL = {
+        value       = module.medusa_postgres.qa_database_url
+        description = "PostgreSQL URL for the QA Medusa service."
+      }
+      REDIS_URL = {
+        value       = module.medusa_redis.redis_url
+        description = "Redis TLS URL for the QA Medusa service."
+      }
+      JWT_SECRET = {
+        value       = random_password.medusa_jwt_secret.result
+        description = "JWT signing secret for the QA Medusa service."
+      }
+      COOKIE_SECRET = {
+        value       = random_password.medusa_cookie_secret.result
+        description = "Cookie signing secret for the QA Medusa service."
+      }
+    },
+    var.resend_api_key == null ? {} : {
+      RESEND_API_KEY = {
+        value       = var.resend_api_key
+        description = "Resend API key used by the QA Medusa notification provider when email is enabled."
+      }
+    },
+  )
   tags = local.tags
 }

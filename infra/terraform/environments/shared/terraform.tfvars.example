@@ -3,6 +3,7 @@ aws_profile = "your-aws-profile"
 
 github_owner = "your-github-owner"
 github_repo  = "your-github-repo"
+create_prod_deploy_role = false
 
 # Prefer TF_VAR_vercel_api_token in the shell instead of committing this.
 vercel_api_token = "vercel-token"
@@ -27,6 +28,7 @@ production_medusa_admin_domain = "admin.example.com"
 production_media_domain       = "media.example.com"
 qa_media_domain               = "qa-media.example.com"
 transactional_email_domain    = "mail.neonfold.com"
+resend_dns_enabled            = false
 qa_medusa_static_ip           = "203.0.113.10"
 
 # Prefer CLOUDFLARE_API_TOKEN in the shell instead of committing it.

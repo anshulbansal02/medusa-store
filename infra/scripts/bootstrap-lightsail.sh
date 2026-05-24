@@ -123,6 +123,17 @@ systemctl reload caddy || systemctl restart caddy
 systemctl enable tailscaled
 systemctl start tailscaled
 
+ufw --force reset
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw allow in on tailscale0
+if [[ "${ALLOW_TEMPORARY_PUBLIC_SSH:-true}" == "true" ]]; then
+  ufw allow 22/tcp
+fi
+ufw --force enable
+
 # Vector is installed during bootstrap. Keep it stopped until the Better Stack
 # source token and final config are available from SSM.
 usermod -aG docker,adm vector || true

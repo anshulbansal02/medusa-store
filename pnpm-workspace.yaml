@@ -16,11 +16,11 @@ allowBuilds:
   unrs-resolver: true
 
 overrides:
-  "@mikro-orm/cli": 6.6.14
-  "@mikro-orm/core": 6.6.14
-  "@mikro-orm/knex": 6.6.14
-  "@mikro-orm/migrations": 6.6.14
-  "@mikro-orm/postgresql": 6.6.14
+  "@mikro-orm/cli": 6.6.12
+  "@mikro-orm/core": 6.6.12
+  "@mikro-orm/knex": 6.6.12
+  "@mikro-orm/migrations": 6.6.12
+  "@mikro-orm/postgresql": 6.6.12
   "@opentelemetry/exporter-prometheus": 0.217.0
   "@opentelemetry/sdk-node": 0.217.0
   ajv: 8.20.0

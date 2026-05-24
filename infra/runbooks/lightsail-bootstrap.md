@@ -19,6 +19,9 @@ scp -i ~/.ssh/id_ed25519_ecom_lightsail infra/scripts/bootstrap-lightsail.sh ubu
 ssh -i ~/.ssh/id_ed25519_ecom_lightsail ubuntu@<qa-public-ip> 'sudo bash /tmp/bootstrap-lightsail.sh'
 ```
 
+The bootstrap configures UFW with public `80/443`, Tailscale ingress, and
+temporary public `22/tcp` so the initial SSH session can finish.
+
 Then connect the host to Tailscale:
 
 ```sh
@@ -49,6 +52,13 @@ mise exec -- terraform -chdir=infra/terraform/environments/qa plan \
 ```
 
 Review and apply that plan only after Tailscale access works.
+
+Then remove the host-level temporary SSH allowance; Tailscale SSH remains
+allowed through the `tailscale0` interface rule:
+
+```sh
+ssh ubuntu@<tailscale-ip-or-magicdns-name> 'sudo ufw delete allow 22/tcp || true; sudo ufw status verbose'
+```
 
 Current QA has already been bootstrapped and public SSH is closed. Routine SSH:
 

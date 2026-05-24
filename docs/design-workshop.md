@@ -82,8 +82,8 @@ Use this file for future high-level design discussions. When a decision becomes 
   - Production storefront manual deploy from `main`.
 - Medusa:
   - Production Medusa runs on AWS Lightsail Singapore.
-  - QA Medusa may share the production Lightsail instance, but stays stopped by default.
-  - Production deploys from `main` are manual workflow dispatch for v1.
+  - QA Medusa runs separately first; production Medusa compute remains deferred until QA setup and testing are complete.
+  - Production Medusa deploy remains deferred until production compute and full runtime config are approved.
 - Data:
   - Production Postgres uses Neon Singapore.
   - QA Postgres uses a Neon branch with separate credentials.

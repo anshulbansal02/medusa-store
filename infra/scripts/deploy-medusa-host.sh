@@ -38,9 +38,9 @@ chmod 0600 "${release_env}"
 
 read_env_value() {
   local key="$1"
-  awk -F= -v key="${key}" '$1 == key { print $2; exit }' "${ENV_FILE}" \
+  awk -v key="${key}" 'index($0, key "=") == 1 { print substr($0, length(key) + 2); exit }' "${ENV_FILE}" \
     | tr -d '\r' \
-    | sed -e 's/^"//' -e 's/"$//'
+    | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"
 }
 
 for key in "${required_env_keys[@]}"; do
@@ -58,6 +58,22 @@ url_to_host() {
   fi
 }
 
+validate_caddy_host() {
+  local host="$1"
+  if [[ ! "${host}" =~ ^[A-Za-z0-9.-]+(:[0-9]{1,5})?$ ]]; then
+    echo "Invalid Caddy hostname derived from Medusa URL: ${host}" >&2
+    exit 1
+  fi
+}
+
+validate_admin_path() {
+  local path="$1"
+  if [[ ! "${path}" =~ ^/[A-Za-z0-9._~/%-]*$ ]]; then
+    echo "Invalid ADMIN_PATH for Caddy redirect: ${path}" >&2
+    exit 1
+  fi
+}
+
 backend_host="$(url_to_host "$(read_env_value MEDUSA_BACKEND_URL)")"
 admin_host="$(url_to_host "$(read_env_value MEDUSA_ADMIN_URL)")"
 admin_path="$(read_env_value ADMIN_PATH)"
@@ -69,6 +85,11 @@ if [[ -z "${backend_host}" ]]; then
   echo "MEDUSA_BACKEND_URL must be an https URL with a hostname." >&2
   exit 1
 fi
+validate_caddy_host "${backend_host}"
+if [[ -n "${admin_host}" ]]; then
+  validate_caddy_host "${admin_host}"
+fi
+validate_admin_path "${admin_path}"
 
 docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" --profile migrate run --rm medusa-migrate
 docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" up -d medusa-server medusa-worker

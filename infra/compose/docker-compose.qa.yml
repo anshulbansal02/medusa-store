@@ -2,6 +2,8 @@ services:
   medusa-server:
     image: ${MEDUSA_IMAGE:?Set MEDUSA_IMAGE to the immutable GHCR image tag}
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     env_file:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
     environment:
@@ -28,6 +30,8 @@ services:
   medusa-worker:
     image: ${MEDUSA_IMAGE:?Set MEDUSA_IMAGE to the immutable GHCR image tag}
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     env_file:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
     environment:
@@ -43,6 +47,8 @@ services:
     image: ${MEDUSA_IMAGE:?Set MEDUSA_IMAGE to the immutable GHCR image tag}
     profiles:
       - migrate
+    security_opt:
+      - no-new-privileges:true
     env_file:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
     environment:

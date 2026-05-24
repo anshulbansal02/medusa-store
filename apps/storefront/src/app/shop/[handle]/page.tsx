@@ -142,19 +142,6 @@ async function CollectionRoute({
   );
 }
 
-function splitProductName(name: string): Array<{ key: string; word: string }> {
-  const words: Array<{ key: string; word: string }> = [];
-  let cursor = 0;
-
-  for (const word of name.split(" ")) {
-    const wordStart = name.indexOf(word, cursor);
-    words.push({ key: `${wordStart}-${word}`, word });
-    cursor = wordStart + word.length + 1;
-  }
-
-  return words;
-}
-
 function ProductRouteContent({
   product,
   relatedProducts,
@@ -164,7 +151,6 @@ function ProductRouteContent({
 }) {
   const primaryCategory = product.categories[0];
   const productJsonLd = createProductJsonLd(product);
-  const productNameWords = splitProductName(product.name);
   const content = siteContent.product;
 
   return (
@@ -179,13 +165,13 @@ function ProductRouteContent({
       <SiteHeader />
 
       <section className="px-4 pt-24 pb-28 sm:px-6 sm:pt-28 sm:pb-20 lg:px-8">
-        <div className="mx-auto grid max-w-[1440px] gap-10 lg:grid-cols-[1.08fr_0.92fr] xl:gap-14">
+        <div className="mx-auto grid max-w-[1440px] min-w-0 gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] xl:gap-14">
           <ProductGallery images={product.images} productName={product.name} />
 
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
             <nav
               aria-label={content.breadcrumbLabel}
-              className="mb-6 flex items-center gap-2 text-muted-foreground text-sm"
+              className="mb-6 flex min-w-0 flex-wrap items-center gap-2 text-muted-foreground text-sm"
             >
               <Link
                 href="/shop"
@@ -195,7 +181,9 @@ function ProductRouteContent({
                 {content.shopBreadcrumbLabel}
               </Link>
               <span aria-hidden="true">/</span>
-              <span className="text-foreground">{product.name}</span>
+              <span className="min-w-0 break-words text-foreground">
+                {product.name}
+              </span>
             </nav>
 
             <div className="border-border border-b pb-6">
@@ -203,13 +191,8 @@ function ProductRouteContent({
                 {content.statusLabel}
               </p>
               <div className="mt-3 flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-6">
-                <h1 className="font-heading text-5xl leading-none sm:text-6xl">
-                  {productNameWords.map((part, index) => (
-                    <span key={part.key} className="whitespace-nowrap">
-                      {part.word}
-                      {index < productNameWords.length - 1 ? " " : ""}
-                    </span>
-                  ))}
+                <h1 className="min-w-0 break-words font-heading text-5xl leading-none sm:text-6xl [overflow-wrap:anywhere]">
+                  {product.name}
                 </h1>
                 <p className="shrink-0 pt-1 font-medium">{product.price}</p>
               </div>

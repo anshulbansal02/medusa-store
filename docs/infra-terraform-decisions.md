@@ -370,7 +370,7 @@ Options:
 
 Decision:
 
-- Start with controlled Docker Compose deploys from GitHub Actions.
+- After production compute and full runtime config are approved, start with controlled Docker Compose deploys from GitHub Actions.
 - Require immutable image tags, a Medusa server health check, and a rollback runbook.
 - Deploy the worker with normal Compose restart semantics.
 - Treat `docker-rollout` as the planned lightweight upgrade for near-zero-downtime `medusa-server` deploys after the baseline deploy path is stable.
@@ -507,7 +507,7 @@ Decision:
 - Prefer write-only SSM value support where available.
 - Accept that Terraform remote state may contain secret values.
 - Treat Terraform remote state as a secret-bearing artifact.
-- GitHub Actions fetches SSM parameters during deploy and writes `.env.prod` / `.env.qa` to Lightsail over Tailscale SSH.
+- GitHub Actions fetches SSM parameters during deploy and writes the target Medusa env file to Lightsail over Tailscale SSH.
 - Keep generated env files out of Git and with restrictive server permissions.
 - GitHub environment secrets should hold only deploy/bootstrap credentials needed to read SSM, run Terraform, and reach Lightsail, not duplicate the full app secret set.
 
@@ -1478,7 +1478,7 @@ Options:
 
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
-| Manual QA and production dispatch | `dev` pushes run CI only; QA deploys are manual workflow dispatch. Production deploys from `main` are also manual workflow dispatch/approval. | Keeps deploys intentional and avoids slow deploy/watch cycles while preserving CI feedback. | QA feedback requires an explicit deploy step. | Accepted |
+| Manual QA and production storefront dispatch | `dev` pushes run CI only; QA deploys are manual workflow dispatch. Production storefront deploys from `main` are manual workflow dispatch/approval. Production Medusa deploy is added later after compute/runtime approval. | Keeps deploys intentional and avoids slow deploy/watch cycles while preserving CI feedback. | QA feedback requires an explicit deploy step. | Accepted |
 | QA auto from `dev`, production manual dispatch | `dev` pushes can deploy QA; production deploys from `main` require manual workflow dispatch/approval. | Fast QA feedback, controlled production releases. | Creates deploy overhead during active setup. | Rejected |
 | Production auto on `main` push | Every push/merge to `main` deploys production. | Fully automated. | Too risky for checkout/order/payment backend in v1. | Rejected |
 | Fully manual QA and prod | No automatic deploys. | Maximum control. | Slower QA feedback. | Rejected |
@@ -1486,7 +1486,8 @@ Options:
 Decision:
 
 - QA deploys are manual workflow dispatch from `dev`.
-- Production deploys are manual workflow dispatch for v1.
+- Production storefront deploys are manual workflow dispatch for v1.
+- Production Medusa deploy remains deferred until production compute and full runtime config are explicitly approved.
 - Development work can push directly to `dev`; production releases go through PR merge into `main`.
 - Production migrations keep their explicit approval gate.
 - Revisit automatic production deploy only after production stability and rollback confidence improve.

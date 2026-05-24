@@ -111,7 +111,7 @@ Implement in this order:
 4. Prod/QA Terraform environment roots.
 5. AWS Lightsail, SSM, IAM, and snapshot baseline.
 6. Cloudflare DNS, R2, Access, WAF baseline, Turnstile, and Web Analytics.
-7. Upstash prod/QA Redis.
+7. Upstash QA Redis and gated production Redis runtime wiring.
 8. Neon prod/QA Postgres, or documented manual fallback if provider audit fails.
 9. Vercel project, domains, and environment config.
 10. Better Stack observability.
@@ -367,6 +367,7 @@ Terraform-managed:
   - `80/tcp` open publicly for launch.
   - `443/tcp` open publicly for launch.
   - `22/tcp` only for bootstrap if needed, then closed after Tailscale access is verified.
+- Host UFW mirrors the same baseline: public `80/443`, Tailscale ingress, and temporary public `22/tcp` removed after Tailscale access is verified.
 - Automatic Lightsail snapshots for active Medusa Lightsail hosts, starting with QA.
 - SSM Parameter Store hierarchy:
   - `/ecom/prod/medusa/*`
@@ -579,7 +580,7 @@ Verification:
 - Domains connected.
 - QA/prod env vars configured on their separate projects.
 - QA storefront deploy still works.
-- Production deploy remains manual workflow dispatch.
+- Production storefront deploy remains manual workflow dispatch.
 
 ## Phase 9: Observability Infrastructure
 
@@ -689,7 +690,7 @@ Verification:
 - GitHub Actions can reach the host over Tailscale before public SSH is closed.
 - Vector sends a test log.
 - Swap exists and swappiness is low.
-- Public `22` closed after Tailscale verification.
+- Public `22` and the host-level temporary UFW SSH allowance are closed after Tailscale verification.
 
 ## Phase 11: Medusa Docker Runtime Files
 
@@ -748,7 +749,7 @@ Workflows:
 - Storefront QA deploy manual workflow dispatch from `dev`.
 - Storefront production deploy manual workflow dispatch from `main`.
 - Medusa QA deploy/start manual workflow dispatch from `dev`.
-- Medusa production deploy manual workflow dispatch.
+- Medusa production deploy workflow remains deferred until production compute and full runtime config are approved.
 
 Remove or replace:
 
@@ -764,7 +765,7 @@ Medusa deploy flow:
 4. Join Tailscale from GitHub Actions deploy job.
 5. SSH to Lightsail over Tailscale.
 6. Fetch SSM parameters for target environment.
-7. Write `.env.prod` or `.env.qa` with restrictive permissions.
+7. Write the target Medusa env file with restrictive permissions.
 8. Pull selected GHCR image.
 9. Run QA migration automatically only against QA DB if selected.
 10. Production migration requires explicit approval gate.
@@ -785,7 +786,7 @@ Rules:
 - GitHub Actions does not run Terraform apply.
 - Direct pushes to `dev` run CI only and do not deploy automatically.
 - Production releases go through PR merge into `main`.
-- Production deploys are manual workflow dispatch.
+- Production storefront deploys are manual workflow dispatch. Production Medusa deploy remains deferred until production compute and full runtime config are approved.
 - Production migrations require explicit approval.
 - Do not use Watchtower/auto-updaters.
 - Add `docker-rollout` later only after baseline deploy is stable.
@@ -827,7 +828,7 @@ Manual:
 
 - Resend:
   - Domain verification.
-  - SPF/DKIM/DMARC.
+  - SPF/DKIM/DMARC enabled through `resend_dns_enabled` after sender-domain values are verified.
   - API key.
   - Sender email.
   - Store secret/config in SSM.
@@ -988,7 +989,7 @@ Pre-cutover:
 Cutover:
 
 1. Deploy production storefront manually.
-2. Deploy production Medusa manually.
+2. Deploy production Medusa through the approved production path after production compute and full runtime config are enabled.
 3. Run approved production migrations if required.
 4. Verify `/health`.
 5. Verify `/ready`.
@@ -1057,7 +1058,7 @@ Before marking implementation complete, verify:
 - Logs reach Better Stack.
 - Better Stack receives test events.
 - QA uses separate Neon/Upstash/secrets/payment keys.
-- Production deploy is manual dispatch.
+- Production storefront deploy is manual dispatch; production Medusa deploy remains deferred until compute/runtime approval.
 - Production migrations require explicit approval.
 - Rollback by immutable GHCR tag is documented and tested in QA.
 - Launch checklist is updated for any implementation-specific findings.

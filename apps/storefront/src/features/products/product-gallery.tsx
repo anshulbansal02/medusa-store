@@ -33,12 +33,12 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   return (
     <div
       className={cn(
-        "grid gap-3",
+        "grid min-w-0 max-w-full gap-3 overflow-hidden",
         hasThumbnails ? "lg:grid-cols-[88px_1fr]" : "lg:grid-cols-1",
       )}
     >
       {hasThumbnails ? (
-        <div className="-mx-4 order-2 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 lg:order-1 lg:block lg:space-y-3 lg:overflow-visible lg:pb-0">
+        <div className="order-2 flex w-full min-w-0 max-w-full gap-2 overflow-x-auto pb-1 lg:order-1 lg:block lg:space-y-3 lg:overflow-visible lg:pb-0">
           {images.map((image, index) => (
             <Button
               key={image}
@@ -89,6 +89,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             alt={`${productName} ${content.imageAltSuffix} ${activeIndex + 1}`}
             fill
             loading="eager"
+            preload
             fetchPriority="high"
             sizes="(min-width: 1024px) 52vw, 100vw"
             className="object-cover transition duration-300 ease-out group-hover:scale-[1.015]"

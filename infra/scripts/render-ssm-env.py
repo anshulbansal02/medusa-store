@@ -45,8 +45,12 @@ def main() -> int:
         if key in seen:
             raise ValueError(f"Duplicate dotenv key derived from SSM parameter: {key}")
 
+        value = parameter["Value"]
+        if "\n" in value or "\r" in value or "\0" in value:
+            raise ValueError(f"Invalid multiline dotenv value from SSM parameter: {name}")
+
         seen.add(key)
-        lines.append(f"{key}={shlex.quote(parameter['Value'])}")
+        lines.append(f"{key}={shlex.quote(value)}")
 
     if not lines:
         raise ValueError("No SSM parameters found for the requested prefix.")

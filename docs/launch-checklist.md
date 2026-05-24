@@ -18,14 +18,15 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - GitHub repo settings, Actions environments, and Actions secrets are configured manually for v1.
 - Direct pushes to `dev` are allowed for active development and run CI.
 - QA deploys from `dev` are manual workflow dispatch for v1.
-- Production releases merge to `main` through PR, then deploy by manual workflow dispatch for v1.
+- Production releases merge to `main` through PR, then deploy the storefront by manual workflow dispatch for v1.
 - GitHub Actions CI runs on `dev` and `main` for lint/typecheck/build checks.
 - CI stays lean: no heavy/fancy checks unless they catch a real current risk.
 - CI/CD deploy mapping:
   - Storefront QA deploy from `dev` is manual workflow dispatch.
   - Medusa QA deploy from `dev` is manual workflow dispatch.
-  - Production deploys from `main` are manual workflow dispatch.
-- Confirm the manually dispatched Medusa deploy target shows a successful build step before smoke testing API endpoints.
+  - Production storefront deploy from `main` is manual workflow dispatch.
+  - Production Medusa deploy remains deferred until production compute and full runtime config are approved.
+- Confirm the manually dispatched QA Medusa deploy target shows a successful build step before smoke testing API endpoints.
 - Confirm Medusa QA deploy credentials for the shared Lightsail QA setup.
 - Confirm Vercel storefront QA deploy is enabled through the GitHub `qa` environment secret `VERCEL_TOKEN`.
 - Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL=https://qa-api.example.com` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` on the QA Vercel project.
@@ -152,7 +153,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Cloudflare SSL mode is full end-to-end HTTPS, not Flexible SSL.
 - Lightsail `80/443` are open for launch and Cloudflare-only origin restriction is tracked as post-stability hardening.
 - Tailscale SSH/deploy access works before public SSH is closed.
-- Public Lightsail SSH is closed after Tailscale access is verified, with emergency access documented.
+- Public Lightsail SSH and the host-level temporary UFW SSH allowance are closed after Tailscale access is verified, with emergency access documented.
 - Docker Compose is running separate Medusa server and worker services.
 - Medusa QA/prod Compose files are present under `infra/compose/` and require explicit `MEDUSA_IMAGE` and `MEDUSA_ENV_FILE` values.
 - Lightsail bootstrap script/runbook has been run and is committed under `infra/`.
@@ -161,14 +162,14 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Medusa Docker image uses Node 24 Debian slim, not Alpine, unless compatibility is revalidated.
 - Production Lightsail automatic snapshots are enabled and understood as host recovery only.
 - Medusa production image is stored privately in GHCR.
-- Production deploy uses an immutable image tag, not only `latest`.
-- Medusa server health check exists before automated production deploys.
+- Any future production Medusa deploy uses an immutable image tag, not only `latest`.
+- Medusa server health check exists before any production Medusa deploy path is enabled.
 - Medusa `/ready` readiness check exists for Postgres/Redis dependency connectivity.
 - Production rollback by previous immutable image tag is documented.
 - Production Medusa database migrations require explicit approval before running.
 - Cloudflare Tunnel is not required for v1 public ingress.
 - Vercel, Lightsail/deploy, and any remaining platform deploy secrets are stored only in approved secret stores and injected at runtime.
-- AWS SSM Parameter Store paths exist for Medusa QA runtime config/secrets; production paths are created before production deploy.
+- AWS SSM Parameter Store paths exist for Medusa QA runtime config/secrets; production paths are created before production Medusa deploy.
 - Production Medusa runtime SSM config is enabled only after production Neon, Upstash, R2 credentials, and production domains are approved; required secret values are supplied through ignored tfvars or `TF_VAR_*`, never committed.
 - Terraform remote state bucket is encrypted, versioned, public-access-blocked, and access-restricted because state may contain secrets.
 - Terraform backend bootstrap was created through `infra/terraform/bootstrap`.
@@ -176,7 +177,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - GitHub Actions fetches SSM parameters and writes Lightsail runtime env files during deploy.
 - Generated Lightsail env files have restrictive permissions.
 - QA backend domain `qa-api.example.com` is configured and verified. QA admin domain `qa-admin.example.com` is configured, proxied through Cloudflare, and still requires Medusa Admin authentication.
-- QA Medusa containers are stopped by default if sharing the production Lightsail instance.
+- QA Medusa runs on its separate QA Lightsail instance during the QA-first setup.
 - QA uses separate Neon branch/database, Redis, secrets, and Razorpay test credentials.
 - Medusa Admin has strong credentials.
 - Cloudflare Access protects production `admin.brand.com` before production launch; QA Access is Terraform-wired and must be enabled after the Cloudflare API token has Zero Trust Access write permission.

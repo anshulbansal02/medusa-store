@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { siteContent } from "@/content/site-content";
 import type { StorefrontProductCategory } from "@/lib/medusa/categories";
 import type { StorefrontProduct } from "@/lib/medusa/products";
-import { cn } from "@/lib/utils";
 
 type SearchDialogProps = {
   products: StorefrontProduct[];
@@ -86,14 +85,21 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
         <Search className="size-4 stroke-icon" aria-hidden="true" />
       </DialogTrigger>
       <DialogContent
-        className="top-4 max-w-3xl translate-y-0 gap-0 rounded-none border border-border bg-background p-0 sm:top-6 sm:max-w-3xl"
+        closeLabel="Close search"
+        className="top-0 left-0 h-svh max-w-none translate-x-0 translate-y-0 grid-rows-[auto_minmax(0,1fr)] gap-0 rounded-none border-0 bg-background p-0 sm:top-6 sm:left-1/2 sm:h-auto sm:max-h-[min(82svh,760px)] sm:max-w-4xl sm:-translate-x-1/2 sm:translate-y-0 sm:border sm:border-border"
         showCloseButton
       >
-        <div className="border-border border-b px-4 pt-4 pb-3 sm:px-5 sm:pt-5">
+        <div className="border-border border-b px-4 pt-5 pb-4 sm:px-6 sm:pt-6 sm:pb-5">
           <DialogTitle className="sr-only">{content.dialogTitle}</DialogTitle>
           <DialogDescription className="sr-only">
             {content.dialogDescription}
           </DialogDescription>
+          <div className="mb-4 max-w-xl pr-10">
+            <p className="text-muted-foreground text-sm">{content.eyebrow}</p>
+            <p className="mt-1 font-heading text-4xl leading-none sm:text-5xl">
+              {content.title}
+            </p>
+          </div>
           <SearchDialogForm
             content={content}
             query={query}
@@ -101,26 +107,37 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
           />
         </div>
 
-        <div className="max-h-[min(72svh,680px)] overflow-y-auto px-4 py-4 sm:px-5">
-          <SearchCategoryLinks categories={categoryResults} content={content} />
+        <div className="min-h-0 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
+          <div className="grid min-w-0 gap-7 lg:grid-cols-[220px_minmax(0,1fr)]">
+            <SearchCategoryLinks
+              categories={categoryResults}
+              content={content}
+            />
 
-          <div className={cn(categoryResults.length > 0 && "mt-6")}>
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-muted-foreground text-sm">
-                {normalizedQuery ? content.matchingLabel : content.latestLabel}
-              </p>
-              {normalizedQuery ? (
-                <Link
-                  href={`/search?q=${encodeURIComponent(query.trim())}`}
-                  prefetch={false}
-                  className="text-sm underline-offset-4 hover:underline"
-                >
-                  {content.viewAllAction}
-                </Link>
-              ) : null}
+            <div className="min-w-0">
+              <div className="flex items-center justify-between gap-4 border-border border-b pb-3">
+                <p className="text-muted-foreground text-sm">
+                  {normalizedQuery
+                    ? content.matchingLabel
+                    : content.latestLabel}
+                </p>
+                {normalizedQuery ? (
+                  <Link
+                    href={`/search?q=${encodeURIComponent(query.trim())}`}
+                    prefetch={false}
+                    className="inline-flex items-center gap-2 text-sm underline-offset-4 hover:underline"
+                  >
+                    {content.viewAllAction}
+                    <ArrowRight className="size-3.5 stroke-icon" />
+                  </Link>
+                ) : null}
+              </div>
+
+              <SearchProductResults
+                content={content}
+                products={productResults}
+              />
             </div>
-
-            <SearchProductResults content={content} products={productResults} />
           </div>
         </div>
       </DialogContent>
@@ -138,17 +155,27 @@ function SearchDialogForm({
   query: string;
 }) {
   return (
-    <form action="/search" className="flex gap-2 pr-10">
-      <Input
-        autoFocus
-        type="search"
-        name="q"
-        value={query}
-        onChange={(event) => onQueryChange(event.currentTarget.value)}
-        placeholder={content.dialogPlaceholder}
-        className="h-12 rounded-none border-border bg-background px-4"
-      />
-      <Button type="submit" size="lg" className="h-12 rounded-none px-5">
+    <form action="/search" className="grid gap-3 pr-10 sm:grid-cols-[1fr_auto]">
+      <div className="relative min-w-0">
+        <Search
+          className="absolute top-1/2 left-4 size-4 -translate-y-1/2 stroke-icon text-muted-foreground"
+          aria-hidden="true"
+        />
+        <Input
+          autoFocus
+          type="search"
+          name="q"
+          value={query}
+          onChange={(event) => onQueryChange(event.currentTarget.value)}
+          placeholder={content.dialogPlaceholder}
+          className="h-12 rounded-none border-border bg-background pr-4 pl-11"
+        />
+      </div>
+      <Button
+        type="submit"
+        size="lg"
+        className="h-12 rounded-none px-5 sm:min-w-28"
+      >
         {content.action}
       </Button>
     </form>
@@ -167,21 +194,21 @@ function SearchCategoryLinks({
   }
 
   return (
-    <div>
+    <aside className="min-w-0">
       <p className="text-muted-foreground text-sm">{content.editsLabel}</p>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:grid lg:overflow-visible lg:pb-0">
         {categories.map((category) => (
           <Link
             key={category.id}
             href={`/shop/${category.handle}`}
             prefetch={false}
-            className="border border-border px-3 py-2 text-sm transition hover:border-foreground"
+            className="shrink-0 border border-border px-3 py-2 text-sm transition hover:border-foreground lg:w-full"
           >
             {category.name}
           </Link>
         ))}
       </div>
-    </div>
+    </aside>
   );
 }
 
@@ -197,40 +224,53 @@ function SearchProductResults({
   }
 
   return (
-    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-      {products.map((product) => (
-        <SearchProductResult key={product.id} product={product} />
+    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      {products.map((product, index) => (
+        <SearchProductResult
+          key={product.id}
+          product={product}
+          eager={index === 0}
+        />
       ))}
     </div>
   );
 }
 
-function SearchProductResult({ product }: { product: StorefrontProduct }) {
+function SearchProductResult({
+  eager,
+  product,
+}: {
+  eager: boolean;
+  product: StorefrontProduct;
+}) {
   const content = siteContent.search;
 
   return (
     <Link
       href={product.href}
       prefetch={false}
-      className="group grid grid-cols-[72px_1fr] gap-3 border border-transparent p-1 transition hover:border-border"
+      className="group grid min-w-0 grid-cols-[76px_minmax(0,1fr)] gap-3 border border-border p-2 transition hover:border-foreground"
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-muted">
         <Image
           src={product.image}
           alt={`${product.name} ${content.imageAltSuffix}`}
           fill
+          preload={eager}
+          loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : "auto"}
           sizes="72px"
           className="object-cover transition duration-300 ease-out group-hover:scale-[1.03]"
         />
       </div>
-      <div className="min-w-0 py-1">
+      <div className="min-w-0 self-center py-1">
         <p className="truncate font-medium text-sm">{product.name}</p>
         {product.note ? (
           <p className="mt-1 line-clamp-2 text-muted-foreground text-sm">
             {product.note}
           </p>
         ) : null}
-        <p className="mt-2 text-sm">{product.price}</p>
+        <p className="mt-2 text-sm font-medium">{product.price}</p>
       </div>
     </Link>
   );
@@ -238,7 +278,7 @@ function SearchProductResult({ product }: { product: StorefrontProduct }) {
 
 function SearchEmptyState({ content }: { content: SearchContent }) {
   return (
-    <div className="mt-3 border border-border px-4 py-6">
+    <div className="mt-4 border border-border px-4 py-6">
       <p className="font-medium text-sm">{content.emptyTitle}</p>
       <p className="mt-1 text-muted-foreground text-sm">
         {content.emptyDescription}

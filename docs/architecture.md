@@ -128,7 +128,7 @@ Defer hard Docker memory limits until after QA usage shows real Medusa server/wo
 
 Use GitHub Container Registry for v1 Medusa production images. Keep images private and deploy immutable version tags so rollback does not depend on `latest`.
 
-Production deploys start as controlled Docker Compose updates from GitHub Actions: pull an immutable GHCR image tag, run migrations intentionally, restart services, run a health check, and rollback by redeploying the previous tag. Add `docker-rollout` later for near-zero-downtime `medusa-server` updates after the baseline deploy path is stable. Worker updates can use normal Compose restart semantics.
+When production Medusa compute is approved, production deploys should start as controlled Docker Compose updates from GitHub Actions: pull an immutable GHCR image tag, run migrations intentionally, restart services, run a health check, and rollback by redeploying the previous tag. Add `docker-rollout` later for near-zero-downtime `medusa-server` updates after the baseline deploy path is stable. Worker updates can use normal Compose restart semantics.
 
 Production Medusa database migrations require an explicit manual approval gate in the deployment workflow. Use expand-migrate-contract for schema changes and do not combine destructive schema cleanup with the same-minute production app cutover.
 
@@ -203,7 +203,7 @@ Redis is used for:
 
 Postgres remains the durable data store for products, orders, customers, carts, payments, and inventory.
 
-QA should not share production Redis. Do not run QA Redis initially; add it only if QA backend flows require production-like behavior.
+QA uses a separate Upstash Redis database in Singapore so backend flows stay production-like without sharing production Redis.
 
 ## Media
 
@@ -332,7 +332,8 @@ Branches:
 - QA deploys are manually dispatched from `dev`.
 - `main` is the production release branch.
 - Production releases merge from `dev` into `main` through PR.
-- Production deploys are manually dispatched from `main`.
+- Production storefront deploys are manually dispatched from `main`.
+- Production Medusa deploy remains deferred until production compute and full runtime config are approved.
 - `dev` should be the default GitHub branch.
 - `dev` and `main` must be protected according to their roles: direct development pushes on `dev`, PR-based release protection on `main`.
 
@@ -350,7 +351,8 @@ Production:
 - Production Medusa compute on AWS Lightsail in Singapore, instantiated after QA setup and testing.
 - Production Postgres on Neon in Singapore.
 - Production Redis on Upstash in Singapore, pay-as-you-go initially.
-- Production deploys are manual workflow dispatch for v1.
+- Production storefront deploys are manual workflow dispatch for v1.
+- Production Medusa deploy remains deferred until production compute and full runtime config are approved.
 - Production migrations require explicit approval.
 - Razorpay live keys.
 - Resend production domain.

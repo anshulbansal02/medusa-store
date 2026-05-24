@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { LinkPendingIndicator } from "@/components/site/link-pending-indicator";
 import { MobileMenu } from "@/components/site/mobile-menu";
 import { siteContent } from "@/content/site-content";
 import { BagDrawer } from "@/features/cart/bag-drawer";
@@ -53,10 +54,10 @@ export async function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              prefetch={false}
-              className="transition hover:text-foreground"
+              className="inline-flex items-center gap-2 transition hover:text-foreground"
             >
-              {item.label}
+              <span>{item.label}</span>
+              <LinkPendingIndicator />
             </Link>
           ))}
         </nav>

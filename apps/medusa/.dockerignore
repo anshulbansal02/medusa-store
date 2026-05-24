@@ -3,7 +3,12 @@ node_modules
 coverage
 .env
 .env.*
-!.env.example
+.DS_Store
+.git
+.gitignore
+.turbo
+.yalc
+*.log
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*

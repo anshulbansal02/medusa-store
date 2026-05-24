@@ -26,6 +26,12 @@ variable "github_repo" {
   type        = string
 }
 
+variable "create_prod_deploy_role" {
+  description = "Whether to create the production Medusa AWS deploy role. Keep false until production Medusa deploy is approved."
+  type        = bool
+  default     = false
+}
+
 variable "vercel_api_token" {
   description = "Vercel API token for Terraform-managed storefront resources. Prefer TF_VAR_vercel_api_token."
   type        = string
@@ -140,6 +146,12 @@ variable "transactional_email_domain" {
   description = "Verified Resend transactional email sending subdomain."
   type        = string
   default     = "mail.neonfold.com"
+}
+
+variable "resend_dns_enabled" {
+  description = "Whether to manage Resend DNS records for the transactional email subdomain."
+  type        = bool
+  default     = false
 }
 
 variable "qa_medusa_static_ip" {

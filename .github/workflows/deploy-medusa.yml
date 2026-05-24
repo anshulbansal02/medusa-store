@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   deploy-qa:
-    if: github.event_name == 'push' || github.event.inputs.target == 'qa'
+    if: github.event.inputs.target == 'qa'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: qa
@@ -39,6 +39,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Resolve Medusa image
         id: image
@@ -133,20 +135,29 @@ jobs:
         run: |
           set -euo pipefail
           host="${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}"
-          ssh -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "install -d -m 0755 /home/ubuntu/ecom/compose /home/ubuntu/ecom/scripts && install -d -m 0750 /home/ubuntu/ecom/shared/env"
-          scp -i "$HOME/.ssh/ecom_qa" infra/compose/docker-compose.qa.yml ubuntu@"$host":/home/ubuntu/ecom/compose/docker-compose.qa.yml
-          scp -i "$HOME/.ssh/ecom_qa" infra/scripts/deploy-medusa-host.sh ubuntu@"$host":/home/ubuntu/ecom/scripts/deploy-medusa-host.sh
-          scp -i "$HOME/.ssh/ecom_qa" "$RUNNER_TEMP/medusa.qa.env" ubuntu@"$host":/home/ubuntu/ecom/shared/env/medusa.qa.env
-          ssh -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "chmod 0755 /home/ubuntu/ecom/scripts/deploy-medusa-host.sh && chmod 0600 /home/ubuntu/ecom/shared/env/medusa.qa.env"
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "install -d -m 0755 /home/ubuntu/ecom/compose /home/ubuntu/ecom/scripts && install -d -m 0750 /home/ubuntu/ecom/shared/env"
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$HOME/.ssh/ecom_qa" infra/compose/docker-compose.qa.yml ubuntu@"$host":/home/ubuntu/ecom/compose/docker-compose.qa.yml
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$HOME/.ssh/ecom_qa" infra/scripts/deploy-medusa-host.sh ubuntu@"$host":/home/ubuntu/ecom/scripts/deploy-medusa-host.sh
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$HOME/.ssh/ecom_qa" "$RUNNER_TEMP/medusa.qa.env" ubuntu@"$host":/home/ubuntu/ecom/shared/env/medusa.qa.env
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "chmod 0755 /home/ubuntu/ecom/scripts/deploy-medusa-host.sh && chmod 0600 /home/ubuntu/ecom/shared/env/medusa.qa.env"
 
       - name: Login host to GHCR
         run: |
           set -euo pipefail
           host="${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}"
-          printf '%s' "${{ secrets.GITHUB_TOKEN }}" | ssh -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "docker login ghcr.io -u '${{ github.actor }}' --password-stdin"
+          printf '%s' "${{ secrets.GITHUB_TOKEN }}" | ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "docker login ghcr.io -u '${{ github.actor }}' --password-stdin"
 
       - name: Deploy on QA host
         run: |
           set -euo pipefail
           host="${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}"
-          ssh -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "MEDUSA_IMAGE='$MEDUSA_IMAGE' /home/ubuntu/ecom/scripts/deploy-medusa-host.sh"
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "MEDUSA_IMAGE='$MEDUSA_IMAGE' /home/ubuntu/ecom/scripts/deploy-medusa-host.sh"
+
+      - name: Logout host from GHCR
+        if: always()
+        run: |
+          set -euo pipefail
+          host="${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}"
+          if [ -f "$HOME/.ssh/ecom_qa" ] && [ -n "$host" ]; then
+            ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "docker logout ghcr.io >/dev/null 2>&1 || true" || true
+          fi

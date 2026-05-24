@@ -146,9 +146,11 @@ variable "qa_media_bucket_name" {
 }
 
 variable "resend_api_key" {
-  description = "Resend API key used by the QA Medusa notification provider. Prefer TF_VAR_resend_api_key."
+  description = "Optional Resend API key used by the QA Medusa notification provider. Prefer TF_VAR_resend_api_key when email is enabled."
   type        = string
   sensitive   = true
+  default     = null
+  nullable    = true
 }
 
 variable "resend_from_email" {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { LinkPendingIndicator } from "@/components/site/link-pending-indicator";
 import { siteContent } from "@/content/site-content";
 import { ProductGrid } from "@/features/products/product-grid";
 import { ProductListingFilters } from "@/features/products/product-listing-filters";
@@ -189,10 +190,10 @@ export function ProductListing({
 
         <div className="grid gap-5 py-5">
           {beforeControls}
-          <div className="flex flex-col gap-4 border-border border-b pb-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex w-full min-w-0 max-w-full flex-col gap-4 overflow-hidden border-border border-b pb-5 lg:flex-row lg:items-center lg:justify-between">
             <nav
               aria-label={content.categoryNavigationLabel}
-              className="-mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0"
+              className="flex w-full min-w-0 max-w-full gap-2 overflow-x-auto"
             >
               {categoryLinks.map((item) => {
                 const active = item.href === activeCategoryValue;
@@ -204,13 +205,14 @@ export function ProductListing({
                     prefetch={false}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "shrink-0 border px-4 py-2 text-sm transition",
+                      "inline-flex shrink-0 items-center gap-2 border px-4 py-2 text-sm transition",
                       active
                         ? "border-foreground bg-foreground text-background"
                         : "border-border hover:border-foreground",
                     )}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    <LinkPendingIndicator />
                   </Link>
                 );
               })}
@@ -233,9 +235,13 @@ export function ProductListing({
                 <Link
                   href={activeCategoryFilter.href}
                   prefetch={false}
-                  className="border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
+                  className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
                 >
-                  {activeCategoryFilter.label} <span aria-hidden="true">x</span>
+                  <span>
+                    {activeCategoryFilter.label}{" "}
+                    <span aria-hidden="true">x</span>
+                  </span>
+                  <LinkPendingIndicator />
                 </Link>
               ) : null}
               {appliedFilters.map((filter) => (
@@ -245,11 +251,14 @@ export function ProductListing({
                     [filter.key]: null,
                   })}
                   prefetch={false}
-                  className="border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
+                  className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
                 >
-                  {getAppliedFilterLabel(filter.key)}:{" "}
-                  {getAppliedFilterValue(filter.key, filter.value)}{" "}
-                  <span aria-hidden="true">x</span>
+                  <span>
+                    {getAppliedFilterLabel(filter.key)}:{" "}
+                    {getAppliedFilterValue(filter.key, filter.value)}{" "}
+                    <span aria-hidden="true">x</span>
+                  </span>
+                  <LinkPendingIndicator />
                 </Link>
               ))}
               <Link
