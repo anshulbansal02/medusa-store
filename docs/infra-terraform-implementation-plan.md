@@ -578,12 +578,13 @@ Goal: configure monitoring, alerts, logs, and error tracking.
 
 Current status:
 
-- Terraform manages Better Stack Uptime monitors for `qa.neonfold.com`, paused `qa-admin.neonfold.com`, `qa-api.neonfold.com/health`, `qa-api.neonfold.com/ready`, and paused `www.neonfold.com`.
+- Terraform manages Better Stack Uptime monitors for `qa.neonfold.com`, `qa-admin.neonfold.com`, `qa-api.neonfold.com/health`, `qa-api.neonfold.com/ready`, and paused `www.neonfold.com`.
 - The shared root has been verified with `better_stack_uptime_enabled=true` and reports no changes after apply.
 - Better Stack is the v1 observability provider for uptime, logs, alerts, and error tracking. Sentry is deferred unless Better Stack proves insufficient after QA or early production usage.
 - Better Stack Telemetry source `ecom-qa-medusa-logs` exists with source ID `2461802`; its token is stored in SSM `/ecom/qa/host/BETTER_STACK_SOURCE_TOKEN`.
 - Vector is configured on QA with the Better Stack-generated Ubuntu/Docker config. Docker log collection requires the `vector` service user to be in the `docker` group, and host log file access uses the `adm` group.
 - QA `ADMIN_PATH=/app` is stored in SSM. Medusa `admin.path = "/"` is not used for QA because it made API `/health` and `/ready` return Admin HTML; instead Caddy redirects the dedicated admin hostname root to `/app`.
+- Better Stack health/readiness monitors use keyword checks (`OK` and `"ready":true`) instead of status-only checks, so Admin fallback HTML cannot satisfy API health monitoring.
 - Alert delivery test and error-tracking applications remain pending.
 
 Terraform-managed where stable:

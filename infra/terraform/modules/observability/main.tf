@@ -4,6 +4,7 @@ resource "betteruptime_monitor" "monitor" {
   url                   = each.value.url
   monitor_type          = each.value.monitor_type
   expected_status_codes = each.value.expected_status_codes
+  required_keyword      = each.value.required_keyword
   pronounceable_name    = each.value.name
   check_frequency       = each.value.check_frequency
   confirmation_period   = each.value.confirmation_period

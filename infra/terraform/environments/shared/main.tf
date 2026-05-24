@@ -12,25 +12,20 @@ locals {
       url  = "https://${var.qa_storefront_domain}"
     }
     qa_medusa_admin = {
-      name   = "QA Medusa Admin"
-      url    = "https://${var.qa_medusa_admin_domain}"
-      paused = true
+      name = "QA Medusa Admin"
+      url  = "https://${var.qa_medusa_admin_domain}"
     }
     qa_medusa_health = {
-      name         = "QA Medusa health"
-      url          = "https://${var.qa_medusa_api_domain}/health"
-      monitor_type = "expected_status_code"
-      expected_status_codes = [
-        200,
-      ]
+      name             = "QA Medusa health"
+      url              = "https://${var.qa_medusa_api_domain}/health"
+      monitor_type     = "keyword"
+      required_keyword = "OK"
     }
     qa_medusa_ready = {
-      name         = "QA Medusa readiness"
-      url          = "https://${var.qa_medusa_api_domain}/ready"
-      monitor_type = "expected_status_code"
-      expected_status_codes = [
-        200,
-      ]
+      name             = "QA Medusa readiness"
+      url              = "https://${var.qa_medusa_api_domain}/ready"
+      monitor_type     = "keyword"
+      required_keyword = "\"ready\":true"
     }
   }
   storefront_image_hostnames   = join(",", [local.production_media_domain, local.qa_media_domain])

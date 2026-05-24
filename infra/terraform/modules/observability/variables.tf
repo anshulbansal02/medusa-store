@@ -5,6 +5,7 @@ variable "better_stack_uptime_monitors" {
     url                   = string
     monitor_type          = optional(string, "status")
     expected_status_codes = optional(list(number))
+    required_keyword      = optional(string)
     check_frequency       = optional(number, 300)
     confirmation_period   = optional(number, 60)
     recovery_period       = optional(number, 180)
