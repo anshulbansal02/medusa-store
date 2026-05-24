@@ -523,6 +523,14 @@ Terraform-managed where provider support is reliable:
 - Environment variables.
 - Production/preview environment values.
 
+Current state:
+
+- The existing storefront project `medusa-store-storefront` is imported into shared Terraform.
+- The project is not linked to GitHub so Vercel does not auto-deploy from Git pushes.
+- Default Vercel Function region is `sin1`, matching the Singapore Medusa/data tier. Use `bom1` only if backend/data move to India or measurement proves the user-facing benefit outweighs backend round-trip latency.
+- Domains are deferred until the production domain and exact QA/prod hostnames are known.
+- Environment variables are still injected by GitHub Actions during CLI deploys until final browser-safe public values exist. Move stable Vercel app env vars into Terraform-managed Vercel resources when values are known and state sensitivity has been reviewed.
+
 GitHub Actions-managed:
 
 - Storefront deployment.

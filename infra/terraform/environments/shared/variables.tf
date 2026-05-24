@@ -25,3 +25,21 @@ variable "github_repo" {
   description = "GitHub repository name allowed to assume deploy roles."
   type        = string
 }
+
+variable "vercel_api_token" {
+  description = "Vercel API token for Terraform-managed storefront resources. Prefer TF_VAR_vercel_api_token."
+  type        = string
+  sensitive   = true
+}
+
+variable "vercel_storefront_project_name" {
+  description = "Vercel project name for the storefront."
+  type        = string
+  default     = "medusa-store-storefront"
+}
+
+variable "vercel_storefront_function_regions" {
+  description = "Default Vercel Function regions for the storefront."
+  type        = set(string)
+  default     = ["sin1"]
+}

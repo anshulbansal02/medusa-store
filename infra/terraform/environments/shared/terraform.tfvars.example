@@ -3,3 +3,9 @@ aws_profile = "your-aws-profile"
 
 github_owner = "anshulbansal02"
 github_repo  = "medusa-store"
+
+# Prefer TF_VAR_vercel_api_token in the shell instead of committing this.
+vercel_api_token = "vercel-token"
+
+vercel_storefront_project_name     = "medusa-store-storefront"
+vercel_storefront_function_regions = ["sin1"]

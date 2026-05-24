@@ -6,3 +6,7 @@ provider "aws" {
     tags = local.tags
   }
 }
+
+provider "vercel" {
+  api_token = var.vercel_api_token
+}

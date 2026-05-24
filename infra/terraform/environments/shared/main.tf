@@ -21,3 +21,10 @@ module "github_actions_aws_deploy" {
   create_prod_role = true
   tags             = local.tags
 }
+
+module "vercel_storefront" {
+  source = "../../modules/vercel-storefront"
+
+  project_name     = var.vercel_storefront_project_name
+  function_regions = var.vercel_storefront_function_regions
+}

@@ -181,6 +181,7 @@ Rules:
 - The deploy workflow uses `vercel deploy --cwd ./apps/storefront`; Vercel performs the remote build for the linked storefront project.
 - Vercel preview deployments are currently protected by Vercel SSO. Keep QA private unless the team explicitly needs public QA access.
 - Terraform manages Vercel environment variables where practical. Secret values require provider behavior review and secret-bearing state controls.
+- Terraform now manages the shared Vercel storefront project itself. Keep the project unlinked from GitHub so deploys remain manual GitHub Actions dispatches.
 - GitHub environment variables/secrets hold deploy credentials and any deployment-only values not managed by Terraform:
   - `VERCEL_ORG_ID`
   - `VERCEL_PROJECT_ID`
