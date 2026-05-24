@@ -45,3 +45,14 @@ variable "environment_variables" {
   }))
   default = {}
 }
+
+variable "domains" {
+  description = "Vercel project domains keyed by stable Terraform identifiers."
+  type = map(object({
+    domain               = string
+    git_branch           = optional(string)
+    redirect             = optional(string)
+    redirect_status_code = optional(number)
+  }))
+  default = {}
+}

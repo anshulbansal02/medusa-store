@@ -27,3 +27,23 @@ output "vercel_storefront_environment_variable_ids" {
   description = "Terraform-managed Vercel storefront environment variable IDs."
   value       = module.vercel_storefront.environment_variable_ids
 }
+
+output "vercel_storefront_domain_ids" {
+  description = "Terraform-managed Vercel storefront domain IDs."
+  value       = module.vercel_storefront.domain_ids
+}
+
+output "cloudflare_dns_record_ids" {
+  description = "Terraform-managed Cloudflare DNS record IDs."
+  value       = var.cloudflare_site_enabled ? module.cloudflare_site[0].dns_record_ids : {}
+}
+
+output "cloudflare_r2_bucket_names" {
+  description = "Terraform-managed Cloudflare R2 media bucket names."
+  value       = var.cloudflare_site_enabled ? module.cloudflare_site[0].r2_bucket_names : {}
+}
+
+output "cloudflare_r2_custom_domain_status" {
+  description = "Terraform-managed Cloudflare R2 media custom-domain status."
+  value       = var.cloudflare_site_enabled ? module.cloudflare_site[0].r2_custom_domain_status : {}
+}

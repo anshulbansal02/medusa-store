@@ -306,17 +306,18 @@ Do not provision dedicated search infrastructure in the initial infra build. Kee
 Use subdomains for separate services.
 
 ```txt
-www.brand.com        storefront
-brand.com            redirect to www.brand.com
+www.neonfold.com     production storefront
+neonfold.com         redirect to www.neonfold.com
 admin.brand.com      Medusa Admin
 api.brand.com        Medusa API
-media.brand.com      R2 media
-qa.brand.com         QA storefront
-qa-api.brand.com     QA API, only if hosted QA backend exists
+media.neonfold.com   production R2 media
+qa.neonfold.com      QA storefront
+qa-api.neonfold.com  QA API
+qa-media.neonfold.com QA R2 media
 qa-admin.brand.com   QA Admin, only if hosted QA backend exists
 ```
 
-Manage production DNS in Cloudflare after a planned cutover from the current Shopify-managed DNS setup. This does not require transferring registrar ownership unless the business intentionally chooses to do that later.
+Manage DNS in Cloudflare for `neonfold.com`. This is an interim launch domain and can be replaced with the final brand domain later by changing Terraform domain variables and reapplying.
 
 Keep this service-separated domain layout for v1. Do not mount Medusa API or Admin under storefront paths.
 

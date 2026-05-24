@@ -1,4 +1,10 @@
 locals {
+  qa_storefront_domain      = "${var.qa_storefront_subdomain}.${var.domain_name}"
+  qa_medusa_api_domain      = "${var.qa_medusa_api_subdomain}.${var.domain_name}"
+  medusa_store_cors_origins = join(",", distinct(concat(var.medusa_store_cors_base_origins, ["https://${local.qa_storefront_domain}"])))
+  medusa_admin_cors_origins = join(",", distinct(concat(var.medusa_admin_cors_base_origins, ["https://${local.qa_medusa_api_domain}"])))
+  medusa_auth_cors_origins  = join(",", distinct(concat(var.medusa_auth_cors_base_origins, ["https://${local.qa_medusa_api_domain}", "https://${local.qa_storefront_domain}"])))
+  medusa_backend_url        = "https://${local.qa_medusa_api_domain}"
   tags = {
     Project     = var.project
     ManagedBy   = "terraform"
@@ -69,19 +75,19 @@ module "medusa_ssm_config" {
       description = "S3-compatible region value used by Cloudflare R2."
     }
     STORE_CORS = {
-      value       = var.medusa_store_cors_origins
+      value       = local.medusa_store_cors_origins
       description = "Allowed storefront origins for the QA Medusa service."
     }
     ADMIN_CORS = {
-      value       = var.medusa_admin_cors_origins
+      value       = local.medusa_admin_cors_origins
       description = "Allowed admin origins for the QA Medusa service."
     }
     AUTH_CORS = {
-      value       = var.medusa_auth_cors_origins
+      value       = local.medusa_auth_cors_origins
       description = "Allowed auth origins for the QA Medusa service."
     }
     MEDUSA_BACKEND_URL = {
-      value       = var.medusa_backend_url
+      value       = local.medusa_backend_url
       description = "Externally reachable QA Medusa backend URL."
     }
   }

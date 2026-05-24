@@ -24,6 +24,17 @@ MEDUSA_ENV_FILE=${ENV_FILE}
 EOF
 chmod 0600 "${release_env}"
 
+backend_url="$(
+  awk -F= '$1 == "MEDUSA_BACKEND_URL" { print $2; exit }' "${ENV_FILE}" \
+    | tr -d '\r' \
+    | sed -e 's/^"//' -e 's/"$//'
+)"
+caddy_site=":80"
+if [[ "${backend_url}" == https://* ]]; then
+  caddy_site="${backend_url#https://}"
+  caddy_site="${caddy_site%%/*}"
+fi
+
 docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" --profile migrate run --rm medusa-migrate
 docker compose --env-file "${release_env}" -f "${COMPOSE_FILE}" up -d medusa-server medusa-worker
 
@@ -31,8 +42,10 @@ sudo tee /etc/caddy/Caddyfile >/dev/null <<'EOF'
 {
   admin localhost:2019
 }
+EOF
+sudo tee -a /etc/caddy/Caddyfile >/dev/null <<EOF
 
-:80 {
+${caddy_site} {
   reverse_proxy 127.0.0.1:29181
 }
 EOF

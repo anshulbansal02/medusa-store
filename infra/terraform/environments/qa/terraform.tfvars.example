@@ -20,7 +20,6 @@ neon_region_id                         = "aws-ap-southeast-1"
 neon_pg_version                        = 17
 neon_history_retention_seconds         = 21600
 
-medusa_store_cors_origins = "http://storefront.localhost,http://52.77.164.161,http://100.71.144.128"
-medusa_admin_cors_origins = "http://localhost:29181,http://52.77.164.161,http://100.71.144.128"
-medusa_auth_cors_origins  = "http://localhost:29181,http://52.77.164.161,http://100.71.144.128"
-medusa_backend_url        = "http://52.77.164.161"
+domain_name              = "neonfold.com"
+qa_storefront_subdomain  = "qa"
+qa_medusa_api_subdomain  = "qa-api"

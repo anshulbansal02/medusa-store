@@ -150,16 +150,15 @@ Accounts:
 
 Domain:
 
-- Production domain name.
-- Decision on exact brand domain values for:
-  - `brand.com`
-  - `www.brand.com`
-  - `api.brand.com`
-  - `admin.brand.com`
-  - `media.brand.com`
-  - `qa.brand.com`
-  - `qa-api.brand.com`
-  - `qa-admin.brand.com`
+- Final brand domain name later. Interim domain is `neonfold.com`.
+- Current interim hostnames:
+  - `neonfold.com`
+  - `www.neonfold.com`
+  - `qa.neonfold.com`
+  - `qa-api.neonfold.com`
+  - `media.neonfold.com`
+  - `qa-media.neonfold.com`
+- Later hostname decisions still needed for production `api`, `admin`, and optional QA admin.
 
 Access identities:
 
@@ -439,6 +438,14 @@ Manual:
 - R2 S3 access key/secret generation in Cloudflare dashboard.
 - Store R2 credentials in SSM SecureString.
 
+Current status:
+
+- Cloudflare is authoritative for interim domain `neonfold.com`.
+- Terraform manages DNS for `neonfold.com`, `www.neonfold.com`, `qa.neonfold.com`, and `qa-api.neonfold.com`.
+- Terraform manages R2 buckets `ecom-qa-media` and `ecom-prod-media`.
+- Terraform manages R2 custom domains `qa-media.neonfold.com` and `media.neonfold.com`; ownership and SSL are active.
+- Production `api`, production `admin`, Cloudflare Access, WAF/ruleset baseline, Turnstile, Web Analytics, R2 S3 credentials, and Medusa R2 runtime SSM parameters remain pending.
+
 Rules:
 
 - Do not enable global Bot Fight Mode at launch.
@@ -536,8 +543,10 @@ Current state:
 - The existing storefront project `medusa-store-storefront` is imported into shared Terraform.
 - The project is not linked to GitHub so Vercel does not auto-deploy from Git pushes.
 - Default Vercel Function region is `sin1`, matching the Singapore Medusa/data tier. Use `bom1` only if backend/data move to India or measurement proves the user-facing benefit outweighs backend round-trip latency.
-- Domains are deferred until the production domain and exact QA/prod hostnames are known.
-- QA preview `MEDUSA_BACKEND_URL` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as Vercel project environment variables.
+- Interim domains use `neonfold.com`: `www.neonfold.com` for production storefront, `neonfold.com` as a 308 redirect to `www`, `qa.neonfold.com` for QA storefront, and `qa-api.neonfold.com` for QA Medusa API.
+- Vercel project domains `neonfold.com`, `www.neonfold.com`, and `qa.neonfold.com` are Terraform-managed.
+- QA preview `MEDUSA_BACKEND_URL` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as Vercel project environment variables. `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com` for future preview deploys.
+- `NEXT_PUBLIC_IMAGE_HOSTNAMES` is Terraform-managed for preview and production and is derived from the configured media hostnames.
 - Remaining Vercel app environment variables are deferred until final browser-safe public values exist. Move stable Vercel app env vars into Terraform-managed Vercel resources when values are known and state sensitivity has been reviewed.
 
 GitHub Actions-managed:

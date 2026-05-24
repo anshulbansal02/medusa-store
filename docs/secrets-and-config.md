@@ -144,7 +144,7 @@ Redis:
 
 R2:
 
-- Terraform manages the R2 bucket and media DNS/custom-domain resources where supported.
+- Terraform manages R2 buckets `ecom-qa-media` and `ecom-prod-media`, plus media custom domains `qa-media.neonfold.com` and `media.neonfold.com`.
 - R2 S3 access credentials are created manually in Cloudflare.
 - Store R2 access key ID and secret access key in SSM `SecureString` parameters.
 - Rotate R2 credentials through a documented manual runbook.
@@ -175,13 +175,14 @@ Rules:
 
 - Vercel project: `medusa-store-storefront`.
 - Current QA preview URL: `https://medusa-store-storefront-okdjppru3-anshul-bansal-s-projects.vercel.app`.
+- Interim domains: `qa.neonfold.com` for QA storefront, `qa-api.neonfold.com` for QA Medusa API, `www.neonfold.com` for future production storefront, and `neonfold.com` as an apex redirect.
 - Terraform manages the Vercel project/configuration where provider support is reliable.
 - GitHub Actions owns storefront deployment; Vercel Git auto-deploys are not required.
-- `dev` pushes run the QA deploy workflow.
+- `dev` pushes run CI only. QA storefront deploy is manual workflow dispatch.
 - Production storefront deployment is manual workflow dispatch for v1.
 - The deploy workflow uses `vercel deploy --cwd ./apps/storefront`; Vercel performs the remote build for the linked storefront project.
 - Vercel preview deployments are currently protected by Vercel SSO. Keep QA private unless the team explicitly needs public QA access.
-- Terraform manages Vercel environment variables where practical. QA preview `MEDUSA_BACKEND_URL` and browser-safe `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are already Terraform-managed. Secret values require provider behavior review and secret-bearing state controls.
+- Terraform manages Vercel environment variables where practical. QA preview `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com`, browser-safe `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` is Terraform-managed, and `NEXT_PUBLIC_IMAGE_HOSTNAMES` is derived from the configured media domains. Secret values require provider behavior review and secret-bearing state controls.
 - Terraform now manages the shared Vercel storefront project itself. Keep the project unlinked from GitHub so deploys remain manual GitHub Actions dispatches.
 - GitHub environment variables/secrets hold deploy credentials and any deployment-only values not managed by Terraform:
   - `VERCEL_ORG_ID`

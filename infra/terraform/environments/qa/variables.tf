@@ -116,26 +116,38 @@ variable "neon_history_retention_seconds" {
   default     = 21600
 }
 
-variable "medusa_store_cors_origins" {
-  description = "Comma-separated allowed storefront origins for QA Medusa."
+variable "domain_name" {
+  description = "Base domain for QA public hostnames. Keep aligned with the shared Terraform environment."
   type        = string
-  default     = "http://storefront.localhost,http://52.77.164.161,http://100.71.144.128"
+  default     = "neonfold.com"
 }
 
-variable "medusa_admin_cors_origins" {
-  description = "Comma-separated allowed admin origins for QA Medusa."
+variable "qa_storefront_subdomain" {
+  description = "Subdomain for the QA storefront."
   type        = string
-  default     = "http://localhost:29181,http://52.77.164.161,http://100.71.144.128"
+  default     = "qa"
 }
 
-variable "medusa_auth_cors_origins" {
-  description = "Comma-separated allowed auth origins for QA Medusa."
+variable "qa_medusa_api_subdomain" {
+  description = "Subdomain for the QA Medusa API."
   type        = string
-  default     = "http://localhost:29181,http://52.77.164.161,http://100.71.144.128"
+  default     = "qa-api"
 }
 
-variable "medusa_backend_url" {
-  description = "Externally reachable QA Medusa backend URL before domain setup."
-  type        = string
-  default     = "http://52.77.164.161"
+variable "medusa_store_cors_base_origins" {
+  description = "Base allowed storefront origins for QA Medusa before derived public domain origins are added."
+  type        = list(string)
+  default     = ["http://storefront.localhost", "http://52.77.164.161", "http://100.71.144.128"]
+}
+
+variable "medusa_admin_cors_base_origins" {
+  description = "Base allowed admin origins for QA Medusa before derived public domain origins are added."
+  type        = list(string)
+  default     = ["http://localhost:29181", "http://52.77.164.161", "http://100.71.144.128"]
+}
+
+variable "medusa_auth_cors_base_origins" {
+  description = "Base allowed auth origins for QA Medusa before derived public domain origins are added."
+  type        = list(string)
+  default     = ["http://localhost:29181", "http://52.77.164.161", "http://100.71.144.128"]
 }

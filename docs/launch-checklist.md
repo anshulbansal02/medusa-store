@@ -28,7 +28,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Confirm the manually dispatched Medusa deploy target shows a successful build step before smoke testing API endpoints.
 - Confirm Medusa QA deploy credentials for the shared Lightsail QA setup.
 - Confirm Vercel storefront QA deploy is enabled through the GitHub `qa` environment secret `VERCEL_TOKEN`.
-- Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL` and, when ready, `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`.
+- Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL=https://qa-api.neonfold.com` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`.
 - Confirm the QA preview URL loads after Vercel SSO authentication.
 
 ## Storefront UX
@@ -175,7 +175,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Terraform production/QA applies are run locally with S3 remote state and native S3 lockfiles.
 - GitHub Actions fetches SSM parameters and writes Lightsail runtime env files during deploy.
 - Generated Lightsail env files have restrictive permissions.
-- QA backend domains `qa-api` and `qa-admin` are configured when QA backend is exposed.
+- QA backend domain `qa-api.neonfold.com` is configured when QA backend is exposed. Add QA admin domain only if hosted admin exposure is needed.
 - QA Medusa containers are stopped by default if sharing the production Lightsail instance.
 - QA uses separate Neon branch/database, Redis, secrets, and Razorpay test credentials.
 - Medusa Admin has strong credentials.

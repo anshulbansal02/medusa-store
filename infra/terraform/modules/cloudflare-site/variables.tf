@@ -25,7 +25,7 @@ variable "r2_buckets" {
   description = "R2 buckets to create, keyed by a stable Terraform identifier."
   type = map(object({
     name          = string
-    location      = optional(string, "apac")
+    location      = optional(string, "APAC")
     storage_class = optional(string, "Standard")
   }))
   default = {}
