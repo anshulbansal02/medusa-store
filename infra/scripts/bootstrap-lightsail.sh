@@ -112,6 +112,7 @@ systemctl start tailscaled
 
 # Vector is installed during bootstrap. Keep it stopped until the Better Stack
 # source token and final config are available from SSM.
+usermod -aG docker,adm vector || true
 systemctl disable --now vector || true
 
 if [[ ! -f /swapfile ]]; then

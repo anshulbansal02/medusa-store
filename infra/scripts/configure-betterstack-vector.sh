@@ -32,10 +32,12 @@ curl -fsS \
   "https://telemetry.betterstack.com/vector-yaml/ubuntu/${source_token}?docker=${docker_present}" \
   -o "${config_path}"
 
-chmod 0640 "${config_path}"
+chmod 0644 "${config_path}"
 chown root:root "${config_path}"
 
-vector validate --config "${config_path}"
+vector validate "${config_path}" >/dev/null
+echo "Vector config validated."
+usermod -aG docker,adm vector
 systemctl enable vector
 systemctl restart vector
 systemctl --no-pager --full status vector >/dev/null

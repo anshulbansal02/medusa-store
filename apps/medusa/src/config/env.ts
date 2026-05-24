@@ -1,6 +1,7 @@
 export type BackendEnv = NodeJS.ProcessEnv;
 
 export type WorkerMode = "shared" | "server" | "worker";
+type AdminPath = `/${string}`;
 
 type RazorpayConfig =
   | {
@@ -64,6 +65,10 @@ function readWorkerMode(value?: string): WorkerMode {
   return value === "server" || value === "worker" ? value : "shared";
 }
 
+function readAdminPath(value?: string): AdminPath {
+  return value?.startsWith("/") ? (value as AdminPath) : "/app";
+}
+
 export function getMedusaConfig(env: BackendEnv = process.env) {
   return {
     databaseUrl: env.DATABASE_URL,
@@ -77,7 +82,7 @@ export function getMedusaConfig(env: BackendEnv = process.env) {
       cookieSecret: env.COOKIE_SECRET,
     },
     admin: {
-      path: env.ADMIN_PATH || "/app",
+      path: readAdminPath(env.ADMIN_PATH),
       backendUrl: env.MEDUSA_BACKEND_URL,
     },
   };

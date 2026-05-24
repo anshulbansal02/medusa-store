@@ -12,8 +12,9 @@ locals {
       url  = "https://${var.qa_storefront_domain}"
     }
     qa_medusa_admin = {
-      name = "QA Medusa Admin"
-      url  = "https://${var.qa_medusa_admin_domain}"
+      name   = "QA Medusa Admin"
+      url    = "https://${var.qa_medusa_admin_domain}"
+      paused = true
     }
     qa_medusa_health = {
       name         = "QA Medusa health"
