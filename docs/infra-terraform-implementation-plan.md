@@ -169,7 +169,7 @@ Access identities:
 
 Secrets/config values:
 
-- Neon connection details after Terraform/provider setup or manual fallback.
+- Neon API key for Terraform provider auth, then Neon connection details after Terraform/provider setup or manual fallback.
 - Upstash Redis URLs after Terraform setup.
 - Razorpay QA and production key IDs/secrets/webhook secrets.
 - Resend API key and sender domain details.
@@ -216,7 +216,7 @@ Steps:
 5. Confirm local tooling:
    - Terraform CLI installed at the pinned version selected during implementation.
    - AWS CLI available for identity checks.
-   - Cloudflare/Vercel/Upstash/Neon provider credentials available locally.
+   - Cloudflare/Vercel/Upstash/Neon provider credentials available locally. For Neon, create an API key; the CLI OAuth login is not enough for Terraform.
    - Node/pnpm repo tooling remains aligned with project rules.
 
 6. Audit provider support:
@@ -457,6 +457,8 @@ Terraform-managed:
 
 - Production Upstash Redis in Singapore.
 - QA Upstash Redis in Singapore.
+- Use Upstash Global Redis with Singapore as the primary region because Regional Redis is legacy/deprecated.
+- Use the provider/API minimum `$20` budget guardrail.
 - Pay-as-you-go pricing initially.
 - Outputs/SSM params for Redis URLs if provider behavior supports secure handling.
 - Usage/billing alert if available.

@@ -15,8 +15,8 @@ Do not paste secrets, tokens, connection strings, private keys, or customer data
 | Railway | pending | Replace/delete any app hosting, databases, Redis, variables, domains, and workflows if present. |
 | Cloudflare | pending | Inventory zone, DNS, R2 buckets, Access apps, Turnstile widgets, Web Analytics. |
 | AWS | in progress | Terraform state bucket created in `ap-southeast-1`; obsolete DynamoDB lock table removed after switching to native S3 lockfiles. Production Lightsail resources were removed after the QA-first sequencing decision. QA Lightsail, the first non-secret QA SSM runtime parameters, and GitHub Actions OIDC/QA SSM read IAM are Terraform-managed. Continue inventory for billing alerts. |
-| Neon | pending | Inventory projects, branches, roles, databases, restore posture. |
-| Upstash | pending | Inventory Redis databases and regions. |
+| Neon | in progress | QA/prod project shell and QA branch/database/role/endpoint are Terraform-managed. Terraform uses the account-supported history retention limit of `21600` seconds and leaves endpoint suspend interval unset. Production migration remains deferred. |
+| Upstash | in progress | QA Redis is Terraform-managed as Upstash Global Redis with Singapore primary region. Production Redis is deferred until production setup. |
 | Better Stack | pending | Inventory monitors, log sources, alert channels. |
 | Sentry | pending | Inventory organizations, projects, DSNs, alert rules. |
 | GitHub | pending | Inventory workflows, environments, variables, secrets, branch protection. |
@@ -52,10 +52,15 @@ Classification values:
 | AWS | `/ecom/qa/medusa/NODE_ENV` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret Medusa runtime config for QA; value is `production`. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
 | AWS | `/ecom/qa/medusa/MEDUSA_WORKER_MODE` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret Medusa runtime config for QA; value is `shared` for the single-host QA service. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
 | AWS | `/ecom/qa/medusa/S3_REGION` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret S3-compatible region value for Cloudflare R2 integration; value is `auto`. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
+| AWS | `/ecom/qa/medusa/DATABASE_URL` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Secret Neon Postgres pooler URL for QA Medusa, stored as `SecureString`. Version `2` was smoke-tested with `psql` without printing the value. | Keep under QA Terraform and do not print value in logs. | no |
+| AWS | `/ecom/qa/medusa/REDIS_URL` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Secret Redis TLS URL for QA Medusa, stored as `SecureString`. | Keep under QA Terraform and do not print value in logs. | no |
 | AWS | `token.actions.githubusercontent.com` IAM OIDC provider | shared | global | Terraform shared | keep/import | GitHub Actions OIDC provider for short-lived AWS credentials. Client ID is `sts.amazonaws.com`; ARN is `arn:aws:iam::174766597237:oidc-provider/token.actions.githubusercontent.com`. | Use from deploy roles; do not create long-lived AWS keys for GitHub Actions. | no |
 | AWS | `ecom-qa-github-actions-deploy` IAM role | qa | global | Terraform shared | keep/import | GitHub Actions QA deploy role. Trust is scoped to `repo:anshulbansal02/medusa-store:environment:qa` and `aud=sts.amazonaws.com`; ARN is `arn:aws:iam::174766597237:role/ecom-qa-github-actions-deploy`. | Store ARN as a GitHub QA environment variable for deploy workflow use. | no |
 | AWS | `ecom-qa-github-actions-deploy-ssm-read` IAM policy | qa | ap-southeast-1 | Terraform shared | keep/import | Read-only SSM access for QA deploys. Allows `ssm:GetParameter`, `ssm:GetParameters`, and `ssm:GetParametersByPath` only on `/ecom/qa/medusa/*`. | Keep attached only to the QA deploy role. | no |
-| Neon | production Postgres | prod | aws-ap-southeast-1 | pending | pending | Accepted target database. | Audit Terraform provider or document manual fallback. | yes before production migration |
+| Neon | `ecom-medusa` project | prod/qa | aws-ap-southeast-1 | Terraform qa | keep/import | Accepted database project. Project ID `patient-leaf-89100055`; PostgreSQL 17; history retention `21600` seconds; default branch is named `prod` with default database/role shape for later production setup. | Keep under QA Terraform for now; do not run production migrations until production setup is explicitly approved. | no |
+| Neon | `qa` branch | qa | aws-ap-southeast-1 | Terraform qa | keep/import | QA database branch. Branch ID `br-icy-meadow-aolzunse`; database and role are both `medusa_qa`. | Keep separate from production data and use only for QA Medusa. | no |
+| Neon | `qa` endpoint | qa | aws-ap-southeast-1 | Terraform qa | keep/import | QA read-write endpoint. Endpoint ID `ep-wispy-cloud-aob2x5co`; SSM uses the pooler host output after enabling pooling. | Keep pooler enabled for runtime connection string. | no |
+| Upstash | `ecom-qa-medusa` Redis database | qa | global, primary `ap-southeast-1` | Terraform qa | keep/import | QA Medusa Redis. Database ID `ab3b521d-ea04-4db6-8c3b-a1e29bb6055a`; endpoint `thorough-cow-135355.upstash.io`; TLS enabled; budget guardrail `$20`; no read regions. | Keep under QA Terraform; monitor usage after QA deploy. | no |
 | Upstash | production Redis | prod | Singapore | pending | pending | Accepted target Redis. | Confirm provider region ID and pricing mode. | no |
 
 ## Manual Inputs Needed
@@ -66,7 +71,8 @@ Collect these outside Git:
 - AWS account/profile, state bucket name, and state region.
 - Cloudflare account ID, zone ID, and admin email allowlist.
 - Vercel team/project identifiers.
-- Neon, Upstash, Better Stack, and Sentry account/API-token availability.
+- Upstash, Better Stack, and Sentry account/API-token availability.
+- Neon API key for Terraform provider auth is stored only in the local uncommitted `.env` file as `NEON_KEY`; CLI OAuth login is not sufficient for Terraform.
 - Tailscale admin/operator identities for SSH and GitHub Actions deploy access.
 - Razorpay QA/live keys and webhook setup ownership.
 - Resend sender domain and API-key ownership.

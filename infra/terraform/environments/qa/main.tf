@@ -23,11 +23,22 @@ module "medusa_lightsail" {
 module "medusa_redis" {
   source = "../../modules/upstash-redis"
 
-  database_name = "${var.project}-${var.environment}-medusa"
-  region        = var.upstash_redis_region
-  budget        = var.upstash_redis_budget
-  eviction      = false
-  auto_scale    = false
+  database_name  = "${var.project}-${var.environment}-medusa"
+  primary_region = var.upstash_redis_primary_region
+  read_regions   = var.upstash_redis_read_regions
+  budget         = var.upstash_redis_budget
+  eviction       = false
+  auto_scale     = false
+}
+
+module "medusa_postgres" {
+  source = "../../modules/neon-postgres"
+
+  project_name              = "${var.project}-medusa"
+  org_id                    = var.neon_org_id
+  region_id                 = var.neon_region_id
+  pg_version                = var.neon_pg_version
+  history_retention_seconds = var.neon_history_retention_seconds
 }
 
 module "medusa_ssm_config" {
@@ -49,6 +60,10 @@ module "medusa_ssm_config" {
     }
   }
   secure_string_parameters = {
+    DATABASE_URL = {
+      value       = module.medusa_postgres.qa_database_url
+      description = "PostgreSQL URL for the QA Medusa service."
+    }
     REDIS_URL = {
       value       = module.medusa_redis.redis_url
       description = "Redis TLS URL for the QA Medusa service."

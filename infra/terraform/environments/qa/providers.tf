@@ -11,3 +11,7 @@ provider "upstash" {
   email   = var.upstash_email
   api_key = var.upstash_api_key
 }
+
+provider "neon" {
+  api_key = var.neon_api_key
+}

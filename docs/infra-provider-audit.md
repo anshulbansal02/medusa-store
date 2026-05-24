@@ -30,7 +30,7 @@ Local status:
 | Vercel | `vercel/vercel` | `5.3.0` | candidate | Needed for storefront project, domains, and env vars. Avoid mixing inline and standalone env-var modes. |
 | Better Stack Uptime | `BetterStackHQ/better-uptime` | `0.20.17` | candidate | Partner provider. Covers uptime resources; log source support may require a separate provider/API or manual setup. |
 | Sentry | `jianyuan/sentry` | `0.15.0-beta3` | review before use | Registry latest is beta. Not pinned in root modules until resource support and stability are reviewed. |
-| Neon | `terraform-community-providers/neon` | `0.1.15` | review before use | Community provider. Audit import behavior, sensitive outputs, region ID, branch/role/database resources, pooled/direct connection outputs, and lifecycle behavior before use. |
+| Neon | `kislerdm/neon` | `0.13.0` | validated, blocked on API key for plan/apply | Community provider with project, branch, endpoint, role, database, sensitive connection outputs, and import support. Requires a Neon API key; Neon CLI OAuth login is not accepted by the provider/API for Terraform auth. |
 
 ## Official References Checked
 
@@ -46,7 +46,9 @@ Local status:
 - Better Stack Terraform docs: https://betterstack.com/docs/uptime/terraform/
 - Better Stack provider registry: https://registry.terraform.io/providers/BetterStackHQ/better-uptime/latest
 - Sentry provider registry: https://registry.terraform.io/providers/jianyuan/sentry/latest/docs
-- Neon provider registry: https://registry.terraform.io/providers/terraform-community-providers/neon/latest/docs
+- Neon provider registry: https://registry.terraform.io/providers/kislerdm/neon/latest/docs
+- Neon regions: https://neon.com/docs/conceptual-guides/regions
+- Neon API current user endpoint: https://api-docs.neon.tech/reference/getcurrentuserinfo
 
 Registry API checks on 2026-05-24:
 
@@ -57,15 +59,15 @@ Registry API checks on 2026-05-24:
 - Vercel provider latest: `5.3.0`, published 2026-05-20.
 - Better Stack Uptime provider latest: `0.20.17`, published 2026-05-13.
 - Sentry provider latest: `0.15.0-beta3`, published 2026-05-18.
-- Neon provider latest: `0.1.15`, published 2026-04-20.
+- Neon provider latest: `0.13.0`, published 2026-01-02.
 
 ## Open Review Items
 
 - Confirm AWS provider `6.x` resource arguments for Lightsail snapshots and port rules before adding the Lightsail module.
 - Confirm Cloudflare provider `5.x` resources for Access, WAF/security baseline, Turnstile, R2 bucket, and media custom domain before adding Cloudflare resources.
-- Confirm Upstash Singapore region ID and pricing mode fields before adding Redis resources.
+- Confirmed Upstash Terraform provider `2.1.0` uses `upstash_redis_database`; Regional Redis creation is rejected as deprecated, so use `region = "global"` with `primary_region = "ap-southeast-1"` for Singapore-primary databases. The Upstash API rejects budget values below `$20`.
 - Confirm Vercel env var resource mode and sensitive-value behavior before managing env vars.
 - Confirm Better Stack log source Terraform support. If unsupported or unstable, keep log source manual and document the reason.
 - Decide whether to use the beta Sentry provider, pin a stable older version, or keep Sentry manual for v1. Sentry is intentionally not in the root `required_providers` blocks yet.
-- Complete the Neon provider audit before adding any Neon resources. If it fails, create Neon manually and document/import stable resources later.
-- Neon is intentionally not in the root `required_providers` blocks yet.
+- Neon provider schema validation passed after using `store_password = "yes"`. The QA root now pins `kislerdm/neon` `0.13.0`.
+- Neon Terraform plan/apply uses `NEON_KEY` from the local uncommitted `.env` file mapped to `TF_VAR_neon_api_key`. The current account rejected explicit endpoint suspend interval changes and history retention above `21600` seconds, so Terraform leaves suspend interval unset and pins history retention to `21600` seconds.

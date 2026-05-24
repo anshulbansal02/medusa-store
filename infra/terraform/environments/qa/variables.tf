@@ -68,14 +68,50 @@ variable "upstash_api_key" {
   sensitive   = true
 }
 
-variable "upstash_redis_region" {
-  description = "Upstash Redis region for QA."
+variable "upstash_redis_primary_region" {
+  description = "Primary region for the QA Upstash Global Redis database."
   type        = string
   default     = "ap-southeast-1"
+}
+
+variable "upstash_redis_read_regions" {
+  description = "Optional read regions for the QA Upstash Global Redis database."
+  type        = set(string)
+  default     = []
 }
 
 variable "upstash_redis_budget" {
   description = "Monthly budget guardrail for QA Upstash Redis in USD."
   type        = number
-  default     = 5
+  default     = 20
+}
+
+variable "neon_api_key" {
+  description = "Neon API key for the Terraform provider. Prefer TF_VAR_neon_api_key."
+  type        = string
+  sensitive   = true
+}
+
+variable "neon_org_id" {
+  description = "Neon organization ID that owns the Medusa project."
+  type        = string
+  default     = "org-soft-pond-66604026"
+}
+
+variable "neon_region_id" {
+  description = "Neon region ID for the Medusa project."
+  type        = string
+  default     = "aws-ap-southeast-1"
+}
+
+variable "neon_pg_version" {
+  description = "PostgreSQL major version for the Neon project."
+  type        = number
+  default     = 17
+}
+
+variable "neon_history_retention_seconds" {
+  description = "Neon point-in-time restore history retention, in seconds."
+  type        = number
+  default     = 21600
 }

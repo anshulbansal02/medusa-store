@@ -8,6 +8,14 @@ lightsail_ssh_public_key_path     = "~/.ssh/id_ed25519_ecom_lightsail.pub"
 lightsail_temporary_ssh_cidrs     = []
 lightsail_automatic_snapshot_time = "20:00"
 
-upstash_email        = "you@example.com"
-upstash_redis_region = "ap-southeast-1"
-upstash_redis_budget = 5
+upstash_email                = "you@example.com"
+upstash_redis_primary_region = "ap-southeast-1"
+upstash_redis_read_regions   = []
+upstash_redis_budget         = 20
+
+# Export secret values with TF_VAR_* instead of committing them:
+# export TF_VAR_neon_api_key="..."
+neon_org_id                            = "org-soft-pond-66604026"
+neon_region_id                         = "aws-ap-southeast-1"
+neon_pg_version                        = 17
+neon_history_retention_seconds         = 21600

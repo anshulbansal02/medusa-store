@@ -126,8 +126,8 @@ Redis:
 
 - Production `REDIS_URL` points to Upstash Redis in Singapore.
 - Start production Redis on Upstash pay-as-you-go pricing.
-- QA/staging `REDIS_URL` points to a separate Upstash Redis database in Singapore.
-- Start QA/staging Redis on Upstash pay-as-you-go pricing.
+- QA/staging `REDIS_URL` points to a separate Upstash Global Redis database with Singapore as the primary region.
+- Start QA/staging Redis on Upstash pay-as-you-go pricing with the provider/API minimum budget guardrail.
 - QA/staging must not share production Redis.
 
 R2:

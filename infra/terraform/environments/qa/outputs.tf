@@ -48,3 +48,23 @@ output "medusa_redis_endpoint" {
   description = "QA Medusa Upstash Redis endpoint."
   value       = module.medusa_redis.endpoint
 }
+
+output "medusa_postgres_project_id" {
+  description = "QA Medusa Neon project ID."
+  value       = module.medusa_postgres.project_id
+}
+
+output "medusa_postgres_region_id" {
+  description = "QA Medusa Neon region ID."
+  value       = module.medusa_postgres.region_id
+}
+
+output "medusa_postgres_qa_branch_id" {
+  description = "QA Medusa Neon branch ID."
+  value       = module.medusa_postgres.qa_branch_id
+}
+
+output "medusa_postgres_qa_endpoint_host" {
+  description = "QA Medusa Neon endpoint host."
+  value       = module.medusa_postgres.qa_endpoint_host
+}
