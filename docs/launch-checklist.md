@@ -16,15 +16,16 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Real secrets are not committed.
 - `dev` and `main` branches are protected.
 - GitHub repo settings, Actions environments, and Actions secrets are configured manually for v1.
-- `dev` deploys to QA.
-- Production deploys from `main` are manual workflow dispatch for v1.
+- Direct pushes to `dev` are allowed for active development and run CI.
+- QA deploys from `dev` are manual workflow dispatch for v1.
+- Production releases merge to `main` through PR, then deploy by manual workflow dispatch for v1.
 - GitHub Actions CI runs on `dev` and `main` for lint/typecheck/build checks.
 - CI stays lean: no heavy/fancy checks unless they catch a real current risk.
 - CI/CD deploy mapping:
-  - `push` to `dev` deploys the Vercel QA preview.
-  - Medusa QA/staging may auto-deploy from `dev`.
-  - Production Medusa deploy from `main` is manual workflow dispatch.
-- Confirm the Medusa deploy target shows a successful build step before smoke testing API endpoints.
+  - Storefront QA deploy from `dev` is manual workflow dispatch.
+  - Medusa QA deploy from `dev` is manual workflow dispatch.
+  - Production deploys from `main` are manual workflow dispatch.
+- Confirm the manually dispatched Medusa deploy target shows a successful build step before smoke testing API endpoints.
 - Confirm Medusa QA deploy credentials for the shared Lightsail QA setup.
 - Confirm Vercel storefront QA deploy is enabled through the GitHub `qa` environment secret `VERCEL_TOKEN`.
 - Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL` and, when ready, `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`.

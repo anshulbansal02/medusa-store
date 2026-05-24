@@ -698,9 +698,9 @@ Workflows:
   - storefront production build.
   - Medusa production build.
   - Terraform fmt/validate later without apply permissions.
-- Storefront QA deploy from `dev`.
-- Storefront production deploy manual workflow dispatch.
-- Medusa QA deploy/start from `dev` where useful.
+- Storefront QA deploy manual workflow dispatch from `dev`.
+- Storefront production deploy manual workflow dispatch from `main`.
+- Medusa QA deploy/start manual workflow dispatch from `dev`.
 - Medusa production deploy manual workflow dispatch.
 
 Remove or replace:
@@ -736,6 +736,8 @@ Rules:
 
 - GitHub repository settings/secrets/environments are manual for v1.
 - GitHub Actions does not run Terraform apply.
+- Direct pushes to `dev` run CI only and do not deploy automatically.
+- Production releases go through PR merge into `main`.
 - Production deploys are manual workflow dispatch.
 - Production migrations require explicit approval.
 - Do not use Watchtower/auto-updaters.

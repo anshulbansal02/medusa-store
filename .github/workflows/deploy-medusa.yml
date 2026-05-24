@@ -1,14 +1,6 @@
 name: Deploy Medusa
 
 on:
-  push:
-    branches: [dev]
-    paths:
-      - apps/medusa/**
-      - infra/compose/docker-compose.qa.yml
-      - infra/scripts/deploy-medusa-host.sh
-      - infra/scripts/render-ssm-env.py
-      - .github/workflows/deploy-medusa.yml
   workflow_dispatch:
     inputs:
       target:

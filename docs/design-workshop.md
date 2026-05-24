@@ -72,14 +72,14 @@ Use this file for future high-level design discussions. When a decision becomes 
 ## Environment Summary
 
 - Branches:
-  - feature branches are used for development work.
-  - `dev` deploys to QA.
-  - feature branches merge into `dev`; `dev` merges into `main` for production release.
+  - `dev` is used for active development and accepts direct pushes.
+  - `dev` runs CI but deploys to QA only by manual workflow dispatch.
+  - `dev` merges into `main` through PR for production release.
   - `dev` should be the default GitHub branch.
-  - `dev` and `main` deploy to hosted environments and must be protected.
+  - `dev` and `main` must be protected according to their roles.
 - Vercel:
-  - QA storefront from `dev`.
-  - Production storefront from `main`.
+  - QA storefront manual deploy from `dev`.
+  - Production storefront manual deploy from `main`.
 - Medusa:
   - Production Medusa runs on AWS Lightsail Singapore.
   - QA Medusa may share the production Lightsail instance, but stays stopped by default.

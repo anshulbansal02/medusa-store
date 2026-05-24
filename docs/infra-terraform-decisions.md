@@ -1483,14 +1483,16 @@ Options:
 
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
-| QA auto from `dev`, production manual dispatch | `dev` pushes can deploy QA; production deploys from `main` require manual workflow dispatch/approval. | Fast QA feedback, controlled production releases. | Production release is one manual step. | Accepted |
+| Manual QA and production dispatch | `dev` pushes run CI only; QA deploys are manual workflow dispatch. Production deploys from `main` are also manual workflow dispatch/approval. | Keeps deploys intentional and avoids slow deploy/watch cycles while preserving CI feedback. | QA feedback requires an explicit deploy step. | Accepted |
+| QA auto from `dev`, production manual dispatch | `dev` pushes can deploy QA; production deploys from `main` require manual workflow dispatch/approval. | Fast QA feedback, controlled production releases. | Creates deploy overhead during active setup. | Rejected |
 | Production auto on `main` push | Every push/merge to `main` deploys production. | Fully automated. | Too risky for checkout/order/payment backend in v1. | Rejected |
 | Fully manual QA and prod | No automatic deploys. | Maximum control. | Slower QA feedback. | Rejected |
 
 Decision:
 
-- QA deploys may run automatically from `dev`.
+- QA deploys are manual workflow dispatch from `dev`.
 - Production deploys are manual workflow dispatch for v1.
+- Development work can push directly to `dev`; production releases go through PR merge into `main`.
 - Production migrations keep their explicit approval gate.
 - Revisit automatic production deploy only after production stability and rollback confidence improve.
 
@@ -1498,6 +1500,7 @@ Reason:
 
 - Production Medusa deploys affect checkout, orders, payment callbacks, and admin operations.
 - Manual dispatch is the right control point for one-operator v1 production.
+- Manual QA deploys avoid unnecessary deployment churn while infrastructure and application setup are still changing quickly.
 
 ### Decision 47: CI Checks Before Deploy
 
