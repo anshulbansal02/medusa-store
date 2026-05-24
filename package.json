@@ -24,6 +24,11 @@
     "typecheck": "pnpm --recursive --if-present typecheck",
     "format": "pnpm --dir apps/storefront format",
     "format:check": "pnpm --dir apps/storefront format:check",
+    "infra:fmt": "terraform fmt -recursive infra/terraform",
+    "infra:fmt:check": "terraform fmt -check -recursive infra/terraform",
+    "infra:validate:bootstrap": "terraform -chdir=infra/terraform/bootstrap validate",
+    "infra:validate:prod": "terraform -chdir=infra/terraform/environments/prod validate",
+    "infra:validate:qa": "terraform -chdir=infra/terraform/environments/qa validate",
     "portless:list": "portless list",
     "portless:trust": "portless trust",
     "portless:proxy:stop": "portless proxy stop"

@@ -32,5 +32,15 @@ storefront-home-*.png
 # hosting
 .vercel/
 
+# terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+
 # coverage
 coverage/

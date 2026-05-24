@@ -11,8 +11,9 @@ Single-brand premium fashion ecommerce storefront.
 - Email: Resend.
 - Media: Cloudflare R2.
 - Analytics: Cloudflare Web Analytics.
-- Hosting: Vercel Pro + Railway Pro.
-- Database/cache: Railway Postgres + Railway Redis.
+- Hosting: Vercel Pro storefront + AWS Lightsail Medusa compute.
+- Database/cache: Neon Postgres Singapore + Upstash Redis Singapore.
+- Infrastructure: Terraform-managed durable infrastructure with GitHub Actions-managed deploys.
 
 ## Current Status
 
@@ -72,6 +73,8 @@ Do not switch local HTTP app development to standard ports like `3000`, `4000`, 
 - [Engineering Standards](docs/engineering-standards.md): code organization, tooling, security, performance.
 - [Secrets And Config](docs/secrets-and-config.md): environment variables, secret handling, hosted config, rotation.
 - [Implementation Plan](docs/implementation-plan.md): MVP scope and build phases.
+- [Infrastructure And Terraform Decisions](docs/infra-terraform-decisions.md): accepted infrastructure direction.
+- [Infrastructure And Terraform Implementation Plan](docs/infra-terraform-implementation-plan.md): execution order for Terraform, infra, deploy, and launch setup.
 - [Launch Checklist](docs/launch-checklist.md): manual launch readiness checks.
 - [Cost Model](docs/cost-model.md): cost assumptions and guardrails.
 - [References](docs/references.md): official docs and research sources.
@@ -87,12 +90,11 @@ Do not switch local HTTP app development to standard ports like `3000`, `4000`, 
 
 ## Next Step
 
-Continue with Phase 1 from [Implementation Plan](docs/implementation-plan.md):
+Continue infrastructure setup from [Infrastructure And Terraform Implementation Plan](docs/infra-terraform-implementation-plan.md):
 
 ```txt
-Design foundation:
-  visual system
-  Tailwind tokens
-  shadcn CLI-installed component structure
-  Base UI primitives
+Preflight and provider audit:
+  resource inventory
+  provider support checks
+  Terraform bootstrap state
 ```
