@@ -1,7 +1,7 @@
 # Cost Model
 
 Status: v1 cost guardrail
-Last reviewed: 2026-05-15
+Last reviewed: 2026-05-24
 
 Target: keep recurring operating cost around USD 50/month or lower where practical, excluding payment gateway transaction fees and domain renewal.
 
@@ -28,8 +28,7 @@ Target: keep recurring operating cost around USD 50/month or lower where practic
 | Cloudflare R2 | Product/media storage | Low at initial image/catalog scale |
 | Cloudflare DNS | Authoritative DNS | Free/low-cost DNS management; registrar transfer not required |
 | Cloudflare Web Analytics | Basic website analytics | Free |
-| Better Stack | Uptime checks and alerts | Free/low-cost tier expected initially; verify commercial-use terms |
-| Sentry | Application error tracking | Free/low-cost tier expected initially |
+| Better Stack | Uptime checks, alerts, logs, and application error tracking | Free/low-cost tier expected initially; verify commercial-use terms and ingestion limits |
 | Resend | Transactional email | Free plan expected to be enough initially |
 | Razorpay | Payments | Transaction fees; excluded from infra target |
 | Domain | Existing domain | Renewal cost; excluded from monthly infra target |
@@ -44,7 +43,7 @@ Target: keep recurring operating cost around USD 50/month or lower where practic
 - Instantiate production compute after QA setup and testing, when explicitly approved.
 - Delete QA backend compute when it is no longer needed; stopped Lightsail instances still accrue charges until deleted.
 - Prefer free/native features when they are good enough and do not add complexity.
-- Do not rely on a free tier blindly. Track limits and overage behavior for GitHub Actions minutes/storage, GHCR storage/transfer, Vercel bandwidth/build/image usage, Lightsail bandwidth/snapshots, Neon storage/compute, Upstash commands/bandwidth/storage, Cloudflare R2 storage/operations/egress, Resend sends, Better Stack, and Sentry.
+- Do not rely on a free tier blindly. Track limits and overage behavior for GitHub Actions minutes/storage, GHCR storage/transfer, Vercel bandwidth/build/image usage, Lightsail bandwidth/snapshots, Neon storage/compute, Upstash commands/bandwidth/storage, Cloudflare R2 storage/operations/egress, Resend sends, and Better Stack.
 - Add budget alerts or usage review checkpoints before enabling always-on QA, production traffic, or media-heavy campaigns.
 
 ## Approximate Shape
@@ -58,7 +57,7 @@ Base expected recurring:
   Upstash Redis pay-as-you-go
   Cloudflare R2 small usage
   Resend Free
-  Better Stack/Sentry free or low usage tiers
+  Better Stack free or low usage tier
   Cloudflare Web Analytics Free
 
 Target:
@@ -79,7 +78,7 @@ Revisit cost model if:
 - Product image traffic grows significantly.
 - QA backend becomes always-on and costly.
 - Analytics needs become more advanced.
-- Better Stack or Sentry usage exceeds free/low-cost tiers.
+- Better Stack usage exceeds free/low-cost tiers.
 - Shipping automation adds paid tools.
 - Marketing starts paid ads or email campaigns.
 

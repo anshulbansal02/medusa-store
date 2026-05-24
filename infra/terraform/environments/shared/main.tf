@@ -1,11 +1,52 @@
 data "aws_caller_identity" "current" {}
 
 locals {
+  better_stack_uptime_monitors = {
+    production_storefront = {
+      name   = "Production storefront"
+      url    = "https://${var.production_storefront_domain}"
+      paused = true
+    }
+    qa_storefront = {
+      name = "QA storefront"
+      url  = "https://${var.qa_storefront_domain}"
+    }
+    qa_medusa_admin = {
+      name = "QA Medusa Admin"
+      url  = "https://${var.qa_medusa_admin_domain}"
+    }
+    qa_medusa_health = {
+      name         = "QA Medusa health"
+      url          = "https://${var.qa_medusa_api_domain}/health"
+      monitor_type = "expected_status_code"
+      expected_status_codes = [
+        200,
+      ]
+    }
+    qa_medusa_ready = {
+      name         = "QA Medusa readiness"
+      url          = "https://${var.qa_medusa_api_domain}/ready"
+      monitor_type = "expected_status_code"
+      expected_status_codes = [
+        200,
+      ]
+    }
+  }
   storefront_image_hostnames   = join(",", [local.production_media_domain, local.qa_media_domain])
   cloudflare_r2_buckets        = var.cloudflare_r2_media_enabled ? local.r2_media_buckets : {}
   cloudflare_r2_custom_domains = var.cloudflare_r2_media_enabled ? local.r2_media_custom_domains : {}
-  production_media_domain      = var.production_media_domain
-  qa_media_domain              = var.qa_media_domain
+  cloudflare_web_analytics_sites = var.cloudflare_web_analytics_enabled ? {
+    production = {
+      host         = var.production_storefront_domain
+      auto_install = false
+    }
+    qa = {
+      host         = var.qa_storefront_domain
+      auto_install = false
+    }
+  } : {}
+  production_media_domain = var.production_media_domain
+  qa_media_domain         = var.qa_media_domain
   tags = {
     Project     = var.project
     ManagedBy   = "terraform"
@@ -55,7 +96,14 @@ module "vercel_storefront_qa" {
       domain = var.qa_storefront_domain
     }
   }
-  environment_variables = {
+  environment_variables = merge({
+    site_url = {
+      key       = "NEXT_PUBLIC_SITE_URL"
+      value     = "https://${var.qa_storefront_domain}"
+      target    = ["production"]
+      sensitive = false
+      comment   = "Canonical QA storefront URL for metadata and absolute links."
+    }
     qa_medusa_backend_url = {
       key       = "MEDUSA_BACKEND_URL"
       value     = "https://${var.qa_medusa_api_domain}"
@@ -77,7 +125,17 @@ module "vercel_storefront_qa" {
       sensitive = false
       comment   = "Allowed image hostnames for QA storefront deployments."
     }
-  }
+    },
+    var.cloudflare_site_enabled && var.cloudflare_web_analytics_enabled ? {
+      cloudflare_web_analytics_token = {
+        key       = "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN"
+        value     = module.cloudflare_site[0].web_analytics_site_tokens["qa"]
+        target    = ["production"]
+        sensitive = false
+        comment   = "Cloudflare Web Analytics token for the QA storefront."
+      }
+    } : {}
+  )
 }
 
 module "vercel_storefront_prod" {
@@ -95,7 +153,14 @@ module "vercel_storefront_prod" {
       domain = var.production_storefront_domain
     }
   }
-  environment_variables = {
+  environment_variables = merge({
+    site_url = {
+      key       = "NEXT_PUBLIC_SITE_URL"
+      value     = "https://${var.production_storefront_domain}"
+      target    = ["production"]
+      sensitive = false
+      comment   = "Canonical production storefront URL for metadata and absolute links."
+    }
     image_hostnames = {
       key       = "NEXT_PUBLIC_IMAGE_HOSTNAMES"
       value     = local.storefront_image_hostnames
@@ -103,7 +168,17 @@ module "vercel_storefront_prod" {
       sensitive = false
       comment   = "Allowed image hostnames for production storefront deployments."
     }
-  }
+    },
+    var.cloudflare_site_enabled && var.cloudflare_web_analytics_enabled ? {
+      cloudflare_web_analytics_token = {
+        key       = "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN"
+        value     = module.cloudflare_site[0].web_analytics_site_tokens["production"]
+        target    = ["production"]
+        sensitive = false
+        comment   = "Cloudflare Web Analytics token for the production storefront."
+      }
+    } : {}
+  )
 }
 
 moved {
@@ -151,7 +226,22 @@ module "cloudflare_site" {
       proxied = false
       comment = "QA Medusa API on AWS Lightsail. Terraform-managed."
     }
+    qa_medusa_admin = {
+      name    = var.qa_medusa_admin_domain
+      type    = "A"
+      content = var.qa_medusa_static_ip
+      proxied = true
+      comment = "QA Medusa Admin on AWS Lightsail. Terraform-managed."
+    }
   }
-  r2_buckets        = local.cloudflare_r2_buckets
-  r2_custom_domains = local.cloudflare_r2_custom_domains
+  r2_buckets          = local.cloudflare_r2_buckets
+  r2_custom_domains   = local.cloudflare_r2_custom_domains
+  web_analytics_sites = local.cloudflare_web_analytics_sites
+}
+
+module "observability" {
+  count  = var.better_stack_uptime_enabled ? 1 : 0
+  source = "../../modules/observability"
+
+  better_stack_uptime_monitors = local.better_stack_uptime_monitors
 }

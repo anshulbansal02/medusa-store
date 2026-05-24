@@ -1,8 +1,11 @@
 locals {
   medusa_store_cors_origins = join(",", distinct(concat(var.medusa_store_cors_base_origins, ["https://${var.qa_storefront_domain}"])))
-  medusa_admin_cors_origins = join(",", distinct(concat(var.medusa_admin_cors_base_origins, ["https://${var.qa_medusa_api_domain}"])))
-  medusa_auth_cors_origins  = join(",", distinct(concat(var.medusa_auth_cors_base_origins, ["https://${var.qa_medusa_api_domain}", "https://${var.qa_storefront_domain}"])))
+  medusa_admin_cors_origins = join(",", distinct(concat(var.medusa_admin_cors_base_origins, ["https://${var.qa_medusa_api_domain}", "https://${var.qa_medusa_admin_domain}"])))
+  medusa_auth_cors_origins  = join(",", distinct(concat(var.medusa_auth_cors_base_origins, ["https://${var.qa_medusa_api_domain}", "https://${var.qa_medusa_admin_domain}", "https://${var.qa_storefront_domain}"])))
   medusa_backend_url        = "https://${var.qa_medusa_api_domain}"
+  medusa_admin_url          = "https://${var.qa_medusa_admin_domain}"
+  medusa_r2_file_url        = "https://${var.qa_media_domain}"
+  medusa_r2_endpoint        = "https://${var.cloudflare_r2_account_id}.r2.cloudflarestorage.com"
   tags = {
     Project     = var.project
     ManagedBy   = "terraform"
@@ -87,6 +90,26 @@ module "medusa_ssm_config" {
     MEDUSA_BACKEND_URL = {
       value       = local.medusa_backend_url
       description = "Externally reachable QA Medusa backend URL."
+    }
+    MEDUSA_ADMIN_URL = {
+      value       = local.medusa_admin_url
+      description = "Externally reachable QA Medusa Admin URL."
+    }
+    ADMIN_PATH = {
+      value       = "/"
+      description = "Medusa Admin UI path for the dedicated QA admin hostname."
+    }
+    S3_FILE_URL = {
+      value       = local.medusa_r2_file_url
+      description = "Public QA media base URL served from Cloudflare R2."
+    }
+    S3_BUCKET = {
+      value       = var.qa_media_bucket_name
+      description = "Cloudflare R2 bucket name for QA Medusa media."
+    }
+    S3_ENDPOINT = {
+      value       = local.medusa_r2_endpoint
+      description = "Cloudflare R2 S3-compatible endpoint for QA Medusa media."
     }
   }
   secure_string_parameters = {

@@ -8,13 +8,14 @@ This module currently supports:
 - DNS records
 - R2 buckets
 - R2 custom domains
+- Cloudflare Access self-hosted applications
 - Turnstile widgets
 - Cloudflare Web Analytics sites
 
-Cloudflare Access and WAF/ruleset resources are intentionally not included yet.
-They need a separate review because policy/ruleset shape is security-sensitive
-and depends on the final admin hostname, approved admin email allowlist, and
-Cloudflare Zero Trust account state.
+Cloudflare Access support is limited to simple self-hosted applications with an
+explicit email allowlist. WAF/ruleset resources are intentionally not included
+yet because their policy shape is security-sensitive and should be added only
+after the final admin hostnames and launch traffic behavior are reviewed.
 
 Manual inputs needed before wiring this module into a live root:
 

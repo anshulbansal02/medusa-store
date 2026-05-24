@@ -22,3 +22,7 @@ neon_history_retention_seconds         = 21600
 
 qa_storefront_domain = "qa.neonfold.com"
 qa_medusa_api_domain = "qa-api.neonfold.com"
+qa_medusa_admin_domain = "qa-admin.neonfold.com"
+qa_media_domain = "qa-media.neonfold.com"
+qa_media_bucket_name = "ecom-qa-media"
+cloudflare_r2_account_id = "cloudflare-account-id"

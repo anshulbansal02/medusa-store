@@ -67,3 +67,13 @@ output "cloudflare_r2_custom_domain_status" {
   description = "Terraform-managed Cloudflare R2 media custom-domain status."
   value       = var.cloudflare_site_enabled ? module.cloudflare_site[0].r2_custom_domain_status : {}
 }
+
+output "cloudflare_web_analytics_site_tokens" {
+  description = "Terraform-managed Cloudflare Web Analytics site tokens."
+  value       = var.cloudflare_site_enabled ? module.cloudflare_site[0].web_analytics_site_tokens : {}
+}
+
+output "better_stack_uptime_monitor_ids" {
+  description = "Terraform-managed Better Stack Uptime monitor IDs."
+  value       = var.better_stack_uptime_enabled ? module.observability[0].better_stack_uptime_monitor_ids : {}
+}

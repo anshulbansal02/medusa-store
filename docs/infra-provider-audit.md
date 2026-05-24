@@ -18,7 +18,7 @@ Reason:
 
 Local status:
 
-- This machine currently has Terraform `1.5.7`, so `terraform init` and `terraform validate` are blocked until Terraform is upgraded locally.
+- The system `terraform` binary is still `1.5.7`, but mise is configured in `.mise.toml` and `mise exec terraform@1.15.4 -- terraform ...` runs the pinned `1.15.4`. Use mise for Terraform commands unless the system binary is upgraded.
 
 ## Provider Candidates
 
@@ -29,7 +29,6 @@ Local status:
 | Upstash | `upstash/upstash` | `2.1.0` | candidate | Needed for Redis databases. Confirm Singapore region IDs and pay-as-you-go behavior before resources. |
 | Vercel | `vercel/vercel` | `5.3.0` | candidate | Needed for storefront project, domains, and env vars. Avoid mixing inline and standalone env-var modes. |
 | Better Stack Uptime | `BetterStackHQ/better-uptime` | `0.20.17` | candidate | Partner provider. Covers uptime resources; log source support may require a separate provider/API or manual setup. |
-| Sentry | `jianyuan/sentry` | `0.15.0-beta3` | review before use | Registry latest is beta. Not pinned in root modules until resource support and stability are reviewed. |
 | Neon | `kislerdm/neon` | `0.13.0` | validated, blocked on API key for plan/apply | Community provider with project, branch, endpoint, role, database, sensitive connection outputs, and import support. Requires a Neon API key; Neon CLI OAuth login is not accepted by the provider/API for Terraform auth. |
 
 ## Official References Checked
@@ -45,7 +44,6 @@ Local status:
 - Vercel project environment variable docs: https://registry.terraform.io/providers/vercel/vercel/latest/docs/resources/project_environment_variable
 - Better Stack Terraform docs: https://betterstack.com/docs/uptime/terraform/
 - Better Stack provider registry: https://registry.terraform.io/providers/BetterStackHQ/better-uptime/latest
-- Sentry provider registry: https://registry.terraform.io/providers/jianyuan/sentry/latest/docs
 - Neon provider registry: https://registry.terraform.io/providers/kislerdm/neon/latest/docs
 - Neon regions: https://neon.com/docs/conceptual-guides/regions
 - Neon API current user endpoint: https://api-docs.neon.tech/reference/getcurrentuserinfo
@@ -58,17 +56,18 @@ Registry API checks on 2026-05-24:
 - Upstash provider latest: `2.1.0`, published 2025-08-27.
 - Vercel provider latest: `5.3.0`, published 2026-05-20.
 - Better Stack Uptime provider latest: `0.20.17`, published 2026-05-13.
-- Sentry provider latest: `0.15.0-beta3`, published 2026-05-18.
 - Neon provider latest: `0.13.0`, published 2026-01-02.
 
 ## Open Review Items
 
 - Confirm AWS provider `6.x` resource arguments for Lightsail snapshots and port rules before adding the Lightsail module.
-- Confirmed Cloudflare provider `5.19.1` exposes `cloudflare_dns_record`, `cloudflare_r2_bucket`, `cloudflare_r2_custom_domain`, `cloudflare_turnstile_widget`, and `cloudflare_web_analytics_site`. A validated module exists for those resources but is not wired to a live root until Cloudflare account/zone/domain inputs are available.
-- Cloudflare Access and WAF/ruleset resources exist in the provider, but remain under review because policy/ruleset shape is security-sensitive and depends on the final admin hostname, approved admin email allowlist, and Zero Trust account state.
+- Confirmed Cloudflare provider `5.19.1` exposes `cloudflare_dns_record`, `cloudflare_r2_bucket`, `cloudflare_r2_custom_domain`, `cloudflare_zero_trust_access_application`, `cloudflare_turnstile_widget`, and `cloudflare_web_analytics_site`. DNS and R2 bucket/custom-domain resources are wired in the shared root for the interim `neonfold.com` domain.
+- Cloudflare Access is intentionally deferred as a later security layer. A trial apply failed with Cloudflare API `403 Authentication error` even though the token verifies as active, so the local `CLOUDFLARE_API_TOKEN` needs Zero Trust Access application write permission before Terraform can manage Access apps. WAF/ruleset resources remain under review because their policy shape is security-sensitive and depends on final traffic behavior.
 - Confirmed Upstash Terraform provider `2.1.0` uses `upstash_redis_database`; Regional Redis creation is rejected as deprecated, so use `region = "global"` with `primary_region = "ap-southeast-1"` for Singapore-primary databases. The Upstash API rejects budget values below `$20`.
 - Confirm Vercel env var resource mode and sensitive-value behavior before managing env vars.
 - Confirm Better Stack log source Terraform support. If unsupported or unstable, keep log source manual and document the reason.
-- Decide whether to use the beta Sentry provider, pin a stable older version, or keep Sentry manual for v1. Sentry is intentionally not in the root `required_providers` blocks yet.
+- Sentry is deferred for v1 after choosing Better Stack as the single observability provider for uptime, logs, alerts, and error tracking. Do not pin the Sentry provider unless that decision changes.
 - Neon provider schema validation passed after using `store_password = "yes"`. The QA root now pins `kislerdm/neon` `0.13.0`.
-- Neon Terraform plan/apply uses `NEON_KEY` from the local uncommitted `.env` file mapped to `TF_VAR_neon_api_key`. The current account rejected explicit endpoint suspend interval changes and history retention above `21600` seconds, so Terraform leaves suspend interval unset and pins history retention to `21600` seconds.
+- Neon Terraform plan/apply uses `TF_VAR_neon_api_key`, sourced from SSM `/ecom/shared/operator/neon/api_key` or the ignored local bootstrap `.env` during setup. The current account rejected explicit endpoint suspend interval changes and history retention above `21600` seconds, so Terraform leaves suspend interval unset and pins history retention to `21600` seconds.
+- Cloudflare's R2 docs say S3-compatible Access Key ID and Secret Access Key values are produced by an R2-specific API token and the secret is shown only once. The current Terraform Cloudflare API token cannot create additional API tokens, so R2 write credentials remain a manual one-time dashboard/API-token step and are stored as SSM `SecureString` values outside Terraform state. QA credentials have been stored in SSM and verified through a Medusa upload/read smoke test.
+- Cloudflare Web Analytics Terraform wiring exists but is disabled by default. Trial applies failed with Cloudflare API `403 Authentication error` for the account-level RUM site endpoint, including after storing the updated token in SSM as version `2`, so the local `CLOUDFLARE_API_TOKEN` still needs the correct Web Analytics/RUM account write permission before Terraform can create Web Analytics sites.

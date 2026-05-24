@@ -67,7 +67,6 @@ Use official docs first when implementation depends on current platform behavior
 - Cloudflare Access: https://developers.cloudflare.com/cloudflare-one/applications/
 - Tailscale SSH: https://tailscale.com/kb/1193/tailscale-ssh
 - Better Stack docs: https://betterstack.com/docs/
-- Sentry docs: https://docs.sentry.io/
 
 ## Analytics Alternatives
 

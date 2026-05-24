@@ -560,20 +560,21 @@ Options:
 
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
-| Better Stack + Sentry + server logs | Use Better Stack for uptime/alerts, Sentry for app errors, and local Docker/Caddy logs for server investigation. | Simple, useful free/low-cost starting point, alerts on downtime and code errors, no self-hosted observability burden. | Free tiers and commercial-use terms must be verified before launch; not a full metrics platform. | Accepted |
+| Better Stack-only + server logs | Use Better Stack for uptime, alerts, logs, and error tracking, with local Docker/Caddy logs for server investigation. | One vendor and alert surface for v1, useful free/low-cost starting point, no self-hosted observability burden. | Better Stack error tracking is newer than Sentry; verify source-map/release/debugging workflow before launch. | Accepted |
+| Better Stack + Sentry + server logs | Use Better Stack for uptime/alerts/logs and Sentry for app errors. | Strong specialized code-level error tracking. | Two vendors, two SDK/config surfaces, duplicate alert/noise/billing management for v1. | Later option |
 | UptimeRobot free + logs | Use UptimeRobot free checks and server logs. | Simple. | UptimeRobot free plan is not ideal for a commercial ecommerce site; weaker app error visibility. | Rejected |
 | Grafana Cloud/Prometheus/Loki | Full metrics/logs/dashboard stack. | Powerful and extensible. | More setup than v1 needs; easy to overbuild. | Rejected for v1 |
 | Self-hosted observability on Lightsail | Run monitoring stack on the same VM. | No external observability vendor. | Bad failure model: monitoring can die with the app host. | Rejected |
 
 Decision:
 
-- Use Better Stack for uptime checks, alerts, and optional lightweight log collection.
-- Use Sentry for storefront and Medusa application error tracking.
+- Use Better Stack for uptime checks, alerts, log collection, and v1 application error tracking.
 - Ship Docker/Caddy/app logs to Better Stack via Vector from day one.
 - Keep local Docker/Caddy logs available on Lightsail as a fallback.
 - Do not set up Prometheus, Grafana, Loki, Datadog, or a self-hosted observability stack for v1.
-- Verify Better Stack and Sentry current free-tier/commercial-use limits before production launch.
-- Manage Better Stack and Sentry resources through Terraform where provider support is stable.
+- Verify Better Stack current free-tier/commercial-use limits before production launch.
+- Manage Better Stack resources through Terraform where provider support is stable.
+- Defer Sentry unless Better Stack error tracking is insufficient after QA or early production usage.
 
 Initial checks:
 
@@ -585,8 +586,8 @@ Initial checks:
 
 Reason:
 
-- Uptime alerts and app exception tracking solve the immediate v1 operational need.
-- Sentry answers "what code broke"; Better Stack answers "is the service reachable".
+- Uptime alerts, logs, and app exception tracking solve the immediate v1 operational need.
+- Keeping v1 on Better Stack avoids duplicate alerting and billing while still covering service reachability, logs, and application errors.
 - Full metrics/log pipelines can be added later if incidents or traffic justify them.
 
 Terraform scope:
@@ -594,10 +595,8 @@ Terraform scope:
 - Terraform manages Better Stack uptime monitors.
 - Terraform manages Better Stack Telemetry/log sources where provider support is stable.
 - Terraform manages Better Stack heartbeats/status page only if needed.
-- Terraform manages Sentry frontend and backend projects.
-- Terraform manages basic Sentry alert rules.
-- Better Stack and Sentry account signup, billing/free-tier setup, and initial API tokens are manual bootstrap steps.
-- Better Stack/Sentry provider credentials must not be committed.
+- Better Stack account signup, billing/free-tier setup, and initial API tokens are manual bootstrap steps.
+- Better Stack provider credentials must not be committed.
 
 Logging:
 
@@ -628,7 +627,7 @@ Worker heartbeat:
 - Do not add a Better Stack worker heartbeat at launch.
 - Add a heartbeat only when the Medusa worker can emit a real periodic signal.
 - Do not fake worker health from the API server.
-- Use worker logs, Sentry backend errors, and Docker restart status initially.
+- Use worker logs, Better Stack error events, and Docker restart status initially.
 
 Status page:
 
@@ -687,7 +686,7 @@ Initial alert areas:
 - Vercel usage/overage.
 - Cloudflare R2 storage/operations.
 - Better Stack log volume and monitor limits.
-- Sentry event volume.
+- Better Stack event volume.
 
 Reason:
 
@@ -942,10 +941,6 @@ vercel
 betterstack
   Uptime monitors
   Log/telemetry sources where stable
-
-sentry
-  Frontend/backend projects
-  Basic alert rules
 
 neon
   Project, branches, roles, and databases after provider audit passes
@@ -1282,7 +1277,7 @@ Options:
 Decision:
 
 - Use Cloudflare Web Analytics as the only web analytics tool for v1.
-- Use Medusa Admin, Razorpay, Resend, Better Stack, and Sentry for commerce/payment/email/uptime/error visibility.
+- Use Medusa Admin, Razorpay, Resend, and Better Stack for commerce/payment/email/uptime/log/error visibility.
 - Do not add GA4, Meta pixels, PostHog, Plausible, or Umami for launch.
 - Revisit Umami Cloud if custom events or lightweight funnel visibility becomes necessary.
 

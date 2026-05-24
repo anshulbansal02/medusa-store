@@ -77,6 +77,7 @@ export function getMedusaConfig(env: BackendEnv = process.env) {
       cookieSecret: env.COOKIE_SECRET,
     },
     admin: {
+      path: env.ADMIN_PATH || "/app",
       backendUrl: env.MEDUSA_BACKEND_URL,
     },
   };

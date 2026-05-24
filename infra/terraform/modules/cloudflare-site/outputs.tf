@@ -19,6 +19,13 @@ output "r2_custom_domain_status" {
   }
 }
 
+output "access_application_ids" {
+  description = "Cloudflare Access application IDs keyed by input key."
+  value = {
+    for key, application in cloudflare_zero_trust_access_application.application : key => application.id
+  }
+}
+
 output "turnstile_sitekeys" {
   description = "Turnstile sitekeys keyed by input key."
   value = {

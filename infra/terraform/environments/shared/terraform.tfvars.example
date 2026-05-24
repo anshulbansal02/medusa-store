@@ -17,6 +17,9 @@ production_apex_domain      = "neonfold.com"
 production_storefront_domain = "www.neonfold.com"
 qa_storefront_domain         = "qa.neonfold.com"
 qa_medusa_api_domain         = "qa-api.neonfold.com"
+qa_medusa_admin_domain       = "qa-admin.neonfold.com"
+production_medusa_api_domain = "api.neonfold.com"
+production_medusa_admin_domain = "admin.neonfold.com"
 production_media_domain      = "media.neonfold.com"
 qa_media_domain              = "qa-media.neonfold.com"
 qa_medusa_static_ip          = "52.77.164.161"
@@ -24,7 +27,12 @@ qa_medusa_static_ip          = "52.77.164.161"
 # Prefer CLOUDFLARE_API_TOKEN in the shell instead of committing it.
 cloudflare_site_enabled     = true
 cloudflare_r2_media_enabled = true
+# Enable only after the Cloudflare API token has Web Analytics/RUM write permission.
+cloudflare_web_analytics_enabled = false
 cloudflare_account_id       = "cloudflare-account-id"
 cloudflare_zone_id          = "cloudflare-zone-id"
 qa_media_bucket_name        = "ecom-qa-media"
 production_media_bucket_name = "ecom-prod-media"
+
+# Prefer TF_VAR_better_stack_uptime_api_token or BETTERUPTIME_API_TOKEN instead of committing it.
+better_stack_uptime_enabled = true

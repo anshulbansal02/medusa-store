@@ -80,6 +80,24 @@ variable "qa_medusa_api_domain" {
   default     = "qa-api.neonfold.com"
 }
 
+variable "qa_medusa_admin_domain" {
+  description = "QA Medusa Admin domain."
+  type        = string
+  default     = "qa-admin.neonfold.com"
+}
+
+variable "production_medusa_api_domain" {
+  description = "Future production Medusa API domain. DNS is deferred until production compute exists."
+  type        = string
+  default     = "api.neonfold.com"
+}
+
+variable "production_medusa_admin_domain" {
+  description = "Future production Medusa Admin domain. DNS is deferred until production compute exists."
+  type        = string
+  default     = "admin.neonfold.com"
+}
+
 variable "production_media_domain" {
   description = "Production media domain served from Cloudflare R2."
   type        = string
@@ -122,6 +140,12 @@ variable "cloudflare_r2_media_enabled" {
   default     = false
 }
 
+variable "cloudflare_web_analytics_enabled" {
+  description = "Whether to create Cloudflare Web Analytics sites for storefront hostnames."
+  type        = bool
+  default     = false
+}
+
 variable "qa_media_bucket_name" {
   description = "Cloudflare R2 bucket name for QA media."
   type        = string
@@ -132,4 +156,17 @@ variable "production_media_bucket_name" {
   description = "Cloudflare R2 bucket name for production media."
   type        = string
   default     = "ecom-prod-media"
+}
+
+variable "better_stack_uptime_enabled" {
+  description = "Whether to manage Better Stack Uptime monitors from the shared root."
+  type        = bool
+  default     = false
+}
+
+variable "better_stack_uptime_api_token" {
+  description = "Better Stack Uptime API token. Prefer TF_VAR_better_stack_uptime_api_token or BETTERUPTIME_API_TOKEN."
+  type        = string
+  sensitive   = true
+  default     = null
 }

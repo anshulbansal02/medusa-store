@@ -128,6 +128,29 @@ variable "qa_medusa_api_domain" {
   default     = "qa-api.neonfold.com"
 }
 
+variable "qa_medusa_admin_domain" {
+  description = "QA Medusa Admin domain."
+  type        = string
+  default     = "qa-admin.neonfold.com"
+}
+
+variable "qa_media_domain" {
+  description = "QA media domain served from Cloudflare R2."
+  type        = string
+  default     = "qa-media.neonfold.com"
+}
+
+variable "qa_media_bucket_name" {
+  description = "Cloudflare R2 bucket name for QA media."
+  type        = string
+  default     = "ecom-qa-media"
+}
+
+variable "cloudflare_r2_account_id" {
+  description = "Cloudflare account ID used in the R2 S3-compatible endpoint URL."
+  type        = string
+}
+
 variable "medusa_store_cors_base_origins" {
   description = "Base allowed storefront origins for QA Medusa before derived public domain origins are added."
   type        = list(string)

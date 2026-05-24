@@ -42,6 +42,17 @@ variable "r2_custom_domains" {
   default = {}
 }
 
+variable "access_applications" {
+  description = "Cloudflare Access self-hosted applications to protect, keyed by a stable Terraform identifier."
+  type = map(object({
+    name             = string
+    domain           = string
+    session_duration = optional(string, "12h")
+    allowed_emails   = set(string)
+  }))
+  default = {}
+}
+
 variable "turnstile_widgets" {
   description = "Turnstile widgets to create, keyed by a stable Terraform identifier."
   type = map(object({

@@ -1,7 +1,7 @@
 # Launch Checklist
 
 Status: v1 manual launch checklist
-Last reviewed: 2026-05-15
+Last reviewed: 2026-05-24
 
 This checklist is intentionally lightweight. There is no written test suite for v1, so manual checks must be disciplined.
 Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and production setup.
@@ -175,13 +175,13 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Terraform production/QA applies are run locally with S3 remote state and native S3 lockfiles.
 - GitHub Actions fetches SSM parameters and writes Lightsail runtime env files during deploy.
 - Generated Lightsail env files have restrictive permissions.
-- QA backend domain `qa-api.neonfold.com` is configured when QA backend is exposed. Add QA admin domain only if hosted admin exposure is needed.
+- QA backend domain `qa-api.neonfold.com` is configured and verified. QA admin domain `qa-admin.neonfold.com` is configured, proxied through Cloudflare, and still requires Medusa Admin authentication.
 - QA Medusa containers are stopped by default if sharing the production Lightsail instance.
 - QA uses separate Neon branch/database, Redis, secrets, and Razorpay test credentials.
 - Medusa Admin has strong credentials.
-- Cloudflare Access protects production `admin.brand.com`.
-- Cloudflare Access email OTP allowlist contains only approved admin emails.
-- Cloudflare Access app/policies for admin are Terraform-managed and reviewed.
+- Cloudflare Access protects production `admin.brand.com` before production launch; QA Access is deferred until the Cloudflare API token has Zero Trust Access write permission.
+- Cloudflare Access email OTP allowlist contains only approved admin emails before Access is enabled.
+- Cloudflare Access app/policies for admin are Terraform-managed and reviewed before Access is enabled.
 - Conservative Cloudflare WAF/security baseline is enabled for proxied API/admin records.
 - Bot Fight Mode and aggressive WAF/rate-limit rules are not enabled at launch unless tested against checkout, webhooks, API, and admin flows.
 - Cloudflare Turnstile protects public forms and is verified server-side.
@@ -210,8 +210,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Medusa `/health` and `/ready` endpoints exist for liveness and readiness checks.
 - Better Stack email/mobile push alerts are tested.
 - Better Stack Terraform-managed monitors are reviewed where provider support is used.
-- Sentry error tracking configured for storefront and Medusa backend if included before launch.
-- Sentry Terraform-managed projects/alerts are reviewed where provider support is used.
+- Better Stack error tracking configured for storefront and Medusa backend if included before launch.
 - No Google Analytics.
 - No Meta/ads pixels.
 - No customer/payment/order data sent to analytics.

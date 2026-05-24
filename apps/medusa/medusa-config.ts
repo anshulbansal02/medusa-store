@@ -30,6 +30,7 @@ module.exports = defineConfig({
   },
   admin: {
     disable: process.env.DISABLE_MEDUSA_ADMIN === 'true',
+    path: medusaConfig.admin.path,
     backendUrl: medusaConfig.admin.backendUrl,
   },
   modules: [

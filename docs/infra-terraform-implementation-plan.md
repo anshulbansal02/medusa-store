@@ -16,7 +16,6 @@ Storefront:
   Vercel Pro
   Next.js App Router
   Cloudflare Web Analytics
-  Sentry frontend project
 
 Backend compute:
   AWS Lightsail 4 GB
@@ -47,8 +46,7 @@ Security:
   Tailscale SSH/deploy access
 
 Observability:
-  Better Stack uptime checks and logs
-  Sentry app error tracking
+  Better Stack uptime checks, logs, alerts, and app error tracking
   /health liveness endpoint
   /ready readiness endpoint
 
@@ -62,7 +60,7 @@ IaC:
 
 ## Existing State And Cleanup Policy
 
-The repo previously documented a Vercel + Railway-oriented baseline. That baseline is obsolete for production infrastructure. The accepted target is Vercel + AWS Lightsail + Neon + Upstash + Cloudflare + Better Stack + Sentry.
+The repo previously documented a Vercel + Railway-oriented baseline. That baseline is obsolete for production infrastructure. The accepted target is Vercel + AWS Lightsail + Neon + Upstash + Cloudflare + Better Stack.
 
 Before implementing, create an inventory of existing external resources. The inventory must classify each resource as `keep`, `import`, `replace`, `delete`, or `ignore`.
 
@@ -116,7 +114,7 @@ Implement in this order:
 7. Upstash prod/QA Redis.
 8. Neon prod/QA Postgres, or documented manual fallback if provider audit fails.
 9. Vercel project, domains, and environment config.
-10. Better Stack and Sentry observability.
+10. Better Stack observability.
 11. Lightsail host bootstrap script and runbooks.
 12. Medusa Docker runtime files and health endpoints.
 13. GitHub Actions deploy workflows.
@@ -142,7 +140,6 @@ Accounts:
 - Neon account.
 - Upstash account.
 - Better Stack account.
-- Sentry account.
 - GitHub repository admin access.
 - Tailscale account.
 - Razorpay account.
@@ -175,7 +172,6 @@ Secrets/config values:
 - R2 access key ID and secret access key.
 - JWT and cookie secrets.
 - Better Stack source token.
-- Sentry DSNs/tokens.
 - Vercel token and project/team IDs if needed for deployment.
 
 ## Phase 0: Preflight And Provider Audit
@@ -199,7 +195,6 @@ Steps:
    - Neon projects, branches, roles, and databases.
    - Upstash Redis databases.
    - Better Stack monitors/sources.
-   - Sentry projects.
    - GitHub Actions workflows, environments, variables, and secrets.
    - Razorpay webhooks and keys.
    - Resend domains and API keys.
@@ -223,8 +218,7 @@ Steps:
    - Cloudflare provider supports DNS, R2 bucket/custom domain, Turnstile widget, and Web Analytics site. Access and WAF/ruleset resources require separate policy review before live wiring.
    - Upstash provider supports Redis database creation in Singapore.
    - Vercel provider supports project, domains, and environment variables without mixing incompatible env-var resource modes.
-   - Better Stack provider supports uptime monitors and log/telemetry sources needed for v1.
-   - Sentry provider supports projects and basic alert rules needed for v1.
+   - Better Stack provider supports uptime monitors needed for v1. Log/telemetry sources and error-tracking applications may remain manual until provider support is reviewed.
    - Neon provider is reviewed before use. Check source, registry docs, import behavior, sensitive outputs, Singapore region ID, branch lifecycle, role/database management, and pooled/direct connection output.
    - Verify current official docs for prices, region names, provider resource behavior, and any limits that affect Terraform code.
 
@@ -441,24 +435,29 @@ Manual:
 Current status:
 
 - Cloudflare is authoritative for interim domain `neonfold.com`.
-- Terraform manages DNS for `neonfold.com`, `www.neonfold.com`, `qa.neonfold.com`, and `qa-api.neonfold.com`.
+- Terraform manages DNS for `neonfold.com`, `www.neonfold.com`, `qa.neonfold.com`, `qa-api.neonfold.com`, and `qa-admin.neonfold.com`.
 - Terraform manages R2 buckets `ecom-qa-media` and `ecom-prod-media`.
 - Terraform manages R2 custom domains `qa-media.neonfold.com` and `media.neonfold.com`; ownership and SSL are active.
-- Production `api`, production `admin`, Cloudflare Access, WAF/ruleset baseline, Turnstile, Web Analytics, R2 S3 credentials, and Medusa R2 runtime SSM parameters remain pending.
+- Terraform manages QA Medusa non-secret R2 runtime SSM parameters for `S3_FILE_URL`, `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION`.
+- QA R2 S3 credentials are stored in SSM `SecureString` and Medusa upload/read has been smoke tested.
+- Shared operator/provider credentials and setup config are stored in SSM under `/ecom/shared/operator/*` so local `.env` files are not the long-term source of truth.
+- Production `api`, production `admin`, production R2 S3 credentials, Cloudflare Access, WAF/ruleset baseline, Turnstile, and Web Analytics activation remain pending.
+- `qa-api.neonfold.com` and `qa-admin.neonfold.com` route to the QA Lightsail Medusa service; `qa-admin.neonfold.com` is proxied through Cloudflare while Access is deferred.
+- Web Analytics Terraform wiring exists but is disabled until the Cloudflare API token has Web Analytics/RUM write permission.
 
 Rules:
 
 - Do not enable global Bot Fight Mode at launch.
 - Do not add aggressive country blocks or broad API challenges at launch.
-- Cloudflare Access protects admin, but Medusa Admin auth remains required.
+- Cloudflare Access is deferred as a later security layer. Medusa Admin auth remains required, and `qa-admin.neonfold.com` is already proxied through Cloudflare.
 - Turnstile tokens must be verified server-side in app code.
 
 Verification:
 
 - Cloudflare is authoritative before production cutover.
 - `api` and `admin` records are proxied.
-- Access blocks unauthenticated `admin`.
-- Email OTP allowlist works.
+- Access blocks unauthenticated `admin` after the deferred Access layer is enabled.
+- Email OTP allowlist works after the deferred Access layer is enabled.
 - Caddy origin still serves valid HTTPS.
 - R2 bucket exists.
 - Media domain resolves and serves test object when configured.
@@ -546,8 +545,11 @@ Current state:
 - Default Vercel Function region is `sin1`, matching the Singapore Medusa/data tier. Use `bom1` only if backend/data move to India or measurement proves the user-facing benefit outweighs backend round-trip latency.
 - Interim domains use `neonfold.com`: `www.neonfold.com` for production storefront, `neonfold.com` as a 308 redirect to `www`, `qa.neonfold.com` for QA storefront, and `qa-api.neonfold.com` for QA Medusa API.
 - Vercel project domains `neonfold.com` and `www.neonfold.com` are managed on the production project. `qa.neonfold.com` is managed on the QA project.
-- QA `MEDUSA_BACKEND_URL` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as QA project production environment variables. `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com`.
+- QA `NEXT_PUBLIC_SITE_URL`, `MEDUSA_BACKEND_URL`, and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as QA project production environment variables. `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com`.
+- Production `NEXT_PUBLIC_SITE_URL` is managed by Terraform as a production project environment variable.
 - `NEXT_PUBLIC_IMAGE_HOSTNAMES` is Terraform-managed for both projects and is derived from the configured media hostnames.
+- QA Vercel env keys and `qa.neonfold.com` domain were verified through the Vercel API, and the latest QA deployment is ready.
+- The storefront deploy workflow pins Vercel CLI `54.2.0`; newer `54.4.1` is too fresh for the repo's minimum-release-age policy on 2026-05-24.
 - Remaining Vercel app environment variables are deferred until final browser-safe public values exist. Move stable Vercel app env vars into Terraform-managed Vercel resources when values are known and state sensitivity has been reviewed.
 
 GitHub Actions-managed:
@@ -574,6 +576,13 @@ Verification:
 
 Goal: configure monitoring, alerts, logs, and error tracking.
 
+Current status:
+
+- Terraform manages Better Stack Uptime monitors for `qa.neonfold.com`, `qa-admin.neonfold.com`, `qa-api.neonfold.com/health`, `qa-api.neonfold.com/ready`, and paused `www.neonfold.com`.
+- The shared root has been verified with `better_stack_uptime_enabled=true` and reports no changes after apply.
+- Better Stack is the v1 observability provider for uptime, logs, alerts, and error tracking. Sentry is deferred unless Better Stack proves insufficient after QA or early production usage.
+- Better Stack log source, Vector source token wiring, alert delivery test, and error-tracking applications remain pending.
+
 Terraform-managed where stable:
 
 - Better Stack uptime monitors:
@@ -582,15 +591,12 @@ Terraform-managed where stable:
   - admin hostname/access path where appropriate
   - SSL/domain expiry checks where supported
 - Better Stack telemetry/log source.
-- Sentry frontend project.
-- Sentry backend project.
-- Basic Sentry alert rules.
+- Better Stack error-tracking applications if provider support is stable; otherwise manual setup.
 
 Manual bootstrap:
 
 - Better Stack account and API token.
 - Better Stack mobile app/push setup.
-- Sentry account and API token.
 
 Server bootstrap later configures:
 
@@ -609,7 +615,7 @@ Verification:
 
 - Better Stack monitors exist.
 - Test alert fires to email/mobile push.
-- Sentry projects receive test events.
+- Better Stack error tracking receives test events.
 - Logs from Caddy/Docker/Medusa appear in Better Stack after server bootstrap.
 
 ## Phase 10: Lightsail Host Bootstrap
@@ -770,6 +776,14 @@ Rules:
 - Do not use Watchtower/auto-updaters.
 - Add `docker-rollout` later only after baseline deploy is stable.
 
+Current status:
+
+- QA Medusa deploy workflow builds an immutable GHCR image, fetches `/ecom/qa/medusa` SSM parameters, joins Tailscale, uploads Compose/env files, runs migrations, and starts Medusa on the QA Lightsail host.
+- Storefront deploy workflow manually deploys the selected Vercel project from GitHub Actions.
+- QA deploys are manual workflow dispatches and the latest QA Medusa/storefront workflow dispatches have completed successfully.
+- CI installs Terraform `1.15.4`, checks Terraform formatting, initializes roots with `-backend=false`, and validates bootstrap/shared/QA/prod roots without provider credentials or apply permissions.
+- The Medusa host deploy script requires both `/health` and `/ready` to pass before reporting success.
+
 Verification:
 
 - QA deploy succeeds.
@@ -898,7 +912,7 @@ Configure where provider support exists:
 - Vercel usage/overage.
 - Cloudflare R2 storage/operations.
 - Better Stack log/monitor limits.
-- Sentry event volume.
+- Better Stack error/log event volume.
 
 Rules:
 
@@ -933,7 +947,7 @@ QA checks:
 - R2 media upload/read works.
 - Turnstile verification works on public forms.
 - Better Stack receives logs and uptime signals.
-- Sentry receives test errors.
+- Better Stack receives test errors.
 - QA containers can be stopped after testing.
 
 Stop/go gate:
@@ -952,7 +966,7 @@ Pre-cutover:
 - Caddy production routes configured.
 - Production SSM parameters populated.
 - Production Neon/Upstash/R2/Resend/Razorpay configured.
-- Better Stack/Sentry configured.
+- Better Stack configured.
 - Launch checklist reviewed.
 - Obsolete Railway or other rejected deployment paths are disabled, deleted, or explicitly scheduled for deletion.
 - DNS has no conflicting active records for the same production hostnames.
@@ -973,7 +987,7 @@ Cutover:
 
 Post-cutover:
 
-- Keep close watch on Better Stack, Sentry, Vercel, Neon, Upstash, Cloudflare, Razorpay, Resend.
+- Keep close watch on Better Stack, Vercel, Neon, Upstash, Cloudflare, Razorpay, Resend.
 - Review costs after first day and first month.
 - Track Cloudflare-only origin restriction as post-stability hardening.
 
@@ -988,7 +1002,7 @@ Do after the launch path is stable:
 - Consider `docker-rollout` for near-zero-downtime `medusa-server` deploys.
 - Tune Docker memory limits after observing QA/production usage.
 - Review Upstash pay-as-you-go vs Fixed 250 MB.
-- Review Better Stack/Sentry event/log volume.
+- Review Better Stack event/log volume.
 - Review Lightsail snapshot cost.
 - Review Cloudflare WAF/rate-limit rules based on actual traffic.
 - Review whether Algolia should be added for best-in-class search.
@@ -1006,7 +1020,7 @@ Future agents must stop and ask before proceeding if:
 - Any step would alter production data, payment settings, DNS authority, or public admin access.
 - Actual provider pricing/limits differ materially from the cost model.
 - Terraform plan shows replacement or deletion of an existing production resource that is not covered by the resource inventory and cleanup policy.
-- Vercel, Cloudflare, Neon, Upstash, Better Stack, or Sentry imports are ambiguous and could create duplicate production resources.
+- Vercel, Cloudflare, Neon, Upstash, or Better Stack imports are ambiguous and could create duplicate production resources.
 
 ## Required Final Verification For Implementation
 
@@ -1027,7 +1041,7 @@ Before marking implementation complete, verify:
 - Medusa server and worker run separately.
 - `/health` and `/ready` work.
 - Logs reach Better Stack.
-- Sentry receives test events.
+- Better Stack receives test events.
 - QA uses separate Neon/Upstash/secrets/payment keys.
 - Production deploy is manual dispatch.
 - Production migrations require explicit approval.

@@ -14,3 +14,18 @@ Recovery outline:
 4. Run `infra/runbooks/lightsail-bootstrap.md`.
 5. Redeploy Medusa through the approved GitHub Actions deployment path.
 6. Verify health checks, Caddy, Tailscale, Docker, logs, and external data connectivity.
+
+## QA App Rollback
+
+QA Medusa images are tagged with immutable commit SHAs in GHCR.
+
+To roll back only the QA app container without replacing infrastructure:
+
+1. Open the `Deploy Medusa` GitHub Actions workflow.
+2. Select target `qa`.
+3. Enter the previous GHCR image tag in `image_tag`.
+4. Run the workflow from `dev`.
+
+When `image_tag` is set, the workflow skips the image build and deploys the
+existing immutable image tag. The host deploy script still runs migrations and
+requires both `/health` and `/ready` before reporting success.

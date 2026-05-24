@@ -62,3 +62,37 @@ ssh ubuntu@100.71.144.128
 - Bootstrap does not contain live secrets.
 - Vector is installed but disabled until the Better Stack source token and final Vector config are available from SSM.
 - Host Node.js is not installed; Medusa uses Node inside the Docker image.
+
+## Better Stack Vector Logs
+
+The Better Stack source token is stored in SSM, not in Git.
+
+Current QA source:
+
+- Better Stack source: `ecom-qa-medusa-logs`
+- source ID: `2461802`
+- platform: `ubuntu`
+- data region: `germany` because this Better Stack account currently rejects `singapore`
+- SSM parameter: `/ecom/qa/host/BETTER_STACK_SOURCE_TOKEN`
+
+To install or refresh the Vector config on QA:
+
+```sh
+scp infra/scripts/configure-betterstack-vector.sh ubuntu@100.71.144.128:/tmp/configure-betterstack-vector.sh
+AWS_PROFILE=personal aws ssm get-parameter \
+  --region ap-southeast-1 \
+  --name /ecom/qa/host/BETTER_STACK_SOURCE_TOKEN \
+  --with-decryption \
+  --query Parameter.Value \
+  --output text \
+  | ssh ubuntu@100.71.144.128 'umask 077; cat >/tmp/betterstack-source-token; sudo SOURCE_TOKEN_FILE=/tmp/betterstack-source-token bash /tmp/configure-betterstack-vector.sh; rm -f /tmp/betterstack-source-token'
+```
+
+Verify:
+
+```sh
+ssh ubuntu@100.71.144.128 'systemctl is-active vector'
+ssh ubuntu@100.71.144.128 'sudo journalctl -u vector -n 50 --no-pager'
+```
+
+Then check Better Stack Telemetry live tail for the source.

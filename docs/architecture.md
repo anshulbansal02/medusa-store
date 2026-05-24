@@ -1,7 +1,7 @@
 # Architecture
 
 Status: canonical v1 architecture
-Last reviewed: 2026-05-15
+Last reviewed: 2026-05-24
 
 ## Goals
 
@@ -166,11 +166,11 @@ Configure a 2 GB swap file with low swappiness during Lightsail bootstrap. Treat
 
 Medusa production Docker builds use an official Node 24 Debian slim base image with multi-stage builds. Do not use Alpine for v1 unless image-size pressure becomes real and native dependency compatibility is verified.
 
-Use Better Stack for uptime checks/alerts and Sentry for storefront and Medusa application error tracking. Manage Better Stack and Sentry resources through Terraform where provider support is stable, with account/API-token bootstrap done manually. Ship Docker/Caddy/app logs to Better Stack via Vector from day one, while keeping local Docker and Caddy logs available on Lightsail as fallback. Do not self-host the observability stack on the production VM for v1.
+Use Better Stack for v1 uptime checks, alerts, log collection, and storefront/Medusa application error tracking. Manage Better Stack resources through Terraform where provider support is stable, with account/API-token bootstrap done manually. Ship Docker/Caddy/app logs to Better Stack via Vector from day one, while keeping local Docker and Caddy logs available on Lightsail as fallback. Do not self-host the observability stack on the production VM for v1. Defer Sentry unless Better Stack error tracking is insufficient after QA or early production usage.
 
 Add cheap unauthenticated Medusa health endpoints: `/health` for shallow liveness and `/ready` for dependency-aware readiness checks including Postgres/Redis connectivity. Better Stack alerts use email and mobile push for v1. Do not configure Slack or build custom WhatsApp/Telegram/Signal alert bridges for v1.
 
-Do not add a worker heartbeat at launch unless the Medusa worker can emit a real periodic signal. Use worker logs, Sentry backend errors, and Docker restart status initially.
+Do not add a worker heartbeat at launch unless the Medusa worker can emit a real periodic signal. Use worker logs, Better Stack error events, and Docker restart status initially.
 
 Do not create a public status page for v1; Better Stack is internal monitoring/alerting only.
 
@@ -293,7 +293,7 @@ Rules:
 - Do not use Google Analytics.
 - Do not use Meta/ads pixels.
 - Do not track customer/payment/order data.
-- Keep commerce visibility in Medusa Admin, Razorpay, Resend, Better Stack, Sentry, and logs.
+- Keep commerce visibility in Medusa Admin, Razorpay, Resend, Better Stack, and logs.
 
 If custom events or lightweight funnel visibility becomes necessary later, evaluate Umami Cloud before heavier product analytics tools.
 

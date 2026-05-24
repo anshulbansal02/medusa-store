@@ -31,7 +31,7 @@ jobs:
           node-version: 24
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@54.4.1
+        run: npm install --global vercel@54.2.0
 
       - name: Deploy QA
         env:
@@ -69,7 +69,7 @@ jobs:
           node-version: 24
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@54.4.1
+        run: npm install --global vercel@54.2.0
 
       - name: Deploy production
         env:

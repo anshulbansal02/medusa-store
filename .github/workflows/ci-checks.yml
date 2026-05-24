@@ -42,3 +42,35 @@ jobs:
 
       - name: Build medusa
         run: pnpm build:medusa
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.4
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive infra/terraform
+
+      - name: Initialize Terraform roots without backends
+        run: |
+          set -euo pipefail
+          for root in \
+            infra/terraform/bootstrap \
+            infra/terraform/environments/shared \
+            infra/terraform/environments/qa \
+            infra/terraform/environments/prod
+          do
+            terraform -chdir="$root" init -backend=false
+          done
+
+      - name: Validate Terraform roots
+        run: |
+          set -euo pipefail
+          for root in \
+            infra/terraform/bootstrap \
+            infra/terraform/environments/shared \
+            infra/terraform/environments/qa \
+            infra/terraform/environments/prod
+          do
+            terraform -chdir="$root" validate
+          done

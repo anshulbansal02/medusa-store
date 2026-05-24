@@ -10,3 +10,7 @@ provider "aws" {
 provider "vercel" {
   api_token = var.vercel_api_token
 }
+
+provider "betteruptime" {
+  api_token = var.better_stack_uptime_api_token
+}

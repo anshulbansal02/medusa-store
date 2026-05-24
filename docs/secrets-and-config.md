@@ -1,7 +1,7 @@
 # Secrets And Config
 
 Status: canonical v1 secrets and configuration guide
-Last reviewed: 2026-05-15
+Last reviewed: 2026-05-24
 
 ## Principles
 
@@ -10,6 +10,7 @@ Last reviewed: 2026-05-15
 - Browser-exposed values must be treated as public.
 - QA and production must not share secrets.
 - Local development should be simple, but not loose.
+- AWS SSM Parameter Store is the source of truth for long-lived operator credentials and hosted runtime secrets.
 
 ## File Layout
 
@@ -26,6 +27,7 @@ apps/medusa/.env                  ignored
 Rules:
 
 - Do not use a root `.env` for application secrets.
+- A root `.env` may exist only as an ignored local operator bootstrap file while setting up infrastructure. Mirror long-lived values into SSM and do not treat the local file as canonical.
 - Commit only `.env.example` files.
 - Keep `.env.example` current when adding or removing config.
 - Do not put real credentials, tokens, database URLs, or webhook secrets in docs.
@@ -64,11 +66,12 @@ Rules:
 
 ## AWS SSM Parameter Store
 
-Use AWS SSM Parameter Store as the central runtime config and secret store for Medusa.
+Use AWS SSM Parameter Store as the central runtime config and secret store for Medusa, and as the operator source of truth for provider tokens needed to run infrastructure tasks.
 
 Path layout:
 
 ```txt
+/ecom/shared/operator/*
 /ecom/prod/medusa/*
 /ecom/qa/medusa/*
 ```
@@ -77,6 +80,7 @@ Rules:
 
 - Store secrets as `SecureString`.
 - Keep QA and production under separate paths.
+- Store shared operator/provider credentials under `/ecom/shared/operator/*`; do not grant deploy roles read access to that path.
 - GitHub Actions may read only the environment path needed for the current deploy.
 - GitHub Actions uses AWS OIDC short-lived credentials for SSM reads. Do not create long-lived AWS access keys for deploy jobs.
 - The QA deploy AWS role is `arn:aws:iam::174766597237:role/ecom-qa-github-actions-deploy`.
@@ -86,6 +90,25 @@ Rules:
 - Do not commit SSM parameter values to Git, Terraform variables, docs, or workflow logs.
 - Commit only non-secret Terraform tfvars; never commit secret values in tfvars.
 - GitHub environment secrets should hold only deploy/bootstrap credentials needed to run Terraform, read SSM, and access Lightsail, not duplicate the full Medusa app secret set.
+
+Current shared operator parameters:
+
+- `/ecom/shared/operator/cloudflare/account_id`
+- `/ecom/shared/operator/cloudflare/zone_id`
+- `/ecom/shared/operator/cloudflare/api_token`
+- `/ecom/shared/operator/cloudflare/r2/api_token`
+- `/ecom/shared/operator/cloudflare/r2/access_key_id`
+- `/ecom/shared/operator/cloudflare/r2/secret_access_key`
+- `/ecom/shared/operator/cloudflare/r2/endpoint`
+- `/ecom/shared/operator/cloudflare/access/qa_admin_allowed_emails`
+- `/ecom/shared/operator/vercel/api_token`
+- `/ecom/shared/operator/neon/api_key`
+- `/ecom/shared/operator/upstash/email`
+- `/ecom/shared/operator/upstash/api_key`
+- `/ecom/shared/operator/tailscale/oauth_client_id`
+- `/ecom/shared/operator/tailscale/audience`
+- `/ecom/shared/operator/medusa/qa_admin_email`
+- `/ecom/shared/operator/medusa/qa_admin_password`
 
 QA Medusa deploy requires these GitHub `qa` environment values:
 

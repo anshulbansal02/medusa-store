@@ -30,6 +30,32 @@ resource "cloudflare_r2_custom_domain" "domain" {
   min_tls     = each.value.min_tls
 }
 
+resource "cloudflare_zero_trust_access_application" "application" {
+  for_each = var.access_applications
+
+  account_id                 = var.account_id
+  name                       = each.value.name
+  type                       = "self_hosted"
+  domain                     = each.value.domain
+  session_duration           = each.value.session_duration
+  http_only_cookie_attribute = true
+  app_launcher_visible       = false
+
+  policies = [
+    {
+      name     = "Allow approved admin emails"
+      decision = "allow"
+      include = [
+        for email in sort(tolist(each.value.allowed_emails)) : {
+          email = {
+            email = email
+          }
+        }
+      ]
+    }
+  ]
+}
+
 resource "cloudflare_turnstile_widget" "widget" {
   for_each = var.turnstile_widgets
 
