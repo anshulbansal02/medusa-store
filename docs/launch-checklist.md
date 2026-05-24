@@ -154,6 +154,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Tailscale SSH/deploy access works before public SSH is closed.
 - Public Lightsail SSH is closed after Tailscale access is verified, with emergency access documented.
 - Docker Compose is running separate Medusa server and worker services.
+- Medusa QA/prod Compose files are present under `infra/compose/` and require explicit `MEDUSA_IMAGE` and `MEDUSA_ENV_FILE` values.
 - Lightsail bootstrap script/runbook has been run and is committed under `infra/`.
 - Lightsail host OS is Ubuntu 22.04 LTS; Node.js runtime is inside the Medusa Docker image.
 - Lightsail 2 GB swap file with low swappiness is configured and understood as an emergency cushion.
@@ -162,6 +163,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Medusa production image is stored privately in GHCR.
 - Production deploy uses an immutable image tag, not only `latest`.
 - Medusa server health check exists before automated production deploys.
+- Medusa `/ready` readiness check exists for Postgres/Redis dependency connectivity.
 - Production rollback by previous immutable image tag is documented.
 - Production Medusa database migrations require explicit approval before running.
 - Cloudflare Tunnel is not required for v1 public ingress.

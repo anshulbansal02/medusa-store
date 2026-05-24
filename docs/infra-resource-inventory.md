@@ -14,7 +14,7 @@ Do not paste secrets, tokens, connection strings, private keys, or customer data
 | Vercel | pending | Inventory projects, domains, env vars, deploy hooks. |
 | Railway | pending | Replace/delete any app hosting, databases, Redis, variables, domains, and workflows if present. |
 | Cloudflare | pending | Inventory zone, DNS, R2 buckets, Access apps, Turnstile widgets, Web Analytics. |
-| AWS | in progress | Terraform state bucket created in `ap-southeast-1`; obsolete DynamoDB lock table removed after switching to native S3 lockfiles. Production Lightsail resources were removed after the QA-first sequencing decision. QA Lightsail and the first non-secret QA SSM runtime parameters are Terraform-managed. Continue inventory for IAM and billing alerts. |
+| AWS | in progress | Terraform state bucket created in `ap-southeast-1`; obsolete DynamoDB lock table removed after switching to native S3 lockfiles. Production Lightsail resources were removed after the QA-first sequencing decision. QA Lightsail, the first non-secret QA SSM runtime parameters, and GitHub Actions OIDC/QA SSM read IAM are Terraform-managed. Continue inventory for billing alerts. |
 | Neon | pending | Inventory projects, branches, roles, databases, restore posture. |
 | Upstash | pending | Inventory Redis databases and regions. |
 | Better Stack | pending | Inventory monitors, log sources, alert channels. |
@@ -52,6 +52,9 @@ Classification values:
 | AWS | `/ecom/qa/medusa/NODE_ENV` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret Medusa runtime config for QA; value is `production`. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
 | AWS | `/ecom/qa/medusa/MEDUSA_WORKER_MODE` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret Medusa runtime config for QA; value is `shared` for the single-host QA service. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
 | AWS | `/ecom/qa/medusa/S3_REGION` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret S3-compatible region value for Cloudflare R2 integration; value is `auto`. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
+| AWS | `token.actions.githubusercontent.com` IAM OIDC provider | shared | global | Terraform shared | keep/import | GitHub Actions OIDC provider for short-lived AWS credentials. Client ID is `sts.amazonaws.com`; ARN is `arn:aws:iam::174766597237:oidc-provider/token.actions.githubusercontent.com`. | Use from deploy roles; do not create long-lived AWS keys for GitHub Actions. | no |
+| AWS | `ecom-qa-github-actions-deploy` IAM role | qa | global | Terraform shared | keep/import | GitHub Actions QA deploy role. Trust is scoped to `repo:anshulbansal02/medusa-store:environment:qa` and `aud=sts.amazonaws.com`; ARN is `arn:aws:iam::174766597237:role/ecom-qa-github-actions-deploy`. | Store ARN as a GitHub QA environment variable for deploy workflow use. | no |
+| AWS | `ecom-qa-github-actions-deploy-ssm-read` IAM policy | qa | ap-southeast-1 | Terraform shared | keep/import | Read-only SSM access for QA deploys. Allows `ssm:GetParameter`, `ssm:GetParameters`, and `ssm:GetParametersByPath` only on `/ecom/qa/medusa/*`. | Keep attached only to the QA deploy role. | no |
 | Neon | production Postgres | prod | aws-ap-southeast-1 | pending | pending | Accepted target database. | Audit Terraform provider or document manual fallback. | yes before production migration |
 | Upstash | production Redis | prod | Singapore | pending | pending | Accepted target Redis. | Confirm provider region ID and pricing mode. | no |
 

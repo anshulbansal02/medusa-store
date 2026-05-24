@@ -78,6 +78,8 @@ Rules:
 - Store secrets as `SecureString`.
 - Keep QA and production under separate paths.
 - GitHub Actions may read only the environment path needed for the current deploy.
+- GitHub Actions uses AWS OIDC short-lived credentials for SSM reads. Do not create long-lived AWS access keys for deploy jobs.
+- The QA deploy AWS role is `arn:aws:iam::174766597237:role/ecom-qa-github-actions-deploy`.
 - Terraform may manage parameter values after provider behavior is reviewed.
 - Prefer write-only SSM value support where available.
 - Terraform state may contain secret values and must be protected like a secret store.

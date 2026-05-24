@@ -1,0 +1,46 @@
+services:
+  medusa-server:
+    image: ${MEDUSA_IMAGE:?Set MEDUSA_IMAGE to the immutable GHCR image tag}
+    restart: unless-stopped
+    env_file:
+      - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
+    environment:
+      MEDUSA_WORKER_MODE: server
+    ports:
+      - "127.0.0.1:29181:9000"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\"",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 45s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  medusa-worker:
+    image: ${MEDUSA_IMAGE:?Set MEDUSA_IMAGE to the immutable GHCR image tag}
+    restart: unless-stopped
+    env_file:
+      - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
+    environment:
+      MEDUSA_WORKER_MODE: worker
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  medusa-migrate:
+    image: ${MEDUSA_IMAGE:?Set MEDUSA_IMAGE to the immutable GHCR image tag}
+    profiles:
+      - migrate
+    env_file:
+      - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
+    command: ["./node_modules/.bin/medusa", "db:migrate"]

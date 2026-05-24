@@ -372,7 +372,10 @@ Terraform-managed:
   - `/ecom/qa/medusa/*`
   - Start with non-secret QA `String` runtime parameters managed by Terraform.
   - Add real `SecureString` secrets only after the provider/state write workflow is reviewed.
-- IAM policies/users/roles needed for local Terraform and deploy-time SSM reads.
+- IAM policies/users/roles needed for local Terraform and deploy-time SSM reads:
+  - GitHub Actions uses OIDC and short-lived AWS credentials, not long-lived AWS access keys.
+  - QA deploy role trust is scoped to `repo:anshulbansal02/medusa-store:environment:qa`.
+  - QA deploy role may read only `/ecom/qa/medusa/*`.
 - Billing/usage alerts where AWS supports them cleanly.
 
 Manual/fallback:
@@ -393,6 +396,7 @@ Verification:
 - Snapshot setting enabled.
 - SSM paths exist.
 - QA non-secret SSM parameters exist at `/ecom/qa/medusa/NODE_ENV`, `/ecom/qa/medusa/MEDUSA_WORKER_MODE`, and `/ecom/qa/medusa/S3_REGION`.
+- GitHub Actions QA deploy IAM role exists and can only read `/ecom/qa/medusa/*`.
 - State reflects resources.
 
 ## Phase 5: Cloudflare Foundation
@@ -647,8 +651,8 @@ Add to repo:
 - Medusa Dockerfile using official Node 24 Debian slim.
 - Multi-stage build.
 - `.dockerignore`.
-- `docker-compose.prod.yml`.
-- `docker-compose.qa.yml`.
+- `infra/compose/docker-compose.prod.yml`.
+- `infra/compose/docker-compose.qa.yml`.
 - Caddyfile template or managed config.
 - Health/readiness endpoints in Medusa:
   - `/health` shallow liveness.
@@ -659,10 +663,11 @@ Compose requirements:
 - `medusa-server` service.
 - `medusa-worker` service.
 - Production services use `restart: unless-stopped`.
-- QA services do not auto-start by default.
+- QA services use the same restart policy on the dedicated QA Lightsail host.
 - Containers are stateless.
 - Images come from private GHCR.
 - Use immutable image tags for production.
+- Compose files require `MEDUSA_IMAGE` and `MEDUSA_ENV_FILE` at deploy time.
 - Docker hard memory limits deferred until QA usage is observed.
 
 Rules:
@@ -677,6 +682,7 @@ Verification:
 - Medusa starts with test env.
 - `/health` returns OK without DB dependency.
 - `/ready` fails/succeeds appropriately based on dependency connectivity.
+- Compose config validates with explicit `MEDUSA_IMAGE` and `MEDUSA_ENV_FILE` values.
 
 ## Phase 12: GitHub Actions Deployment
 

@@ -27,6 +27,7 @@
     "infra:fmt": "terraform fmt -recursive infra/terraform",
     "infra:fmt:check": "terraform fmt -check -recursive infra/terraform",
     "infra:validate:bootstrap": "terraform -chdir=infra/terraform/bootstrap validate",
+    "infra:validate:shared": "terraform -chdir=infra/terraform/environments/shared validate",
     "infra:validate:prod": "terraform -chdir=infra/terraform/environments/prod validate",
     "infra:validate:qa": "terraform -chdir=infra/terraform/environments/qa validate",
     "portless:list": "portless list",

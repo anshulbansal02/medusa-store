@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "build": "medusa build",
+    "predeploy": "medusa db:migrate",
     "start": "medusa start",
     "start:local": "medusa start --port 29181",
     "dev": "medusa develop --port 29181",

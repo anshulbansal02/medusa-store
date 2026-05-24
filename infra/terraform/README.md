@@ -5,6 +5,7 @@ Terraform owns durable infrastructure only. It does not deploy application relea
 ## Roots
 
 - `bootstrap`: local-state bootstrap for the S3 remote state bucket.
+- `environments/shared`: shared AWS account resources using S3 remote state.
 - `environments/prod`: production infrastructure root using S3 remote state.
 - `environments/qa`: QA infrastructure root using separate S3 remote state.
 
@@ -13,7 +14,7 @@ Terraform owns durable infrastructure only. It does not deploy application relea
 - Use Terraform CLI `1.15.4`.
 - Run `terraform fmt -recursive infra/terraform` before review.
 - Run `terraform init` in each root before `terraform validate`.
-- Pass the S3 backend bucket with `-backend-config="bucket=..."` for environment roots after bootstrap creates the bucket.
+- Environment roots have the S3 backend bucket checked in after bootstrap creates the bucket.
 - Do not commit `.terraform/`, local state, plans, provider credentials, or secret tfvars.
 - Commit only non-secret `*.tfvars.example` files.
 - Keep provider credentials in local environment variables or approved secret stores.
