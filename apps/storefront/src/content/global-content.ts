@@ -11,7 +11,12 @@ export const globalContent = {
       href: "/shipping",
       linkLabel: "Shipping details",
     },
-    primaryShopLabel: "New Arrivals",
+    primaryNavigationItems: [
+      { href: "/shop", label: "Shop" },
+      { href: "/shop?sort=newest", label: "New Arrivals" },
+      { href: "/shop/occasion-edit", label: "Occasion Edit" },
+      { href: "/about", label: "About" },
+    ],
     primaryNavigationLabel: "Primary navigation",
     mobileMenu: {
       title: "Menu",

@@ -18,13 +18,7 @@ export async function SiteHeader() {
     getProducts({ limit: 12 }),
   ]);
   const cartItemCount = cart?.itemCount ?? 0;
-  const navItems = [
-    { href: "/shop", label: siteContent.header.primaryShopLabel },
-    ...categories.map((category) => ({
-      href: `/shop/${category.handle}`,
-      label: category.name,
-    })),
-  ];
+  const navItems = siteContent.header.primaryNavigationItems;
   const announcement = siteContent.header.announcement;
 
   return (

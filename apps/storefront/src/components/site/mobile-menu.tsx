@@ -21,7 +21,7 @@ export type MobileMenuItem = {
 };
 
 type MobileMenuProps = {
-  navItems: MobileMenuItem[];
+  navItems: readonly MobileMenuItem[];
 };
 
 export function MobileMenu({ navItems }: MobileMenuProps) {

@@ -6,7 +6,7 @@ Current QA host:
 
 - instance: `ecom-qa-medusa`
 - public IP: `203.0.113.10`
-- Tailscale IP: `100.64.0.10`
+- Tailscale IP: keep the live value in private operator notes.
 - SSH user: `ubuntu`
 - SSH key: `~/.ssh/id_ed25519_ecom_lightsail`
 
@@ -53,7 +53,7 @@ Review and apply that plan only after Tailscale access works.
 Current QA has already been bootstrapped and public SSH is closed. Routine SSH:
 
 ```sh
-ssh ubuntu@100.64.0.10
+ssh ubuntu@<tailscale-ip-or-magicdns-name>
 ```
 
 ## Notes
@@ -78,21 +78,21 @@ Current QA source:
 To install or refresh the Vector config on QA:
 
 ```sh
-scp infra/scripts/configure-betterstack-vector.sh ubuntu@100.64.0.10:/tmp/configure-betterstack-vector.sh
+scp infra/scripts/configure-betterstack-vector.sh ubuntu@<tailscale-ip-or-magicdns-name>:/tmp/configure-betterstack-vector.sh
 AWS_PROFILE=personal aws ssm get-parameter \
   --region ap-southeast-1 \
   --name /ecom/qa/host/BETTER_STACK_SOURCE_TOKEN \
   --with-decryption \
   --query Parameter.Value \
   --output text \
-  | ssh ubuntu@100.64.0.10 'umask 077; cat >/tmp/betterstack-source-token; sudo SOURCE_TOKEN_FILE=/tmp/betterstack-source-token bash /tmp/configure-betterstack-vector.sh; rm -f /tmp/betterstack-source-token'
+  | ssh ubuntu@<tailscale-ip-or-magicdns-name> 'umask 077; cat >/tmp/betterstack-source-token; sudo SOURCE_TOKEN_FILE=/tmp/betterstack-source-token bash /tmp/configure-betterstack-vector.sh; rm -f /tmp/betterstack-source-token'
 ```
 
 Verify:
 
 ```sh
-ssh ubuntu@100.64.0.10 'systemctl is-active vector'
-ssh ubuntu@100.64.0.10 'sudo journalctl -u vector -n 50 --no-pager'
+ssh ubuntu@<tailscale-ip-or-magicdns-name> 'systemctl is-active vector'
+ssh ubuntu@<tailscale-ip-or-magicdns-name> 'sudo journalctl -u vector -n 50 --no-pager'
 ```
 
 Then check Better Stack Telemetry live tail for the source.

@@ -396,8 +396,9 @@ Verification:
 - `80/443` reachable before DNS cutover.
 - Snapshot setting enabled.
 - SSM paths exist.
-- QA non-secret SSM parameters exist at `/ecom/qa/medusa/NODE_ENV`, `/ecom/qa/medusa/MEDUSA_WORKER_MODE`, and `/ecom/qa/medusa/S3_REGION`.
+- QA Medusa runtime SSM parameters exist for Node/worker mode, exact CORS origins, backend/admin/storefront URLs, R2 bucket/endpoint metadata, database URL, Redis URL, JWT/cookie secrets, and integration-specific values that are enabled for QA.
 - Production no-cost scaffold parameters exist at `/ecom/prod/medusa/NODE_ENV`, `/ecom/prod/medusa/MEDUSA_WORKER_MODE`, `/ecom/prod/medusa/S3_REGION`, `/ecom/prod/medusa/JWT_SECRET`, and `/ecom/prod/medusa/COOKIE_SECRET`.
+- Production full runtime SSM parameters are wired behind `enable_medusa_runtime_config = true` and remain disabled until production data services, media credentials, and domains are approved.
 - GitHub Actions QA deploy IAM role exists and can only read `/ecom/qa/medusa/*`.
 - State reflects resources.
 
@@ -442,23 +443,24 @@ Current status:
 - Terraform manages QA Medusa non-secret R2 runtime SSM parameters for `S3_FILE_URL`, `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION`.
 - QA R2 S3 credentials are stored in SSM `SecureString` and Medusa upload/read has been smoke tested.
 - Shared operator/provider credentials and setup config are stored in SSM under `/ecom/shared/operator/*` so local `.env` files are not the long-term source of truth.
-- Production `api`, production `admin`, production R2 S3 credentials, Cloudflare Access, WAF/ruleset baseline, Turnstile, and Web Analytics activation remain pending.
-- `qa-api.example.com` and `qa-admin.example.com` route to the QA Lightsail Medusa service; `qa-admin.example.com` is proxied through Cloudflare while Access is deferred.
+- Production `api`, production `admin`, production R2 S3 credentials, production Cloudflare Access, WAF/ruleset baseline, Turnstile, and Web Analytics activation remain pending.
+- `qa-api.example.com` and `qa-admin.example.com` route to the QA Lightsail Medusa service; `qa-admin.example.com` is proxied through Cloudflare, and QA Access is Terraform-wired as an opt-in setting.
 - Web Analytics Terraform wiring exists but is disabled until the Cloudflare API token has Web Analytics/RUM write permission.
+- QA Cloudflare Access Terraform wiring exists but is disabled until the Cloudflare API token has Zero Trust Access write permission and the admin email allowlist is confirmed.
 
 Rules:
 
 - Do not enable global Bot Fight Mode at launch.
 - Do not add aggressive country blocks or broad API challenges at launch.
-- Cloudflare Access is deferred as a later security layer. Medusa Admin auth remains required, and `qa-admin.example.com` is already proxied through Cloudflare.
+- Enable Cloudflare Access for QA Admin before using QA Admin with real operator/customer data. Medusa Admin auth remains required, and `qa-admin.example.com` is already proxied through Cloudflare.
 - Turnstile tokens must be verified server-side in app code.
 
 Verification:
 
 - Cloudflare is authoritative before production cutover.
-- `api` and `admin` records are proxied.
-- Access blocks unauthenticated `admin` after the deferred Access layer is enabled.
-- Email OTP allowlist works after the deferred Access layer is enabled.
+- Admin records are proxied before Access is enabled. API records may remain DNS-only when direct origin health checks and webhook compatibility are preferred; Caddy must still serve valid HTTPS.
+- Access blocks unauthenticated QA Admin after `cloudflare_access_enabled = true` is applied.
+- Email OTP allowlist works after `cloudflare_access_enabled = true` is applied.
 - Caddy origin still serves valid HTTPS.
 - R2 bucket exists.
 - Media domain resolves and serves test object when configured.
@@ -468,14 +470,19 @@ Verification:
 
 Goal: provision production and QA Redis.
 
+Current status:
+
+- QA Upstash Redis is Terraform-managed as an Upstash Global Redis database with Singapore as the primary region.
+- Production Redis remains deferred until production runtime approval. Do not let QA share production Redis, and do not point production Medusa at QA Redis.
+
 Terraform-managed:
 
-- Production Upstash Redis in Singapore.
 - QA Upstash Redis in Singapore.
 - Use Upstash Global Redis with Singapore as the primary region because Regional Redis is legacy/deprecated.
 - Use the provider/API minimum `$20` budget guardrail.
 - Pay-as-you-go pricing initially.
-- Outputs/SSM params for Redis URLs if provider behavior supports secure handling.
+- QA Redis URL is written to QA SSM as a `SecureString`.
+- Production Redis URL is wired as a gated production SSM input through `enable_medusa_runtime_config`, but the production Redis resource is not created until production setup is approved.
 - Usage/billing alert if available.
 
 Rules:
@@ -487,7 +494,7 @@ Rules:
 
 Verification:
 
-- Production Redis reachable from local test client.
+- Production Redis reachable from local test client before production runtime config is enabled.
 - QA Redis separate from prod.
 - Medusa env uses the right URL per environment.
 
@@ -498,9 +505,10 @@ Goal: provision or document production and QA Postgres.
 If provider audit passes, Terraform-managed:
 
 - Neon project in AWS Singapore (`aws-ap-southeast-1`).
-- Production branch/database/role.
+- Default production branch/database/role shape.
 - QA branch/database/role.
-- Outputs/SSM params for pooled/direct connection details if safe.
+- QA pooled connection URL written to QA SSM as a `SecureString`.
+- Production database URL is wired as a gated production SSM input through `enable_medusa_runtime_config`; production migration and runtime activation remain deferred.
 - Branch lifecycle and reset/refresh rules documented.
 - Usage/billing alert if available.
 
@@ -522,7 +530,7 @@ Rules:
 
 Verification:
 
-- Production connection works.
+- Production connection works before production runtime config is enabled.
 - QA connection works and points to QA branch.
 - Restore workflow tested in non-production context.
 - SSM parameters populated.
