@@ -1,0 +1,125 @@
+name: Deploy Medusa
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - apps/medusa/**
+      - infra/compose/docker-compose.qa.yml
+      - infra/scripts/deploy-medusa-host.sh
+      - infra/scripts/render-ssm-env.py
+      - .github/workflows/deploy-medusa.yml
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target"
+        required: true
+        default: qa
+        type: choice
+        options:
+          - qa
+
+env:
+  AWS_REGION: ap-southeast-1
+  IMAGE_NAME: ghcr.io/${{ github.repository }}/medusa
+  SSM_PATH_PREFIX: /ecom/qa/medusa
+
+jobs:
+  deploy-qa:
+    if: github.event_name == 'push' || github.event.inputs.target == 'qa'
+    runs-on: ubuntu-latest
+    environment: qa
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      MEDUSA_IMAGE: ghcr.io/${{ github.repository }}/medusa:${{ github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Medusa image
+        uses: docker/build-push-action@v7.2.0
+        with:
+          context: ./apps/medusa
+          file: ./apps/medusa/Dockerfile
+          push: true
+          tags: ${{ env.MEDUSA_IMAGE }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: ecom-qa-medusa-deploy
+
+      - name: Fetch Medusa runtime config from SSM
+        run: |
+          set -euo pipefail
+          aws ssm get-parameters-by-path \
+            --region "$AWS_REGION" \
+            --path "$SSM_PATH_PREFIX" \
+            --recursive \
+            --with-decryption \
+            --output json > "$RUNNER_TEMP/ssm-parameters.json"
+          python3 infra/scripts/render-ssm-env.py \
+            --input "$RUNNER_TEMP/ssm-parameters.json" \
+            --output "$RUNNER_TEMP/medusa.qa.env" \
+            --path-prefix "$SSM_PATH_PREFIX"
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4.1.2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ secrets.TS_AUDIENCE }}
+          tags: tag:ci
+          ping: ${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}
+
+      - name: Install SSH material
+        env:
+          QA_LIGHTSAIL_SSH_KNOWN_HOSTS: ${{ vars.QA_LIGHTSAIL_SSH_KNOWN_HOSTS }}
+          QA_LIGHTSAIL_SSH_PRIVATE_KEY: ${{ secrets.QA_LIGHTSAIL_SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}"
+          test -n "$QA_LIGHTSAIL_SSH_KNOWN_HOSTS"
+          test -n "$QA_LIGHTSAIL_SSH_PRIVATE_KEY"
+          install -m 0700 -d "$HOME/.ssh"
+          printf '%s\n' "$QA_LIGHTSAIL_SSH_PRIVATE_KEY" > "$HOME/.ssh/ecom_qa"
+          chmod 0600 "$HOME/.ssh/ecom_qa"
+          printf '%s\n' "$QA_LIGHTSAIL_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 0600 "$HOME/.ssh/known_hosts"
+
+      - name: Upload deployment files
+        run: |
+          set -euo pipefail
+          host="${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}"
+          ssh -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "install -d -m 0755 /home/ubuntu/ecom/compose /home/ubuntu/ecom/scripts && install -d -m 0750 /home/ubuntu/ecom/shared/env"
+          scp -i "$HOME/.ssh/ecom_qa" infra/compose/docker-compose.qa.yml ubuntu@"$host":/home/ubuntu/ecom/compose/docker-compose.qa.yml
+          scp -i "$HOME/.ssh/ecom_qa" infra/scripts/deploy-medusa-host.sh ubuntu@"$host":/home/ubuntu/ecom/scripts/deploy-medusa-host.sh
+          scp -i "$HOME/.ssh/ecom_qa" "$RUNNER_TEMP/medusa.qa.env" ubuntu@"$host":/home/ubuntu/ecom/shared/env/medusa.qa.env
+          ssh -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "chmod 0755 /home/ubuntu/ecom/scripts/deploy-medusa-host.sh && chmod 0600 /home/ubuntu/ecom/shared/env/medusa.qa.env"
+
+      - name: Login host to GHCR
+        run: |
+          set -euo pipefail
+          host="${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}"
+          printf '%s' "${{ secrets.GITHUB_TOKEN }}" | ssh -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "docker login ghcr.io -u '${{ github.actor }}' --password-stdin"
+
+      - name: Deploy on QA host
+        run: |
+          set -euo pipefail
+          host="${{ vars.QA_LIGHTSAIL_TAILSCALE_HOST }}"
+          ssh -i "$HOME/.ssh/ecom_qa" ubuntu@"$host" "MEDUSA_IMAGE='$MEDUSA_IMAGE' /home/ubuntu/ecom/scripts/deploy-medusa-host.sh"

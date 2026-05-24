@@ -87,6 +87,17 @@ Rules:
 - Commit only non-secret Terraform tfvars; never commit secret values in tfvars.
 - GitHub environment secrets should hold only deploy/bootstrap credentials needed to run Terraform, read SSM, and access Lightsail, not duplicate the full Medusa app secret set.
 
+QA Medusa deploy requires these GitHub `qa` environment values:
+
+- Variables:
+  - `AWS_DEPLOY_ROLE_ARN`: `arn:aws:iam::174766597237:role/ecom-qa-github-actions-deploy`.
+  - `QA_LIGHTSAIL_TAILSCALE_HOST`: QA host Tailscale IP or MagicDNS name.
+  - `QA_LIGHTSAIL_SSH_KNOWN_HOSTS`: pinned SSH known-hosts line for the QA host.
+- Secrets:
+  - `QA_LIGHTSAIL_SSH_PRIVATE_KEY`: private key matching the QA Lightsail authorized public key.
+  - `TS_OAUTH_CLIENT_ID`: Tailscale federated identity client ID.
+  - `TS_AUDIENCE`: Tailscale federated identity audience.
+
 ## Public Vs Secret Values
 
 Storefront variables prefixed with `NEXT_PUBLIC_` are public because they are bundled for the browser.
