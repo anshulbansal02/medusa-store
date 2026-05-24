@@ -44,6 +44,8 @@ Target: keep recurring operating cost around USD 50/month or lower where practic
 - Instantiate production compute after QA setup and testing, when explicitly approved.
 - Delete QA backend compute when it is no longer needed; stopped Lightsail instances still accrue charges until deleted.
 - Prefer free/native features when they are good enough and do not add complexity.
+- Do not rely on a free tier blindly. Track limits and overage behavior for GitHub Actions minutes/storage, GHCR storage/transfer, Vercel bandwidth/build/image usage, Lightsail bandwidth/snapshots, Neon storage/compute, Upstash commands/bandwidth/storage, Cloudflare R2 storage/operations/egress, Resend sends, Better Stack, and Sentry.
+- Add budget alerts or usage review checkpoints before enabling always-on QA, production traffic, or media-heavy campaigns.
 
 ## Approximate Shape
 
@@ -67,6 +69,8 @@ Target:
 
 Revisit cost model if:
 
+- Any provider starts charging after a free allowance is exceeded.
+- GitHub Actions, GHCR, Vercel, Cloudflare R2, Neon, Upstash, or Lightsail bandwidth/storage usage begins trending upward without a matching business need.
 - Lightsail compute is too small or operational overhead becomes too high.
 - Lightsail snapshot storage cost is higher than expected.
 - Neon or Upstash cost exceeds the target envelope.
@@ -80,3 +84,12 @@ Revisit cost model if:
 - Marketing starts paid ads or email campaigns.
 
 Before launch, verify current official pricing for Vercel, AWS Lightsail, Neon, Upstash, Cloudflare R2, and Resend because prices and limits can change.
+
+## Later Cost Review Tasks
+
+- Produce a monthly cost and quota checklist before production launch.
+- Confirm GitHub Actions and GHCR usage limits for the organization/account used by this repo.
+- Confirm Vercel Pro usage limits and overage behavior for bandwidth, builds, image optimization, and deployment retention.
+- Confirm Lightsail instance, static IP, snapshot, and outbound transfer charges in the selected region.
+- Confirm Neon and Upstash free/pay-as-you-go limits, autoscaling behavior, and budget controls.
+- Confirm Cloudflare R2 operation/storage costs and any media-domain traffic assumptions.

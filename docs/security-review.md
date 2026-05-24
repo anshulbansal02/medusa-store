@@ -5,6 +5,8 @@ Last reviewed: 2026-05-24
 
 Scope: committed repository content, current working tree, CI/CD workflows, Terraform configuration, deploy scripts, Medusa backend integration code, storefront server actions, and dependency audit output. This review records verified findings only. Do not paste real secrets, IPs, account IDs, provider IDs, customer data, or token values into this file.
 
+Decision: fix the verified security findings before production launch. QA may continue only for infrastructure bring-up when access is intentionally restricted and no real customer data is used.
+
 ## Findings
 
 ### Public Repo Exposes Real Infrastructure Metadata
@@ -146,4 +148,3 @@ Rotation plan:
 - Medusa container runs as the non-root `node` user.
 - Medusa container port is bound to localhost on the host; public exposure is through Caddy.
 - Razorpay frontend verification validates signature server-side and fetches Razorpay payment/order state before completing checkout.
-

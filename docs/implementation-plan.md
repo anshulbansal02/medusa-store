@@ -68,6 +68,8 @@ Use four buckets:
 - Dedicated search engine such as Algolia, Meilisearch, or Typesense.
 - Cloudflare Images.
 - GoatCounter/Umami/PostHog only if Cloudflare Web Analytics becomes insufficient.
+- Deployment speed improvements after the QA/prod path is stable, including evaluating safe build/cache reuse on the Lightsail host or in CI.
+- Security remediation items from `docs/security-review.md`, prioritized before production launch.
 
 ## Explicitly Not V1
 
@@ -184,6 +186,7 @@ Goal: harden the product before production.
 - Performance pass.
 - Accessibility pass.
 - Security pass.
+- Resolve or explicitly risk-accept verified findings from `docs/security-review.md`.
 - Cloudflare Web Analytics.
 - QA/prod deployment.
 - Manual launch checklist.
