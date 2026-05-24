@@ -14,7 +14,7 @@ Do not paste secrets, tokens, connection strings, private keys, or customer data
 | Vercel | pending | Inventory projects, domains, env vars, deploy hooks. |
 | Railway | pending | Replace/delete any app hosting, databases, Redis, variables, domains, and workflows if present. |
 | Cloudflare | pending | Inventory zone, DNS, R2 buckets, Access apps, Turnstile widgets, Web Analytics. |
-| AWS | in progress | Terraform state bucket created in `ap-southeast-1`; obsolete DynamoDB lock table removed after switching to native S3 lockfiles. Production Lightsail resources were created before the QA-first sequencing decision and are now planned for deletion. Continue inventory for QA Lightsail, SSM, IAM, billing alerts. |
+| AWS | in progress | Terraform state bucket created in `ap-southeast-1`; obsolete DynamoDB lock table removed after switching to native S3 lockfiles. Production Lightsail resources were removed after the QA-first sequencing decision. QA Lightsail and the first non-secret QA SSM runtime parameters are Terraform-managed. Continue inventory for IAM and billing alerts. |
 | Neon | pending | Inventory projects, branches, roles, databases, restore posture. |
 | Upstash | pending | Inventory Redis databases and regions. |
 | Better Stack | pending | Inventory monitors, log sources, alert channels. |
@@ -49,6 +49,9 @@ Classification values:
 | AWS | `ecom-qa-medusa` Lightsail instance | qa | ap-southeast-1a | Terraform qa | keep/import | QA-first Medusa compute host. Ubuntu 22.04, `small_3_0` 2 GB, automatic snapshots enabled at `20:00` UTC. Bootstrapped with Docker, Caddy, Tailscale, Vector, swap, log rotation, and deployment directories. Tailscale IPv4 is `100.71.144.128`. | Continue with SSM/runtime config, DNS, and Medusa deployment setup. | no |
 | AWS | `ecom-qa-medusa-static-ip` Lightsail static IP | qa | ap-southeast-1 | Terraform qa | keep/import | Static origin IP for QA Medusa API/admin DNS. Current IPv4 is `52.77.164.161`, attached to `ecom-qa-medusa`. | Use for QA Cloudflare DNS later. | no |
 | AWS | `ecom-qa-medusa-key` Lightsail key pair | qa | ap-southeast-1 | Terraform qa | keep/import | Public key imported from local `~/.ssh/id_ed25519_ecom_lightsail.pub`; private key stays outside Terraform and Git. | Keep for emergency/browser-assisted access; routine SSH uses Tailscale. | no |
+| AWS | `/ecom/qa/medusa/NODE_ENV` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret Medusa runtime config for QA; value is `production`. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
+| AWS | `/ecom/qa/medusa/MEDUSA_WORKER_MODE` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret Medusa runtime config for QA; value is `shared` for the single-host QA service. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
+| AWS | `/ecom/qa/medusa/S3_REGION` SSM parameter | qa | ap-southeast-1 | Terraform qa | keep/import | Non-secret S3-compatible region value for Cloudflare R2 integration; value is `auto`. | Keep under QA Terraform; consumed by deploy env-file generation later. | no |
 | Neon | production Postgres | prod | aws-ap-southeast-1 | pending | pending | Accepted target database. | Audit Terraform provider or document manual fallback. | yes before production migration |
 | Upstash | production Redis | prod | Singapore | pending | pending | Accepted target Redis. | Confirm provider region ID and pricing mode. | no |
 

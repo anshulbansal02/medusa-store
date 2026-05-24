@@ -19,3 +19,24 @@ module "medusa_lightsail" {
   automatic_snapshot_time = var.lightsail_automatic_snapshot_time
   tags                    = local.tags
 }
+
+module "medusa_ssm_config" {
+  source = "../../modules/ssm-config"
+
+  path_prefix = "/${var.project}/${var.environment}/medusa"
+  string_parameters = {
+    NODE_ENV = {
+      value       = "production"
+      description = "Node runtime mode for the QA Medusa service."
+    }
+    MEDUSA_WORKER_MODE = {
+      value       = "shared"
+      description = "Medusa worker mode for the single-host QA service."
+    }
+    S3_REGION = {
+      value       = "auto"
+      description = "S3-compatible region value used by Cloudflare R2."
+    }
+  }
+  tags = local.tags
+}

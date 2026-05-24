@@ -370,6 +370,8 @@ Terraform-managed:
 - SSM Parameter Store hierarchy:
   - `/ecom/prod/medusa/*`
   - `/ecom/qa/medusa/*`
+  - Start with non-secret QA `String` runtime parameters managed by Terraform.
+  - Add real `SecureString` secrets only after the provider/state write workflow is reviewed.
 - IAM policies/users/roles needed for local Terraform and deploy-time SSM reads.
 - Billing/usage alerts where AWS supports them cleanly.
 
@@ -390,6 +392,7 @@ Verification:
 - `80/443` reachable before DNS cutover.
 - Snapshot setting enabled.
 - SSM paths exist.
+- QA non-secret SSM parameters exist at `/ecom/qa/medusa/NODE_ENV`, `/ecom/qa/medusa/MEDUSA_WORKER_MODE`, and `/ecom/qa/medusa/S3_REGION`.
 - State reflects resources.
 
 ## Phase 5: Cloudflare Foundation
