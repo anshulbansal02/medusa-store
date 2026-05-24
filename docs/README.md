@@ -18,6 +18,7 @@ This folder contains the canonical planning and implementation context for the f
 - [Infrastructure And Terraform Implementation Plan](infra-terraform-implementation-plan.md): execution order for Terraform, infra, deploy, and launch setup.
 - [Infrastructure Resource Inventory](infra-resource-inventory.md): Phase 0 external resource inventory and cleanup classification.
 - [Infrastructure Provider Audit](infra-provider-audit.md): preliminary Terraform CLI/provider version record and review gates.
+- [Security Review](security-review.md): verified security findings, fixes, scrub guidance, and rotation notes.
 - [Launch Checklist](launch-checklist.md): manual readiness checks before production launch.
 - [Cost Model](cost-model.md): recurring cost assumptions and guardrails.
 - [References](references.md): official docs and research sources to verify implementation details.
