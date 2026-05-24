@@ -107,6 +107,7 @@ data "aws_iam_policy_document" "qa_deploy" {
     ]
 
     resources = [
+      "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${local.normalized_qa_path}",
       "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${local.normalized_qa_path}/*",
     ]
   }
@@ -150,6 +151,7 @@ data "aws_iam_policy_document" "prod_deploy" {
     ]
 
     resources = [
+      "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${local.normalized_prod_path}",
       "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${local.normalized_prod_path}/*",
     ]
   }
