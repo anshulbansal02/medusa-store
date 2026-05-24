@@ -6,6 +6,7 @@ services:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
     environment:
       MEDUSA_WORKER_MODE: server
+      DISABLE_MEDUSA_ADMIN: "false"
     ports:
       - "127.0.0.1:29181:9000"
     healthcheck:
@@ -31,6 +32,7 @@ services:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
     environment:
       MEDUSA_WORKER_MODE: worker
+      DISABLE_MEDUSA_ADMIN: "true"
     logging:
       driver: json-file
       options:
@@ -43,4 +45,6 @@ services:
       - migrate
     env_file:
       - ${MEDUSA_ENV_FILE:?Set MEDUSA_ENV_FILE to the generated Medusa env file path}
+    environment:
+      DISABLE_MEDUSA_ADMIN: "true"
     command: ["./node_modules/.bin/medusa", "db:migrate"]

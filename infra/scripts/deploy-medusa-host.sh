@@ -36,6 +36,7 @@ sudo tee /etc/caddy/Caddyfile >/dev/null <<'EOF'
   reverse_proxy 127.0.0.1:29181
 }
 EOF
+sudo caddy fmt --overwrite /etc/caddy/Caddyfile
 sudo caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl reload caddy
 

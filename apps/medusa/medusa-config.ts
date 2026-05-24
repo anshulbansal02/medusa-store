@@ -13,11 +13,12 @@ const medusaConfig = getMedusaConfig()
 const razorpayConfig = getRazorpayConfig()
 const resendConfig = getResendConfig()
 const r2Config = getR2Config()
+const redisUrl = medusaConfig.redisUrl
 
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: medusaConfig.databaseUrl,
-    redisUrl: medusaConfig.redisUrl,
+    redisUrl,
     workerMode: medusaConfig.workerMode,
     http: {
       storeCors: medusaConfig.http.storeCors!,
@@ -28,9 +29,68 @@ module.exports = defineConfig({
     },
   },
   admin: {
+    disable: process.env.DISABLE_MEDUSA_ADMIN === 'true',
     backendUrl: medusaConfig.admin.backendUrl,
   },
   modules: [
+    ...(redisUrl
+      ? [
+          {
+            resolve: '@medusajs/medusa/caching',
+            options: {
+              providers: [
+                {
+                  resolve: '@medusajs/caching-redis',
+                  id: 'caching-redis',
+                  is_default: true,
+                  options: {
+                    redisUrl,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            resolve: '@medusajs/medusa/event-bus-redis',
+            options: {
+              redisUrl,
+              jobOptions: {
+                removeOnComplete: {
+                  age: 3600,
+                  count: 1000,
+                },
+                removeOnFail: {
+                  age: 3600,
+                  count: 1000,
+                },
+              },
+            },
+          },
+          {
+            resolve: '@medusajs/medusa/workflow-engine-redis',
+            options: {
+              redis: {
+                redisUrl,
+              },
+            },
+          },
+          {
+            resolve: '@medusajs/medusa/locking',
+            options: {
+              providers: [
+                {
+                  resolve: '@medusajs/medusa/locking-redis',
+                  id: 'locking-redis',
+                  is_default: true,
+                  options: {
+                    redisUrl,
+                  },
+                },
+              ],
+            },
+          },
+        ]
+      : []),
     ...(razorpayConfig.isConfigured
       ? [
           {

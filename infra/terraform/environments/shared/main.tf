@@ -18,6 +18,6 @@ module "github_actions_aws_deploy" {
   aws_region       = var.aws_region
   qa_ssm_path      = "/${var.project}/qa/medusa"
   prod_ssm_path    = "/${var.project}/prod/medusa"
-  create_prod_role = false
+  create_prod_role = true
   tags             = local.tags
 }
