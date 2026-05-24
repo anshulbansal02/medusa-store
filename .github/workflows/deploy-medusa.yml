@@ -54,6 +54,8 @@ jobs:
           file: ./apps/medusa/Dockerfile
           push: true
           tags: ${{ env.MEDUSA_IMAGE }}
+          cache-from: type=gha,scope=medusa
+          cache-to: type=gha,mode=max,scope=medusa
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
