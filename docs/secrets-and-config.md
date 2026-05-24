@@ -137,7 +137,7 @@ R2:
 
 QA/staging compute:
 
-- QA Medusa may run on the production Lightsail instance only during active test windows.
+- QA Medusa runs on a separate QA Lightsail instance during the QA-first setup.
 - QA containers must stay stopped by default.
 - QA must use separate secrets from production even when sharing compute.
 

@@ -21,7 +21,8 @@ The original canonical docs said:
 
 Accepted replacement direction:
 
-- Production Medusa compute moves to AWS Lightsail 4 GB in Singapore.
+- QA Medusa compute is provisioned first on AWS Lightsail in Singapore.
+- Production environment instantiation is deferred until QA is set up and tested.
 - Durable state must remain external to the app host.
 - Production database is Neon Postgres in Singapore.
 - Production Redis is Upstash Redis in Singapore, pay-as-you-go initially.
@@ -33,13 +34,13 @@ Accepted replacement direction:
 The raw research proposes:
 
 - Storefront: Vercel Pro.
-- Backend compute: AWS Lightsail 4 GB in Singapore.
+- Backend compute: AWS Lightsail in Singapore, starting with QA.
 - Database: Neon Postgres Launch in Singapore.
 - Redis: Upstash in Singapore or Mumbai.
 - Media: Cloudflare R2.
 - Email: AWS SES in the raw proposal, but Resend is accepted for v1.
 - CI/CD: GitHub Actions.
-- QA/staging: Neon branch plus a second Medusa container on the same Lightsail instance.
+- QA/staging: separate QA Lightsail host plus separate Neon branch, Redis, and secrets.
 - Infrastructure management: Terraform.
 
 ## Decision Principles
@@ -101,10 +102,11 @@ Options:
 
 Decision:
 
-- Use AWS Lightsail 4 GB in Singapore for production Medusa compute.
+- Use AWS Lightsail in Singapore for Medusa compute, starting with a QA host.
+- Defer production Lightsail instantiation until QA is set up and tested.
 - Keep Medusa stateless at the app tier: no production Postgres, Redis, uploaded media, or other durable state on the Lightsail disk.
 - Use Dockerized Medusa so the app can move later if needed.
-- Accept that the first production app tier is single-instance and may have short app-layer outages.
+- Accept that the first production app tier will likely be single-instance and may have short app-layer outages.
 - Terraform and Codex can reduce setup toil, but they do not remove ownership of OS patching, Caddy config, Docker runtime, log access, deploy rollback, monitoring, SSH hardening, and host recovery.
 
 Reason:
@@ -112,7 +114,7 @@ Reason:
 - Lightsail best matches the current cost/control tradeoff if durable state is external.
 - Render is the cleaner low-ops alternative, but its cost is materially higher.
 - Fly.io is technically strong, but its multi-region strengths are not the first problem for this Medusa backend.
-- Railway/Render remain possible future app-hosting alternatives, but production compute is intentionally Lightsail for v1.
+- Railway/Render remain possible future app-hosting alternatives, but Medusa compute is intentionally Lightsail for v1.
 
 ### Decision 2: Production Database
 
@@ -415,18 +417,17 @@ Options:
 
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
-| Shared Lightsail compute, separate data | Run QA containers on the same Lightsail instance only during active testing, with separate Neon branch, Redis, secrets, and payment keys. | Lowest cost, simple, enough for lightweight internal QA. | QA can compete with production for CPU/RAM/disk/network if left running or load-tested. | Accepted |
-| Separate QA Lightsail instance | Run QA on its own small VM. | Better compute isolation. | Adds another monthly Lightsail cost; stopped Lightsail instances still accrue charges until deleted. | Rejected for v1 |
+| Shared Lightsail compute, separate data | Run QA containers on the same Lightsail instance only during active testing, with separate Neon branch, Redis, secrets, and payment keys. | Lowest cost, simple, enough for lightweight internal QA. | QA can compete with production for CPU/RAM/disk/network if left running or load-tested. | Rejected |
+| Separate QA Lightsail instance | Run QA on its own VM before production is instantiated. | Better compute isolation and allows end-to-end QA before production rollout. | Adds a QA monthly Lightsail cost; stopped Lightsail instances still accrue charges until deleted. | Accepted |
 | Managed temporary QA host | Use a platform host for QA only. | Cleaner isolation and possible easier start/stop. | Adds provider/deploy complexity and cost. | Rejected for v1 |
 
 Decision:
 
-- Run QA/staging Medusa on the same Lightsail instance initially.
-- Keep QA containers stopped by default.
-- Start QA containers only during active test windows.
+- Run QA/staging Medusa on a separate QA Lightsail instance initially.
+- Defer production Lightsail creation until production launch readiness.
 - QA must use a separate Neon branch/database, separate Redis, separate secrets, and Razorpay test keys.
 - QA must not share production Redis, JWT/cookie secrets, webhook secrets, or payment credentials.
-- Move QA to separate compute if QA starts affecting production resources or if always-on QA becomes necessary.
+- Delete the QA Lightsail instance when it is no longer needed; stopped Lightsail instances still accrue charges until deleted.
 
 Reason:
 
@@ -637,23 +638,22 @@ Status page:
 
 ### Decision 18: Lightsail Snapshots
 
-Question: should production Lightsail automatic snapshots be enabled?
+Question: should Lightsail automatic snapshots be enabled?
 
 Options:
 
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
-| Enable production automatic snapshots | Lightsail takes automatic daily instance snapshots and keeps the recent automatic snapshot window. | Faster VM recovery from host corruption/misconfiguration/disk issues. | Snapshot storage has extra cost; not a substitute for Neon/R2/Upstash backups. | Accepted |
-| No Lightsail snapshots | Rebuild host only from Terraform/bootstrap/deploy. | Lowest cost and cleanest immutable-infra discipline. | Slower recovery if host config needs to be reconstructed under pressure. | Rejected for production v1 |
+| Enable automatic snapshots | Lightsail takes automatic daily instance snapshots and keeps the recent automatic snapshot window. | Faster VM recovery from host corruption/misconfiguration/disk issues. | Snapshot storage has extra cost; not a substitute for Neon/R2/Upstash backups. | Accepted |
+| No Lightsail snapshots | Rebuild host only from Terraform/bootstrap/deploy. | Lowest cost and cleanest immutable-infra discipline. | Slower recovery if host config needs to be reconstructed under pressure. | Rejected |
 
 Decision:
 
-- Enable automatic Lightsail snapshots for the production instance.
+- Enable automatic Lightsail snapshots for active Medusa Lightsail instances, starting with QA.
 - Treat snapshots as host recovery convenience only.
 - Do not treat Lightsail snapshots as database, Redis, media, or application-release backups.
 - Do not accumulate manual snapshots casually.
 - Review snapshot storage cost after the first month.
-- QA has no separate snapshot decision while it shares production compute and remains disposable.
 
 Reason:
 
@@ -919,7 +919,7 @@ Terraform-managed provider/resource areas:
 aws
   Lightsail
   S3 backend bucket
-  DynamoDB lock table
+  Native S3 backend lockfiles
   SSM Parameter Store
   IAM as needed
 
@@ -1082,13 +1082,14 @@ Options:
 | Option | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- |
 | Terraform Cloud / HCP Terraform | Managed remote state, locking, team-friendly. | Another service/account and possible cost/plan constraints. | Rejected for v1 |
-| S3 backend + DynamoDB lock | Standard AWS pattern, good if AWS is already used. | More AWS resources and bootstrap steps. | Accepted |
+| S3 backend + native S3 lockfiles | Current Terraform S3 backend pattern, good if AWS is already used. | Requires Terraform CLI support for `use_lockfile`. | Accepted |
+| S3 backend + DynamoDB lock | Older standard AWS pattern. | DynamoDB locking is deprecated by Terraform's S3 backend. | Rejected |
 | Local state | Fastest to start. | Not acceptable for shared production infra. | Not preferred |
 
 Decision:
 
 - Use an AWS S3 backend for Terraform state.
-- Use DynamoDB for Terraform state locking.
+- Use native S3 lockfiles for Terraform state locking.
 - Do not use local state for shared or production infrastructure.
 - Do not add HCP Terraform/Terraform Cloud for v1.
 - Treat Terraform state as secret-bearing because Terraform may manage SSM and Vercel secret values.
@@ -1097,13 +1098,13 @@ Decision:
 
 Bootstrap note:
 
-- The S3 state bucket and DynamoDB lock table must be created before the main Terraform configuration can use them as a backend.
+- The S3 state bucket must be created before the main Terraform configuration can use it as a backend.
 - Use a small bootstrap step/configuration, then switch the main `infra/terraform/environments/*` configurations to the remote backend.
 
 Reason:
 
-- We already use AWS for Lightsail, so S3/DynamoDB avoids adding another state platform.
-- S3 remote state with DynamoDB locking is a standard, durable Terraform backend pattern.
+- We already use AWS for Lightsail, so S3 avoids adding another state platform.
+- Native S3 lockfiles keep the backend durable while avoiding the deprecated DynamoDB locking path.
 
 ### Decision 32: Terraform Execution
 
@@ -1113,14 +1114,14 @@ Options:
 
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
-| Local Terraform apply with remote state | Run `terraform plan/apply` from the operator machine while using S3 remote state and DynamoDB locking. | Simpler credential model for one engineer, fewer CI secrets, still has shared remote state safety. | Less CI audit trail; depends on operator discipline. | Accepted |
+| Local Terraform apply with remote state | Run `terraform plan/apply` from the operator machine while using S3 remote state and native S3 lockfiles. | Simpler credential model for one engineer, fewer CI secrets, still has shared remote state safety. | Less CI audit trail; depends on operator discipline. | Accepted |
 | GitHub Actions plan/apply with approval | Run Terraform from CI with protected production apply. | Repeatable runner, CI audit trail, useful for teams. | Requires broad cloud credentials in CI and more workflow setup. | Rejected for v1 |
 | Mixed local and CI apply | Allow both local and CI applies. | Flexible. | Process drift and unclear source of operational truth. | Rejected |
 
 Decision:
 
 - Run Terraform `plan` and `apply` locally for v1.
-- Always use S3 remote state and DynamoDB locking.
+- Always use S3 remote state and native S3 lockfiles.
 - Never use local state for production or QA infrastructure.
 - GitHub Actions may run `terraform fmt` / `terraform validate` later, but must not apply infrastructure in v1.
 - Revisit GitHub Actions apply if another engineer joins or infra changes become frequent.
@@ -1134,13 +1135,13 @@ Reason:
 
 ### Decision 33: Terraform State Bootstrap
 
-Question: how should the S3 state bucket and DynamoDB lock table be created?
+Question: how should the S3 state bucket be created?
 
 Options:
 
 | Option | What it means | Pros | Risks / tradeoffs | Status |
 | --- | --- | --- | --- | --- |
-| Bootstrap Terraform config | Use a small `infra/terraform/bootstrap` config with local state to create the S3 state bucket and DynamoDB lock table, then use remote state for real environments. | Repeatable, versioned, standard pattern, avoids manual console drift. | One small bootstrap local state file must be handled carefully. | Accepted |
+| Bootstrap Terraform config | Use a small `infra/terraform/bootstrap` config with local state to create the S3 state bucket, then use remote state for real environments. | Repeatable, versioned, standard pattern, avoids manual console drift. | One small bootstrap local state file must be handled carefully. | Accepted |
 | Manual AWS console/CLI setup | Create bucket/table manually. | Quick once. | Less reproducible and easier to drift. | Rejected |
 | Main Terraform creates its own backend | Try to create backend resources from the same config that uses them. | None meaningful. | Backend must exist before it can be used reliably. | Rejected |
 
@@ -1148,8 +1149,8 @@ Decision:
 
 - Add `infra/terraform/bootstrap` for Terraform backend bootstrap resources.
 - Use local state only for this bootstrap config.
-- Bootstrap creates the S3 state bucket and DynamoDB lock table.
-- Main `prod` and `qa` environment configs use the S3 backend and DynamoDB locking from the start.
+- Bootstrap creates the S3 state bucket.
+- Main `prod` and `qa` environment configs use the S3 backend and native S3 lockfiles from the start.
 - Keep bootstrap state secure and do not use it for application/provider resources.
 
 Reason:

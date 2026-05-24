@@ -24,7 +24,7 @@ Local status:
 
 | Provider | Source | Candidate version | Status | Notes |
 | --- | --- | --- | --- | --- |
-| AWS | `hashicorp/aws` | `6.46.0` | candidate | Official provider. Needed for Lightsail, S3, DynamoDB, SSM, IAM, billing resources where supported. |
+| AWS | `hashicorp/aws` | `6.46.0` | candidate | Official provider. Needed for Lightsail, S3, SSM, IAM, billing resources where supported. |
 | Cloudflare | `cloudflare/cloudflare` | `5.19.1` | candidate | Partner provider. Needed for DNS, R2, Access, Turnstile, and security resources where supported. |
 | Upstash | `upstash/upstash` | `2.1.0` | candidate | Needed for Redis databases. Confirm Singapore region IDs and pay-as-you-go behavior before resources. |
 | Vercel | `vercel/vercel` | `5.3.0` | candidate | Needed for storefront project, domains, and env vars. Avoid mixing inline and standalone env-var modes. |

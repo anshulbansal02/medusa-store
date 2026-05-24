@@ -56,7 +56,7 @@ IaC:
   Terraform
   Local plan/apply
   S3 remote state
-  DynamoDB locking
+  Native S3 lockfiles
   Separate prod and QA environments
 ```
 
@@ -109,7 +109,7 @@ Implement in this order:
 
 1. Preflight and provider audit.
 2. Terraform skeleton and pinned providers.
-3. S3/DynamoDB Terraform state bootstrap.
+3. S3 Terraform state bootstrap.
 4. Prod/QA Terraform environment roots.
 5. AWS Lightsail, SSM, IAM, and snapshot baseline.
 6. Cloudflare DNS, R2, Access, WAF baseline, Turnstile, and Web Analytics.
@@ -136,7 +136,7 @@ Collect these before starting implementation. Store real values in the operator 
 
 Accounts:
 
-- AWS account with permission for Lightsail, S3, DynamoDB, IAM, SSM Parameter Store, and billing alerts.
+- AWS account with permission for Lightsail, S3, IAM, SSM Parameter Store, and billing alerts.
 - Cloudflare account with the domain zone.
 - Vercel account/team/project access.
 - Neon account.
@@ -196,7 +196,7 @@ Steps:
    - Vercel projects, domains, environment variables, and deploy hooks.
    - Railway projects, services, databases, variables, domains, and deploy workflows.
    - Cloudflare zones, DNS records, R2 buckets, Access apps, Turnstile widgets, and Web Analytics sites.
-   - AWS resources, especially Lightsail, S3, DynamoDB, SSM, IAM, and billing alerts.
+   - AWS resources, especially Lightsail, S3, SSM, IAM, and billing alerts.
    - Neon projects, branches, roles, and databases.
    - Upstash Redis databases.
    - Better Stack monitors/sources.
@@ -220,7 +220,7 @@ Steps:
    - Node/pnpm repo tooling remains aligned with project rules.
 
 6. Audit provider support:
-   - AWS provider supports Lightsail instance, static IP, firewall/public ports, S3, DynamoDB, SSM, IAM.
+   - AWS provider supports Lightsail instance, static IP, firewall/public ports, S3, SSM, IAM.
    - Cloudflare provider supports DNS, R2 bucket, Access, WAF/security rules where needed, and Turnstile widget.
    - Upstash provider supports Redis database creation in Singapore.
    - Vercel provider supports project, domains, and environment variables without mixing incompatible env-var resource modes.
@@ -305,7 +305,7 @@ Implement `infra/terraform/bootstrap` with local state only for:
 - S3 bucket encryption, preferably SSE-KMS if the extra key setup is acceptable.
 - S3 block public access.
 - Bucket policy/IAM restrictions.
-- DynamoDB lock table.
+- Native S3 lockfile support in the environment backends.
 
 Rules:
 
@@ -317,7 +317,6 @@ Manual inputs:
 
 - AWS profile/account.
 - State bucket name.
-- Lock table name.
 - AWS region for state resources.
 
 Verification:
@@ -326,8 +325,8 @@ Verification:
 - Versioning enabled.
 - Encryption enabled.
 - Public access blocked.
-- DynamoDB lock table exists.
-- A test init from a temporary root module can acquire state lock.
+- Environment roots initialize with the S3 backend and `use_lockfile = true`.
+- A test plan can acquire state lock.
 
 ## Phase 3: Core Terraform Environments
 
@@ -355,11 +354,11 @@ Verification:
 
 ## Phase 4: AWS Core Infrastructure
 
-Goal: create Lightsail and AWS support resources.
+Goal: create QA Lightsail and AWS support resources first, while keeping production instantiation deferred until QA is set up and tested.
 
 Terraform-managed:
 
-- Lightsail 4 GB instance in Singapore.
+- QA Lightsail instance in Singapore, defaulting to a 2 GB bundle for QA cost control.
 - Ubuntu 22.04 LTS blueprint.
 - Static IP.
 - Static IP attachment.
@@ -367,7 +366,7 @@ Terraform-managed:
   - `80/tcp` open publicly for launch.
   - `443/tcp` open publicly for launch.
   - `22/tcp` only for bootstrap if needed, then closed after Tailscale access is verified.
-- Automatic Lightsail snapshots for production.
+- Automatic Lightsail snapshots for active Medusa Lightsail hosts, starting with QA.
 - SSM Parameter Store hierarchy:
   - `/ecom/prod/medusa/*`
   - `/ecom/qa/medusa/*`

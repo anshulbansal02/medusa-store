@@ -4,7 +4,7 @@ Terraform owns durable infrastructure only. It does not deploy application relea
 
 ## Roots
 
-- `bootstrap`: local-state bootstrap for the S3 remote state bucket and DynamoDB lock table.
+- `bootstrap`: local-state bootstrap for the S3 remote state bucket.
 - `environments/prod`: production infrastructure root using S3 remote state.
 - `environments/qa`: QA infrastructure root using separate S3 remote state.
 

@@ -169,7 +169,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - AWS SSM Parameter Store paths exist for Medusa production and QA runtime config/secrets.
 - Terraform remote state bucket is encrypted, versioned, public-access-blocked, and access-restricted because state may contain secrets.
 - Terraform backend bootstrap was created through `infra/terraform/bootstrap`.
-- Terraform production/QA applies are run locally with S3 remote state and DynamoDB locking.
+- Terraform production/QA applies are run locally with S3 remote state and native S3 lockfiles.
 - GitHub Actions fetches SSM parameters and writes Lightsail runtime env files during deploy.
 - Generated Lightsail env files have restrictive permissions.
 - QA backend domains `qa-api` and `qa-admin` are configured when QA backend is exposed.

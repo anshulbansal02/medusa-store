@@ -41,7 +41,7 @@ Use this file for future high-level design discussions. When a decision becomes 
 - Hosting: Vercel Pro for storefront; AWS Lightsail 4 GB in Singapore for production Medusa compute.
 - Database/cache: Neon Postgres Singapore and Upstash Redis Singapore pay-as-you-go.
 - DNS/security/media: Cloudflare DNS, proxied API/admin records, R2 media, Access for admin, Turnstile for public forms.
-- Terraform: broad durable infrastructure under `infra/terraform`; local applies with S3 remote state and DynamoDB locking.
+- Terraform: broad durable infrastructure under `infra/terraform`; local applies with S3 remote state and native S3 lockfiles.
 - Markets: India-only, INR-only, English-only.
 - Dark mode: not v1.
 

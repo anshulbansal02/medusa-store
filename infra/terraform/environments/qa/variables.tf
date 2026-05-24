@@ -22,3 +22,37 @@ variable "environment" {
   default     = "qa"
 }
 
+variable "lightsail_availability_zone" {
+  description = "Lightsail availability zone for the QA Medusa host."
+  type        = string
+  default     = "ap-southeast-1a"
+}
+
+variable "lightsail_blueprint_id" {
+  description = "Lightsail blueprint ID for the QA Medusa host OS."
+  type        = string
+  default     = "ubuntu_22_04"
+}
+
+variable "lightsail_bundle_id" {
+  description = "Lightsail bundle ID for the QA Medusa host size."
+  type        = string
+  default     = "small_3_0"
+}
+
+variable "lightsail_ssh_public_key_path" {
+  description = "Local path to the public SSH key to import into Lightsail."
+  type        = string
+}
+
+variable "lightsail_temporary_ssh_cidrs" {
+  description = "Temporary IPv4 CIDR blocks allowed to reach SSH during bootstrap."
+  type        = set(string)
+  default     = []
+}
+
+variable "lightsail_automatic_snapshot_time" {
+  description = "Daily automatic Lightsail snapshot time in UTC, in HH:00 format."
+  type        = string
+  default     = "20:00"
+}

@@ -14,14 +14,8 @@ variable "state_bucket_name" {
   type        = string
 }
 
-variable "lock_table_name" {
-  description = "DynamoDB table name for Terraform state locking."
-  type        = string
-}
-
 variable "project" {
   description = "Project tag value."
   type        = string
   default     = "ecom"
 }
-

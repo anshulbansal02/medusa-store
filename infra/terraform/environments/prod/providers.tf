@@ -6,8 +6,3 @@ provider "aws" {
     tags = local.tags
   }
 }
-
-provider "cloudflare" {}
-provider "upstash" {}
-provider "vercel" {}
-provider "betteruptime" {}

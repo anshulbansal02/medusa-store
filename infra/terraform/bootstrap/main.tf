@@ -76,14 +76,3 @@ resource "aws_s3_bucket_policy" "terraform_state" {
   policy = data.aws_iam_policy_document.terraform_state.json
 }
 
-resource "aws_dynamodb_table" "terraform_locks" {
-  name         = var.lock_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-}
-

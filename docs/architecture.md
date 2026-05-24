@@ -140,15 +140,15 @@ Manage Neon through Terraform only after provider review/audit passes. If the Ne
 
 Terraform code lives under `infra/terraform` with environment directories and shared modules.
 
-Terraform remote state uses an AWS S3 backend with DynamoDB locking. Use a small bootstrap step/configuration for the state bucket and lock table before regular environment applies.
+Terraform remote state uses an AWS S3 backend with native S3 lockfiles. Use a small bootstrap step/configuration for the state bucket before regular environment applies.
 
 Terraform uses separate environment directories for `prod` and `qa`, with separate state and shared modules. Do not use Terraform workspaces for v1 environment separation.
 
-Run Terraform `plan` and `apply` locally for v1 while using S3 remote state and DynamoDB locking. GitHub Actions may validate Terraform code later, but must not apply infrastructure until the team intentionally changes that decision.
+Run Terraform `plan` and `apply` locally for v1 while using S3 remote state and native S3 lockfiles. GitHub Actions may validate Terraform code later, but must not apply infrastructure until the team intentionally changes that decision.
 
 GitHub repository settings, branch protection, Actions environments, and Actions secrets are configured manually for v1 and documented in checklists. Do not manage GitHub repository settings with Terraform for v1.
 
-Create the S3 state bucket and DynamoDB lock table through a small `infra/terraform/bootstrap` config with local state. Use local state only for this backend bootstrap boundary.
+Create the S3 state bucket through a small `infra/terraform/bootstrap` config with local state. Use local state only for this backend bootstrap boundary.
 
 Pin Terraform CLI and provider versions in each root module, commit `.terraform.lock.hcl`, and upgrade providers intentionally in separate changes.
 
@@ -174,9 +174,9 @@ Do not add a worker heartbeat at launch unless the Medusa worker can emit a real
 
 Do not create a public status page for v1; Better Stack is internal monitoring/alerting only.
 
-Enable automatic Lightsail snapshots for the production instance as host recovery convenience. Treat snapshots as separate from data backups; durable data remains in Neon, Upstash, R2, GHCR, Terraform, and bootstrap/deploy automation. Review snapshot storage cost after the first month.
+Enable automatic Lightsail snapshots for active Medusa Lightsail instances as host recovery convenience, starting with QA. Treat snapshots as separate from data backups; durable data remains in Neon, Upstash, R2, GHCR, Terraform, and bootstrap/deploy automation. Review snapshot storage cost after the first month.
 
-QA/staging Medusa may share the production Lightsail instance, but QA containers stay stopped by default and run only during active test windows. QA must use separate Neon branch/database, separate Redis, separate secrets, and Razorpay test credentials. Move QA to separate compute if it starts affecting production resources or if always-on QA becomes necessary.
+QA/staging Medusa runs on a separate QA Lightsail instance first so QA can be verified end to end before production rollout. Production Lightsail instantiation is deferred until QA is set up and tested. QA must use separate Neon branch/database, separate Redis, separate secrets, and Razorpay test credentials. Delete QA compute when it is no longer needed; stopped Lightsail instances still accrue charges until deleted.
 
 QA/staging Redis uses a separate Upstash Redis database in Singapore on pay-as-you-go pricing. QA must never share production Redis.
 
@@ -340,12 +340,12 @@ QA:
 - QA backend/database from `qa` environment only.
 - QA secrets must be separate from production.
 - QA must not mutate production orders, live payments, production customers, or inventory.
-- QA Medusa may share the production Lightsail instance, but uses separate Neon branch, Upstash Redis, secrets, and Razorpay test credentials.
+- QA Medusa runs on a separate QA Lightsail instance first, with separate Neon branch, Upstash Redis, secrets, and Razorpay test credentials.
 
 Production:
 
 - Production storefront from `main`.
-- Production Medusa compute on AWS Lightsail 4 GB in Singapore.
+- Production Medusa compute on AWS Lightsail in Singapore, instantiated after QA setup and testing.
 - Production Postgres on Neon in Singapore.
 - Production Redis on Upstash in Singapore, pay-as-you-go initially.
 - Production deploys are manual workflow dispatch for v1.

@@ -8,7 +8,7 @@ Target: keep recurring operating cost around USD 50/month or lower where practic
 ## Assumptions
 
 - Vercel Pro account is acceptable.
-- AWS Lightsail 4 GB is accepted for production Medusa compute.
+- AWS Lightsail is accepted for Medusa compute, starting with QA; production instantiation is deferred until QA is set up and tested.
 - Existing domain is already purchased through Shopify.
 - Existing AWS account is available and used for Lightsail compute, Terraform state, and SSM Parameter Store.
 - Production Postgres is Neon in Singapore.
@@ -20,7 +20,8 @@ Target: keep recurring operating cost around USD 50/month or lower where practic
 | Service | Purpose | Expected Cost Posture |
 | --- | --- | --- |
 | Vercel Pro | Next.js storefront | Already acceptable; storefront host |
-| AWS Lightsail 4 GB | Production Medusa compute | Predictable single-instance app-host cost |
+| AWS Lightsail 2 GB | QA Medusa compute first | Predictable lower-cost QA app-host while testing |
+| AWS Lightsail 4 GB | Production Medusa compute later | Predictable single-instance production app-host cost when active |
 | Lightsail snapshots | Host recovery convenience | Extra snapshot storage cost; review after first month |
 | Neon Postgres | Production database | Managed Postgres in Singapore |
 | Upstash Redis | Production cache/events/workflows | Pay-as-you-go initially; review for Fixed 250 MB after real usage |
@@ -40,8 +41,8 @@ Target: keep recurring operating cost around USD 50/month or lower where practic
 - Do not add a CMS in v1.
 - Do not add a dedicated search service in v1.
 - Do not add Cloudflare Images unless image optimization costs or complexity justify it.
-- Keep QA backend optional, small, and stopped or scaled down when not in use.
-- Pause/scale down/remove QA backend if it creates cost.
+- Instantiate production compute after QA setup and testing, when explicitly approved.
+- Delete QA backend compute when it is no longer needed; stopped Lightsail instances still accrue charges until deleted.
 - Prefer free/native features when they are good enough and do not add complexity.
 
 ## Approximate Shape
@@ -49,7 +50,7 @@ Target: keep recurring operating cost around USD 50/month or lower where practic
 ```txt
 Base expected recurring:
   Vercel Pro
-  AWS Lightsail 4 GB
+  AWS Lightsail 2 GB for active QA first; production 4 GB later
   Lightsail snapshot storage
   Neon Postgres
   Upstash Redis pay-as-you-go

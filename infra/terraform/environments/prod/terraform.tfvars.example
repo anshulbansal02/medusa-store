@@ -1,3 +1,12 @@
 aws_region  = "ap-southeast-1"
 aws_profile = "your-aws-profile"
 
+enable_medusa_lightsail = false
+
+# Set enable_medusa_lightsail = true only when production compute is approved.
+lightsail_availability_zone       = "ap-southeast-1a"
+lightsail_blueprint_id            = "ubuntu_22_04"
+lightsail_bundle_id               = "medium_3_0"
+lightsail_ssh_public_key_path     = "~/.ssh/id_ed25519_ecom_lightsail.pub"
+lightsail_temporary_ssh_cidrs     = []
+lightsail_automatic_snapshot_time = "20:00"
