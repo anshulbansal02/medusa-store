@@ -69,11 +69,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     <div
       className={cn(
         "grid min-w-0 max-w-full gap-3 overflow-hidden",
-        hasThumbnails ? "lg:grid-cols-[88px_1fr]" : "lg:grid-cols-1",
+        "grid-cols-1",
       )}
     >
       {hasThumbnails ? (
-        <div className="order-2 flex w-full min-w-0 max-w-full gap-2 overflow-x-auto pb-1 lg:order-1 lg:block lg:space-y-3 lg:overflow-visible lg:pb-0">
+        <div className="order-2 flex w-full min-w-0 max-w-full gap-2 overflow-x-auto pb-1">
           {images.map((image, index) => (
             <Button
               key={image}
@@ -84,7 +84,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               aria-pressed={activeIndex === index}
               onClick={() => setActiveIndex(index)}
               className={cn(
-                "relative aspect-[4/5] h-auto w-20 shrink-0 cursor-pointer overflow-hidden rounded-none border bg-muted p-0 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:w-full",
+                "relative aspect-[4/5] h-auto w-20 shrink-0 cursor-pointer overflow-hidden rounded-none border bg-muted p-0 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 activeIndex === index
                   ? "border-foreground"
                   : "border-transparent hover:border-border",
@@ -111,9 +111,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               variant="ghost"
               className={cn(
                 "group relative order-1 aspect-[4/5] h-auto w-full cursor-pointer overflow-hidden rounded-none bg-muted p-0 text-left hover:bg-muted",
-                hasThumbnails
-                  ? "lg:order-2 lg:aspect-[5/6]"
-                  : "lg:aspect-[4/5]",
+                hasThumbnails ? "lg:aspect-[1/1.08]" : "lg:aspect-[1/1.08]",
               )}
               aria-label={`${content.openViewerLabel}: ${productName}`}
             />
@@ -128,7 +126,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             sizes="(min-width: 1024px) 52vw, 100vw"
             className="object-cover transition duration-300 ease-out group-hover:scale-[1.015]"
           />
-          <span className="absolute right-3 bottom-3 grid size-10 place-items-center bg-background/90 text-foreground shadow-sm backdrop-blur-sm transition group-hover:bg-background">
+          <span className="absolute top-3 right-3 grid size-10 place-items-center bg-background/90 text-foreground shadow-sm backdrop-blur-sm transition group-hover:bg-background">
             <Expand className="size-4 stroke-icon" aria-hidden="true" />
           </span>
         </DialogTrigger>

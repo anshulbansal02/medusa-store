@@ -69,13 +69,20 @@ export type StorefrontProduct = {
   price: string;
   priceAmount: number | null;
   currencyCode: string;
+  compareAtPrice: string | null;
+  compareAtPriceAmount: number | null;
   note: string;
+  description: string;
   image: string;
   images: string[];
   tags: string[];
   sizes: string[];
   colors: string[];
+  variants: ProductDetailVariant[];
+  color: string;
   categories: StorefrontProductCategory[];
+  detailSections: ProductDetailSection[];
+  sizeChart: ProductSizeChart | null;
 };
 
 export type ProductDetail = {

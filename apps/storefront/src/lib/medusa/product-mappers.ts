@@ -96,6 +96,7 @@ export function toStorefrontProduct(
   const images = getProductImages(product);
   const image = getProductImage(product) ?? images[0];
   const price = getVariantPriceInfo(product.variants?.[0]);
+  const variants = toProductDetailVariants(product);
   const tags = [
     ...toProductCardTags(product.metadata),
     ...(product.variants?.flatMap((variant) =>
@@ -113,8 +114,11 @@ export function toStorefrontProduct(
     href: `/shop/${product.handle}`,
     price: price.formatted,
     priceAmount: price.amount,
+    compareAtPrice: price.compareAtFormatted,
+    compareAtPriceAmount: price.compareAtAmount,
     currencyCode: price.currencyCode,
     note: product.description?.split(".")[0] ?? "",
+    description: product.description ?? "",
     image,
     images,
     tags: Array.from(new Set(tags)).slice(0, 3),
@@ -126,22 +130,19 @@ export function toStorefrontProduct(
     colors: getUniqueProductOptions(product, "color").sort((first, second) =>
       first.localeCompare(second),
     ),
+    variants,
+    color: variants.find((variant) => variant.color)?.color ?? "",
     categories:
       product.categories?.map((category) =>
         toStorefrontProductCategory(category),
       ) ?? [],
+    detailSections: toProductDetailSections(product.metadata),
+    sizeChart: toSizeChart(product.metadata),
   };
 }
 
-export function toProductDetail(product: MedusaProduct): ProductDetail | null {
-  const images = getProductImages(product);
-  const price = getVariantPriceInfo(product.variants?.[0]);
-
-  if (!product.handle || !price.formatted || images.length === 0) {
-    return null;
-  }
-
-  const variants =
+function toProductDetailVariants(product: MedusaProduct) {
+  return (
     product.variants
       ?.map((variant) => {
         const variantPrice = getVariantPrice(variant);
@@ -166,7 +167,19 @@ export function toProductDetail(product: MedusaProduct): ProductDetail | null {
           getSizeRank(first.size) - getSizeRank(second.size);
 
         return rankDifference || first.size.localeCompare(second.size);
-      }) ?? [];
+      }) ?? []
+  );
+}
+
+export function toProductDetail(product: MedusaProduct): ProductDetail | null {
+  const images = getProductImages(product);
+  const price = getVariantPriceInfo(product.variants?.[0]);
+
+  if (!product.handle || !price.formatted || images.length === 0) {
+    return null;
+  }
+
+  const variants = toProductDetailVariants(product);
 
   return {
     id: product.id,

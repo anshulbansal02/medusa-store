@@ -41,6 +41,7 @@ export const cartContent = {
     colorLabel: "Color",
     sizeLabel: "Size",
     sizeChartAction: "Size chart",
+    sizeFinderAction: "Find your size",
     sizeHelpPrefix: "Select an available size for",
     quantityLabel: "Quantity",
     decreaseQuantityLabel: "Decrease quantity",
@@ -55,5 +56,22 @@ export const cartContent = {
       added: "Added to bag.",
       error: "This item could not be added. Try again.",
     },
+  },
+  sizeFinder: {
+    title: "Find your size",
+    description:
+      "Compare this piece with a top or dress that already fits you well.",
+    triggerLabel: "Find your size",
+    measurementLabel: "Garment bust",
+    measurementHelp:
+      "Measure flat across the bust, double it, then enter the full measurement in inches.",
+    placeholder: "Example: 38",
+    unitLabel: "in",
+    emptyResult:
+      "Enter a garment bust measurement to see the closest available size.",
+    bestMatchLabel: "Best match",
+    useSizeAction: "Use this size",
+    keepBrowsingAction: "Keep browsing",
+    closeLabel: "Close size finder",
   },
 } as const;

@@ -174,7 +174,12 @@ function ProductRouteContent({
 
       <section className="px-4 pt-24 pb-28 sm:px-6 sm:pt-28 sm:pb-20 lg:px-8">
         <div className="mx-auto grid max-w-[1440px] min-w-0 gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] xl:gap-14">
-          <ProductGallery images={product.images} productName={product.name} />
+          <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+            <ProductGallery
+              images={product.images}
+              productName={product.name}
+            />
+          </div>
 
           <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
             <nav
@@ -229,7 +234,7 @@ function ProductRouteContent({
               productPrice={product.price}
               color={product.color}
               variants={product.variants}
-              hasSizeChart={Boolean(product.sizeChart)}
+              sizeChart={product.sizeChart}
             />
 
             <ProductAssuranceSection content={content} />

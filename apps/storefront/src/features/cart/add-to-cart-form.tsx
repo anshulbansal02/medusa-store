@@ -9,7 +9,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { siteContent } from "@/content/site-content";
 import { addToCartAction } from "@/features/cart/actions";
 import { useBagStore } from "@/features/cart/bag-store";
-import type { ProductDetailVariant } from "@/lib/medusa/products";
+import { ProductSizeFinder } from "@/features/products/product-size-finder";
+import type {
+  ProductDetailVariant,
+  ProductSizeChart,
+} from "@/lib/medusa/products";
 import { cn } from "@/lib/utils";
 
 type AddToCartFormProps = {
@@ -17,7 +21,9 @@ type AddToCartFormProps = {
   productPrice: string;
   color: string;
   variants: ProductDetailVariant[];
-  hasSizeChart: boolean;
+  sizeChart: ProductSizeChart | null;
+  showStickyBar?: boolean;
+  formId?: string;
 };
 
 type AddToBagContent = typeof siteContent.addToBag;
@@ -25,9 +31,11 @@ type AddToBagContent = typeof siteContent.addToBag;
 export function AddToCartForm({
   productName,
   productPrice,
+  showStickyBar = true,
+  sizeChart,
   color,
+  formId = "add-to-cart-form",
   variants,
-  hasSizeChart,
 }: AddToCartFormProps) {
   const content = siteContent.addToBag;
   const router = useRouter();
@@ -66,7 +74,7 @@ export function AddToCartForm({
 
   return (
     <>
-      <form id="add-to-cart-form" onSubmit={handleSubmit} className="py-7">
+      <form id={formId} onSubmit={handleSubmit} className="py-7">
         <input
           type="hidden"
           name="variant_title"
@@ -83,7 +91,7 @@ export function AddToCartForm({
 
         <SizeSelector
           content={content}
-          hasSizeChart={hasSizeChart}
+          sizeChart={sizeChart}
           productName={productName}
           selectedVariantId={selectedVariantId}
           variants={availableVariants}
@@ -112,46 +120,64 @@ export function AddToCartForm({
         </Button>
       </form>
 
-      <StickyAddToBagBar
-        canSubmit={canSubmit}
-        content={content}
-        isPending={isPending}
-        productName={productName}
-        productPrice={productPrice}
-        selectedVariant={selectedVariant}
-      />
+      {showStickyBar ? (
+        <StickyAddToBagBar
+          canSubmit={canSubmit}
+          content={content}
+          isPending={isPending}
+          formId={formId}
+          productName={productName}
+          productPrice={productPrice}
+          selectedVariant={selectedVariant}
+        />
+      ) : null}
     </>
   );
 }
 
 function SizeSelector({
   content,
-  hasSizeChart,
+  sizeChart,
   onSelect,
   productName,
   selectedVariantId,
   variants,
 }: {
   content: AddToBagContent;
-  hasSizeChart: boolean;
+  sizeChart: ProductSizeChart | null;
   onSelect: (value: string) => void;
   productName: string;
   selectedVariantId: string;
   variants: ProductDetailVariant[];
 }) {
+  function selectSize(size: string) {
+    const variant = variants.find((item) => item.size === size);
+
+    if (variant) {
+      onSelect(variant.id);
+    }
+  }
+
   return (
     <fieldset className="mt-6" aria-describedby="size-help">
       <legend className="sr-only">{content.sizeLabel}</legend>
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm font-medium">{content.sizeLabel}</p>
-        {hasSizeChart ? (
-          <a
-            href="#size-chart"
-            className="text-sm underline-offset-4 hover:underline"
-          >
-            {content.sizeChartAction}
-          </a>
-        ) : null}
+        <div className="flex items-center gap-3">
+          <ProductSizeFinder
+            availableSizes={variants.map((variant) => variant.size)}
+            sizeChart={sizeChart}
+            onSelectSize={selectSize}
+          />
+          {sizeChart ? (
+            <a
+              href="#size-chart"
+              className="text-sm underline-offset-4 hover:underline"
+            >
+              {content.sizeChartAction}
+            </a>
+          ) : null}
+        </div>
       </div>
       <p id="size-help" className="sr-only">
         {content.sizeHelpPrefix} {productName}.
@@ -225,6 +251,7 @@ function StickyAddToBagBar({
   canSubmit,
   content,
   isPending,
+  formId,
   productName,
   productPrice,
   selectedVariant,
@@ -232,6 +259,7 @@ function StickyAddToBagBar({
   canSubmit: boolean;
   content: AddToBagContent;
   isPending: boolean;
+  formId: string;
   productName: string;
   productPrice: string;
   selectedVariant: ProductDetailVariant | undefined;
@@ -249,7 +277,7 @@ function StickyAddToBagBar({
         </div>
         <Button
           type="submit"
-          form="add-to-cart-form"
+          form={formId}
           disabled={!canSubmit}
           size="lg"
           className="h-11 rounded-none px-5 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"

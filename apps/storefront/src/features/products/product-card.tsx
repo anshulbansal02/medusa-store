@@ -1,8 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { siteContent } from "@/content/site-content";
+import { ProductQuickLook } from "@/features/products/product-quick-look";
 import { WishlistButton } from "@/features/wishlist/wishlist-button";
 import type { StorefrontProduct } from "@/lib/medusa/products";
 import { cn } from "@/lib/utils";
@@ -14,6 +18,7 @@ export function ProductCard({
   product: StorefrontProduct;
   eager?: boolean;
 }) {
+  const [quickLookOpen, setQuickLookOpen] = useState(false);
   const categoryName = product.categories[0]?.name;
   const content = siteContent.product.card;
   const hoverImage = product.images.find((image) => image !== product.image);
@@ -68,6 +73,8 @@ export function ProductCard({
           type="button"
           variant="secondary"
           size="sm"
+          onClick={() => setQuickLookOpen(true)}
+          aria-label={`${content.quickLookLabel}: ${product.name}`}
           className="absolute right-3 bottom-3 h-9 translate-y-1 rounded-none bg-background/92 px-3.5 text-foreground opacity-0 shadow-sm backdrop-blur-sm transition duration-300 hover:bg-background group-hover:translate-y-0 group-hover:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100 motion-reduce:transition-none"
         >
           {content.quickLookLabel}
@@ -99,6 +106,12 @@ export function ProductCard({
         </Link>
         <p className="shrink-0 text-sm font-medium">{product.price}</p>
       </div>
+
+      <ProductQuickLook
+        open={quickLookOpen}
+        product={product}
+        onOpenChange={setQuickLookOpen}
+      />
     </article>
   );
 }
