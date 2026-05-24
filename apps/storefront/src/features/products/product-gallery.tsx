@@ -136,7 +136,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         {isViewerOpen ? (
           <DialogContent
             showCloseButton={false}
-            className="h-[calc(100svh-1rem)] max-w-[calc(100vw-1rem)] rounded-none bg-transparent p-0 ring-0 sm:h-[calc(100svh-2rem)] sm:max-w-[calc(100vw-2rem)] sm:max-w-none"
+            className="h-svh max-w-none rounded-none bg-transparent p-0 ring-0 sm:max-w-none"
           >
             <DialogTitle className="sr-only">
               {productName} {content.dialogTitleSuffix}

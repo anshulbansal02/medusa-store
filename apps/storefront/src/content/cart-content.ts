@@ -19,6 +19,7 @@ export const cartContent = {
     totalLabel: "Total",
     checkoutAction: "Checkout",
     checkoutFullAction: "Continue to checkout",
+    viewBagAction: "View bag",
     viewFullAction: "View full bag",
     summaryTitle: "Order summary",
     quantityPrefix: "Qty",

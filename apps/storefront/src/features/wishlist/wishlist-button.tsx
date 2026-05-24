@@ -35,14 +35,14 @@ export function WishlistButton({
       aria-pressed={isSaved}
       data-saved={isSaved}
       className={cn(
-        "size-8 rounded-full border border-background/85 bg-background/88 text-foreground shadow-md backdrop-blur-sm transition duration-300 ease-out hover:-translate-y-0.5 hover:bg-background hover:text-primary hover:shadow-lg active:translate-y-0 active:scale-95 data-[saved=true]:border-background data-[saved=true]:bg-background data-[saved=true]:text-primary motion-reduce:transition-none sm:size-10 sm:shadow-lg sm:hover:shadow-xl",
+        "size-8 rounded-full border border-background/85 bg-background/88 text-foreground shadow-md backdrop-blur-sm transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-150 ease-out hover:-translate-y-0.5 hover:border-background hover:bg-background hover:text-primary hover:shadow-lg active:translate-y-0 active:scale-95 data-[saved=true]:border-background data-[saved=true]:bg-background data-[saved=true]:text-primary motion-reduce:transition-none sm:size-10 sm:shadow-lg sm:hover:shadow-xl",
         className,
       )}
       onClick={() => toggleProduct(productId)}
     >
       <Heart
         className={cn(
-          "size-4 stroke-icon-strong transition duration-300 ease-out group-hover/button:scale-110 motion-reduce:transition-none sm:size-[18px]",
+          "size-4 stroke-icon-strong transition-[fill,stroke,transform] duration-150 ease-out group-hover/button:scale-110 motion-reduce:transition-none sm:size-[18px]",
           isSaved ? "fill-current" : "fill-transparent",
         )}
         aria-hidden="true"

@@ -169,7 +169,7 @@ function SizeSelector({
             className={cn(
               "flex aspect-auto h-11 w-full cursor-pointer items-center justify-center rounded-none border-border bg-background text-sm font-medium transition hover:border-foreground focus-visible:ring-2 focus-visible:ring-ring",
               selectedVariantId === variant.id &&
-                "border-foreground bg-foreground text-background hover:bg-foreground hover:text-background",
+                "border-primary bg-primary text-primary-foreground hover:border-primary-hover hover:bg-primary-hover hover:text-primary-foreground",
             )}
           >
             {variant.size}

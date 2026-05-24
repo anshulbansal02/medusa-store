@@ -41,6 +41,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
   --color-primary: var(--primary);
   --color-announcement-foreground: var(--announcement-foreground);
   --color-announcement: var(--announcement);
@@ -78,6 +79,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.015 30);
   --primary: oklch(0.51 0.19 25);
+  --primary-hover: oklch(0.45 0.18 25);
   --primary-foreground: oklch(1 0 0);
   --announcement: oklch(0.18 0.015 30);
   --announcement-foreground: oklch(0.985 0.006 35);
