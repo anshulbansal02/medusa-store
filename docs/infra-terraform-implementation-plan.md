@@ -533,26 +533,27 @@ Goal: manage storefront platform config while keeping deploys in GitHub Actions.
 
 Terraform-managed where provider support is reliable:
 
-- Vercel project.
+- Vercel QA and production projects.
 - Domains.
 - Environment variables.
-- Production/preview environment values.
+- Production environment values per project.
 
 Current state:
 
-- The existing storefront project `medusa-store-storefront` is imported into shared Terraform.
-- The project is not linked to GitHub so Vercel does not auto-deploy from Git pushes.
+- The existing storefront project was imported into shared Terraform and renamed to `medusa-store-storefront-qa`.
+- The production storefront project is `medusa-store-storefront-prod`.
+- Both projects are not linked to GitHub so Vercel does not auto-deploy from Git pushes.
 - Default Vercel Function region is `sin1`, matching the Singapore Medusa/data tier. Use `bom1` only if backend/data move to India or measurement proves the user-facing benefit outweighs backend round-trip latency.
 - Interim domains use `neonfold.com`: `www.neonfold.com` for production storefront, `neonfold.com` as a 308 redirect to `www`, `qa.neonfold.com` for QA storefront, and `qa-api.neonfold.com` for QA Medusa API.
-- Vercel project domains `neonfold.com`, `www.neonfold.com`, and `qa.neonfold.com` are Terraform-managed.
-- QA preview `MEDUSA_BACKEND_URL` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as Vercel project environment variables. `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com` for future preview deploys.
-- `NEXT_PUBLIC_IMAGE_HOSTNAMES` is Terraform-managed for preview and production and is derived from the configured media hostnames.
+- Vercel project domains `neonfold.com` and `www.neonfold.com` are managed on the production project. `qa.neonfold.com` is managed on the QA project.
+- QA `MEDUSA_BACKEND_URL` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` are managed by Terraform as QA project production environment variables. `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com`.
+- `NEXT_PUBLIC_IMAGE_HOSTNAMES` is Terraform-managed for both projects and is derived from the configured media hostnames.
 - Remaining Vercel app environment variables are deferred until final browser-safe public values exist. Move stable Vercel app env vars into Terraform-managed Vercel resources when values are known and state sensitivity has been reviewed.
 
 GitHub Actions-managed:
 
 - Storefront deployment.
-- Manual production workflow dispatch.
+- Manual QA and production workflow dispatch.
 
 Rules:
 
@@ -565,7 +566,7 @@ Verification:
 
 - Vercel project exists.
 - Domains connected.
-- Preview/prod env vars configured.
+- QA/prod env vars configured on their separate projects.
 - QA storefront deploy still works.
 - Production deploy remains manual workflow dispatch.
 

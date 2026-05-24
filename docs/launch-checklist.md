@@ -28,8 +28,8 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - Confirm the manually dispatched Medusa deploy target shows a successful build step before smoke testing API endpoints.
 - Confirm Medusa QA deploy credentials for the shared Lightsail QA setup.
 - Confirm Vercel storefront QA deploy is enabled through the GitHub `qa` environment secret `VERCEL_TOKEN`.
-- Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL=https://qa-api.neonfold.com` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`.
-- Confirm the QA preview URL loads after Vercel SSO authentication.
+- Confirm Vercel storefront QA config has `MEDUSA_BACKEND_URL=https://qa-api.neonfold.com` and `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` on the QA Vercel project.
+- Confirm `qa.neonfold.com` loads after the manual QA storefront deployment.
 
 ## Storefront UX
 

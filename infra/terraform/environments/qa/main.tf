@@ -1,10 +1,8 @@
 locals {
-  qa_storefront_domain      = "${var.qa_storefront_subdomain}.${var.domain_name}"
-  qa_medusa_api_domain      = "${var.qa_medusa_api_subdomain}.${var.domain_name}"
-  medusa_store_cors_origins = join(",", distinct(concat(var.medusa_store_cors_base_origins, ["https://${local.qa_storefront_domain}"])))
-  medusa_admin_cors_origins = join(",", distinct(concat(var.medusa_admin_cors_base_origins, ["https://${local.qa_medusa_api_domain}"])))
-  medusa_auth_cors_origins  = join(",", distinct(concat(var.medusa_auth_cors_base_origins, ["https://${local.qa_medusa_api_domain}", "https://${local.qa_storefront_domain}"])))
-  medusa_backend_url        = "https://${local.qa_medusa_api_domain}"
+  medusa_store_cors_origins = join(",", distinct(concat(var.medusa_store_cors_base_origins, ["https://${var.qa_storefront_domain}"])))
+  medusa_admin_cors_origins = join(",", distinct(concat(var.medusa_admin_cors_base_origins, ["https://${var.qa_medusa_api_domain}"])))
+  medusa_auth_cors_origins  = join(",", distinct(concat(var.medusa_auth_cors_base_origins, ["https://${var.qa_medusa_api_domain}", "https://${var.qa_storefront_domain}"])))
+  medusa_backend_url        = "https://${var.qa_medusa_api_domain}"
   tags = {
     Project     = var.project
     ManagedBy   = "terraform"

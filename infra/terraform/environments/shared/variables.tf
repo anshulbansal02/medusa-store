@@ -32,10 +32,16 @@ variable "vercel_api_token" {
   sensitive   = true
 }
 
-variable "vercel_storefront_project_name" {
-  description = "Vercel project name for the storefront."
+variable "vercel_storefront_qa_project_name" {
+  description = "Vercel project name for the QA storefront."
   type        = string
-  default     = "medusa-store-storefront"
+  default     = "medusa-store-storefront-qa"
+}
+
+variable "vercel_storefront_prod_project_name" {
+  description = "Vercel project name for the production storefront."
+  type        = string
+  default     = "medusa-store-storefront-prod"
 }
 
 variable "vercel_storefront_function_regions" {
@@ -45,45 +51,45 @@ variable "vercel_storefront_function_regions" {
 }
 
 variable "vercel_storefront_qa_medusa_publishable_key" {
-  description = "QA Medusa publishable API key configured on Vercel preview deployments. This is browser-safe."
+  description = "QA Medusa publishable API key configured on the QA Vercel project. This is browser-safe."
   type        = string
   default     = "pk_8c1d080d0113830ac1d39a30dfa86c7927b475e1413899f479b408a95bb39b85"
 }
 
-variable "domain_name" {
-  description = "Base domain for the current storefront environment set. Change this to move from the interim domain to the final brand domain."
+variable "production_apex_domain" {
+  description = "Production apex domain."
   type        = string
   default     = "neonfold.com"
 }
 
-variable "production_storefront_subdomain" {
-  description = "Subdomain for the production storefront. Use an empty string to use the apex."
+variable "production_storefront_domain" {
+  description = "Production storefront domain."
   type        = string
-  default     = "www"
+  default     = "www.neonfold.com"
 }
 
-variable "qa_storefront_subdomain" {
-  description = "Subdomain for the QA storefront."
+variable "qa_storefront_domain" {
+  description = "QA storefront domain."
   type        = string
-  default     = "qa"
+  default     = "qa.neonfold.com"
 }
 
-variable "qa_medusa_api_subdomain" {
-  description = "Subdomain for the QA Medusa API."
+variable "qa_medusa_api_domain" {
+  description = "QA Medusa API domain."
   type        = string
-  default     = "qa-api"
+  default     = "qa-api.neonfold.com"
 }
 
-variable "production_media_subdomain" {
-  description = "Subdomain for production media served from Cloudflare R2."
+variable "production_media_domain" {
+  description = "Production media domain served from Cloudflare R2."
   type        = string
-  default     = "media"
+  default     = "media.neonfold.com"
 }
 
-variable "qa_media_subdomain" {
-  description = "Subdomain for QA media served from Cloudflare R2."
+variable "qa_media_domain" {
+  description = "QA media domain served from Cloudflare R2."
   type        = string
-  default     = "qa-media"
+  default     = "qa-media.neonfold.com"
 }
 
 variable "qa_medusa_static_ip" {

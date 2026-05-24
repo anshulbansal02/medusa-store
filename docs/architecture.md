@@ -317,7 +317,7 @@ qa-media.neonfold.com QA R2 media
 qa-admin.brand.com   QA Admin, only if hosted QA backend exists
 ```
 
-Manage DNS in Cloudflare for `neonfold.com`. This is an interim launch domain and can be replaced with the final brand domain later by changing Terraform domain variables and reapplying.
+Manage DNS in Cloudflare for `neonfold.com`. This is an interim launch domain and can be replaced with the final brand domain later by changing the explicit QA and production Terraform domain variables and reapplying.
 
 Keep this service-separated domain layout for v1. Do not mount Medusa API or Admin under storefront paths.
 

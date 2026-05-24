@@ -20,6 +20,5 @@ neon_region_id                         = "aws-ap-southeast-1"
 neon_pg_version                        = 17
 neon_history_retention_seconds         = 21600
 
-domain_name              = "neonfold.com"
-qa_storefront_subdomain  = "qa"
-qa_medusa_api_subdomain  = "qa-api"
+qa_storefront_domain = "qa.neonfold.com"
+qa_medusa_api_domain = "qa-api.neonfold.com"

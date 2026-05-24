@@ -173,17 +173,17 @@ Rules:
 
 ## Vercel Storefront Deployment Notes
 
-- Vercel project: `medusa-store-storefront`.
-- Current QA preview URL: `https://medusa-store-storefront-okdjppru3-anshul-bansal-s-projects.vercel.app`.
+- Vercel QA project: `medusa-store-storefront-qa`.
+- Vercel production project: `medusa-store-storefront-prod`.
 - Interim domains: `qa.neonfold.com` for QA storefront, `qa-api.neonfold.com` for QA Medusa API, `www.neonfold.com` for future production storefront, and `neonfold.com` as an apex redirect.
 - Terraform manages the Vercel project/configuration where provider support is reliable.
 - GitHub Actions owns storefront deployment; Vercel Git auto-deploys are not required.
 - `dev` pushes run CI only. QA storefront deploy is manual workflow dispatch.
-- Production storefront deployment is manual workflow dispatch for v1.
-- The deploy workflow uses `vercel deploy --cwd ./apps/storefront`; Vercel performs the remote build for the linked storefront project.
-- Vercel preview deployments are currently protected by Vercel SSO. Keep QA private unless the team explicitly needs public QA access.
-- Terraform manages Vercel environment variables where practical. QA preview `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com`, browser-safe `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` is Terraform-managed, and `NEXT_PUBLIC_IMAGE_HOSTNAMES` is derived from the configured media domains. Secret values require provider behavior review and secret-bearing state controls.
-- Terraform now manages the shared Vercel storefront project itself. Keep the project unlinked from GitHub so deploys remain manual GitHub Actions dispatches.
+- Production storefront deployment is manual workflow dispatch from `main` for v1.
+- The deploy workflow uses `vercel deploy --prod --cwd ./apps/storefront`; Vercel performs the remote build for the project ID configured on the selected GitHub environment.
+- QA uses a production deployment inside the separate QA Vercel project so `qa.neonfold.com` is the stable QA hostname without mixing preview aliases into production.
+- Terraform manages Vercel environment variables where practical. QA `MEDUSA_BACKEND_URL` targets `https://qa-api.neonfold.com`, browser-safe `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` is Terraform-managed, and `NEXT_PUBLIC_IMAGE_HOSTNAMES` is derived from the configured media domains. Secret values require provider behavior review and secret-bearing state controls.
+- Terraform manages the QA and production Vercel storefront projects. Keep both projects unlinked from GitHub so deploys remain manual GitHub Actions dispatches.
 - GitHub environment variables/secrets hold deploy credentials and any deployment-only values not managed by Terraform:
   - `VERCEL_ORG_ID`
   - `VERCEL_PROJECT_ID`

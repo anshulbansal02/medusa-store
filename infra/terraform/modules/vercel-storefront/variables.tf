@@ -28,7 +28,7 @@ variable "auto_assign_custom_domains" {
 }
 
 variable "preview_deployments_disabled" {
-  description = "Whether Vercel preview deployments are disabled. CLI-managed QA deploys still use preview target."
+  description = "Whether Vercel preview deployments are disabled."
   type        = bool
   default     = false
 }

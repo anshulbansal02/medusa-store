@@ -13,24 +13,44 @@ output "github_actions_prod_deploy_role_arn" {
   value       = module.github_actions_aws_deploy.prod_deploy_role_arn
 }
 
-output "vercel_storefront_project_id" {
-  description = "Terraform-managed Vercel storefront project ID."
-  value       = module.vercel_storefront.project_id
+output "vercel_storefront_qa_project_id" {
+  description = "Terraform-managed Vercel QA storefront project ID."
+  value       = module.vercel_storefront_qa.project_id
 }
 
-output "vercel_storefront_project_name" {
-  description = "Terraform-managed Vercel storefront project name."
-  value       = module.vercel_storefront.project_name
+output "vercel_storefront_qa_project_name" {
+  description = "Terraform-managed Vercel QA storefront project name."
+  value       = module.vercel_storefront_qa.project_name
 }
 
-output "vercel_storefront_environment_variable_ids" {
-  description = "Terraform-managed Vercel storefront environment variable IDs."
-  value       = module.vercel_storefront.environment_variable_ids
+output "vercel_storefront_qa_environment_variable_ids" {
+  description = "Terraform-managed Vercel QA storefront environment variable IDs."
+  value       = module.vercel_storefront_qa.environment_variable_ids
 }
 
-output "vercel_storefront_domain_ids" {
-  description = "Terraform-managed Vercel storefront domain IDs."
-  value       = module.vercel_storefront.domain_ids
+output "vercel_storefront_qa_domain_ids" {
+  description = "Terraform-managed Vercel QA storefront domain IDs."
+  value       = module.vercel_storefront_qa.domain_ids
+}
+
+output "vercel_storefront_prod_project_id" {
+  description = "Terraform-managed Vercel production storefront project ID."
+  value       = module.vercel_storefront_prod.project_id
+}
+
+output "vercel_storefront_prod_project_name" {
+  description = "Terraform-managed Vercel production storefront project name."
+  value       = module.vercel_storefront_prod.project_name
+}
+
+output "vercel_storefront_prod_environment_variable_ids" {
+  description = "Terraform-managed Vercel production storefront environment variable IDs."
+  value       = module.vercel_storefront_prod.environment_variable_ids
+}
+
+output "vercel_storefront_prod_domain_ids" {
+  description = "Terraform-managed Vercel production storefront domain IDs."
+  value       = module.vercel_storefront_prod.domain_ids
 }
 
 output "cloudflare_dns_record_ids" {

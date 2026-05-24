@@ -116,22 +116,16 @@ variable "neon_history_retention_seconds" {
   default     = 21600
 }
 
-variable "domain_name" {
-  description = "Base domain for QA public hostnames. Keep aligned with the shared Terraform environment."
+variable "qa_storefront_domain" {
+  description = "QA storefront domain."
   type        = string
-  default     = "neonfold.com"
+  default     = "qa.neonfold.com"
 }
 
-variable "qa_storefront_subdomain" {
-  description = "Subdomain for the QA storefront."
+variable "qa_medusa_api_domain" {
+  description = "QA Medusa API domain."
   type        = string
-  default     = "qa"
-}
-
-variable "qa_medusa_api_subdomain" {
-  description = "Subdomain for the QA Medusa API."
-  type        = string
-  default     = "qa-api"
+  default     = "qa-api.neonfold.com"
 }
 
 variable "medusa_store_cors_base_origins" {

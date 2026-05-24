@@ -7,18 +7,19 @@ github_repo  = "medusa-store"
 # Prefer TF_VAR_vercel_api_token in the shell instead of committing this.
 vercel_api_token = "vercel-token"
 
-vercel_storefront_project_name     = "medusa-store-storefront"
-vercel_storefront_function_regions = ["sin1"]
+vercel_storefront_qa_project_name   = "medusa-store-storefront-qa"
+vercel_storefront_prod_project_name = "medusa-store-storefront-prod"
+vercel_storefront_function_regions  = ["sin1"]
 
 vercel_storefront_qa_medusa_publishable_key = "pk_qa_publishable_key"
 
-domain_name                    = "neonfold.com"
-production_storefront_subdomain = "www"
-qa_storefront_subdomain         = "qa"
-qa_medusa_api_subdomain         = "qa-api"
-production_media_subdomain      = "media"
-qa_media_subdomain              = "qa-media"
-qa_medusa_static_ip             = "52.77.164.161"
+production_apex_domain      = "neonfold.com"
+production_storefront_domain = "www.neonfold.com"
+qa_storefront_domain         = "qa.neonfold.com"
+qa_medusa_api_domain         = "qa-api.neonfold.com"
+production_media_domain      = "media.neonfold.com"
+qa_media_domain              = "qa-media.neonfold.com"
+qa_medusa_static_ip          = "52.77.164.161"
 
 # Prefer CLOUDFLARE_API_TOKEN in the shell instead of committing it.
 cloudflare_site_enabled     = true
