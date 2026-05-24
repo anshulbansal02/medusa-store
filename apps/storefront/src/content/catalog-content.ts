@@ -114,7 +114,6 @@ export const catalogContent = {
     },
     sizeChart: {
       title: "Size chart",
-      fullGuideAction: "Full guide",
       sizeColumnLabel: "Size",
     },
   },

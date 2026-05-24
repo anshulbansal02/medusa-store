@@ -17,7 +17,6 @@ export const globalContent = {
       primaryNavigationLabel: "Mobile primary navigation",
       supportNavigationLabel: "Mobile support navigation",
       supportItems: [
-        { href: "/size-guide", label: "Size Guide" },
         { href: "/shipping", label: "Shipping" },
         { href: "/returns", label: "Returns" },
         { href: "/track-order", label: "Track Order" },
@@ -41,10 +40,8 @@ export const globalContent = {
         title: "Help",
         links: [
           { href: "/contact", label: "Contact" },
-          { href: "/size-guide", label: "Size Guide" },
           { href: "/shipping", label: "Shipping" },
           { href: "/returns", label: "Returns" },
-          { href: "/faq", label: "FAQ" },
           { href: "/track-order", label: "Track Order" },
         ],
       },

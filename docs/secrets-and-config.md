@@ -206,6 +206,7 @@ Rules:
 - The deploy workflow uses `vercel deploy --prod --cwd ./apps/storefront`; Vercel performs the remote build for the project ID configured on the selected GitHub environment.
 - QA uses a production deployment inside the separate QA Vercel project so `qa.example.com` is the stable QA hostname without mixing preview aliases into production.
 - Terraform manages Vercel environment variables where practical. QA `MEDUSA_BACKEND_URL` targets `https://qa-api.example.com`, browser-safe `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` is Terraform-managed, and `NEXT_PUBLIC_IMAGE_HOSTNAMES` is derived from the configured media domains. Secret values require provider behavior review and secret-bearing state controls.
+- Storefront QA/prod must set `ORDER_ACCESS_SECRET` as a server-only Vercel environment variable. Use a unique 32+ byte random value per environment; it signs short-lived order detail access grants and must not use `NEXT_PUBLIC_`. Shared Terraform can manage this value through `vercel_storefront_qa_order_access_secret` and `vercel_storefront_prod_order_access_secret`; treat remote state as secret-bearing when doing so.
 - Terraform manages the QA and production Vercel storefront projects. Keep both projects unlinked from GitHub so deploys remain manual GitHub Actions dispatches.
 - GitHub environment variables/secrets hold deploy credentials and any deployment-only values not managed by Terraform:
   - `VERCEL_ORG_ID`

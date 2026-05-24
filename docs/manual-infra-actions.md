@@ -30,13 +30,17 @@ Needed when we resume security/analytics:
   endpoint is account-level RUM site creation, not zone DNS.
 - Keep scope limited to the current account and `example.com` zone where
   Cloudflare allows that.
+- Set `cloudflare_access_enabled = true` and provide
+  `cloudflare_access_admin_emails` in ignored shared Terraform variables before
+  applying Access protection.
 
 After updating `.env`, the agent should store the new token in SSM:
 
 - `/ecom/shared/operator/cloudflare/api_token`
 
-Non-blocking for now: yes. Core QA storefront/backend/media setup can continue
-without this.
+Non-blocking for core storefront/backend/media bring-up: yes. Blocking before
+real QA Admin operator login or real customer/order data is used through QA
+Admin.
 
 ### Better Stack
 

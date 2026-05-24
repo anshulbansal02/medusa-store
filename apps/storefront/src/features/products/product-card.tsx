@@ -90,6 +90,11 @@ export function ProductCard({
             <h3 className="text-sm font-medium leading-snug sm:text-base">
               {product.name}
             </h3>
+            {product.note ? (
+              <p className="mt-1 hidden text-muted-foreground text-sm sm:block">
+                {product.note}
+              </p>
+            ) : null}
           </div>
         </Link>
         <p className="shrink-0 text-sm font-medium">{product.price}</p>

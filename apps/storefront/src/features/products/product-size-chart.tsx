@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { siteContent } from "@/content/site-content";
 import type { ProductSizeChart as ProductSizeChartData } from "@/lib/medusa/products";
 
@@ -20,25 +18,12 @@ export function ProductSizeChart({ sizeChart }: ProductSizeChartProps) {
       aria-labelledby="size-chart-title"
       className="mt-5 border-border border-t pt-5"
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 id="size-chart-title" className="text-sm font-medium">
-            {content.title}
-          </h2>
-          {sizeChart.note ? (
-            <p className="mt-1 text-muted-foreground text-sm">
-              {sizeChart.note}
-            </p>
-          ) : null}
-        </div>
-        <Link
-          href="/size-guide"
-          prefetch={false}
-          className="shrink-0 text-sm underline-offset-4 hover:underline"
-        >
-          {content.fullGuideAction}
-        </Link>
-      </div>
+      <h2 id="size-chart-title" className="text-sm font-medium">
+        {content.title}
+      </h2>
+      {sizeChart.note ? (
+        <p className="mt-1 text-muted-foreground text-sm">{sizeChart.note}</p>
+      ) : null}
 
       <div className="mt-4 overflow-x-auto">
         <table className="w-full min-w-[360px] border-collapse text-left text-sm">

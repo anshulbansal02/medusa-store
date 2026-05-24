@@ -34,9 +34,13 @@ export const orderContent = {
     form: {
       label: "Order reference or confirmation link",
       placeholder: "Paste your order reference or link",
+      emailLabel: "Order email",
+      emailPlaceholder: "Enter the email used at checkout",
       invalidReference:
         "Use the order reference or confirmation link from your email.",
       invalidInput: "Enter an order reference or order link.",
+      invalidEmail: "Enter the email used for this order.",
+      notFound: "We could not match that order reference and email.",
       pendingMessage: "Opening order details...",
       pendingButton: "Opening...",
       submitButton: "View order",

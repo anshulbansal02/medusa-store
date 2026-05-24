@@ -56,6 +56,32 @@ variable "vercel_storefront_qa_medusa_publishable_key" {
   sensitive   = true
 }
 
+variable "vercel_storefront_qa_order_access_secret" {
+  description = "Server-only QA storefront secret used to sign short-lived order detail access grants. Prefer TF_VAR_vercel_storefront_qa_order_access_secret."
+  type        = string
+  sensitive   = true
+  default     = null
+  nullable    = true
+
+  validation {
+    condition     = var.vercel_storefront_qa_order_access_secret == null || length(var.vercel_storefront_qa_order_access_secret) >= 32
+    error_message = "Use at least 32 characters for vercel_storefront_qa_order_access_secret."
+  }
+}
+
+variable "vercel_storefront_prod_order_access_secret" {
+  description = "Server-only production storefront secret used to sign short-lived order detail access grants. Prefer TF_VAR_vercel_storefront_prod_order_access_secret."
+  type        = string
+  sensitive   = true
+  default     = null
+  nullable    = true
+
+  validation {
+    condition     = var.vercel_storefront_prod_order_access_secret == null || length(var.vercel_storefront_prod_order_access_secret) >= 32
+    error_message = "Use at least 32 characters for vercel_storefront_prod_order_access_secret."
+  }
+}
+
 variable "production_apex_domain" {
   description = "Production apex domain."
   type        = string
@@ -137,6 +163,36 @@ variable "cloudflare_r2_media_enabled" {
   description = "Whether to create Cloudflare R2 media buckets and custom domains."
   type        = bool
   default     = false
+}
+
+variable "cloudflare_access_enabled" {
+  description = "Whether to create Cloudflare Access protection for the QA Medusa Admin hostname."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.cloudflare_access_enabled || (var.cloudflare_site_enabled && length(var.cloudflare_access_admin_emails) > 0)
+    error_message = "Enable cloudflare_site_enabled and provide at least one cloudflare_access_admin_emails entry before enabling Cloudflare Access."
+  }
+}
+
+variable "cloudflare_access_admin_emails" {
+  description = "Approved admin email allowlist for Cloudflare Access."
+  type        = set(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for email in var.cloudflare_access_admin_emails : can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", email))
+    ])
+    error_message = "All Cloudflare Access admin emails must be valid email addresses."
+  }
+}
+
+variable "cloudflare_access_session_duration" {
+  description = "Cloudflare Access session duration for protected admin applications."
+  type        = string
+  default     = "12h"
 }
 
 variable "cloudflare_web_analytics_enabled" {

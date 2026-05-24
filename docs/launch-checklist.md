@@ -100,7 +100,6 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 
 - About page present.
 - Contact page present.
-- Size guide present.
 - Shipping policy present.
 - Returns/exchanges policy page present.
 - Refund/cancellation policy present.
@@ -179,7 +178,7 @@ Use `docs/razorpay-integration.md` as the source of truth for Razorpay QA and pr
 - QA Medusa containers are stopped by default if sharing the production Lightsail instance.
 - QA uses separate Neon branch/database, Redis, secrets, and Razorpay test credentials.
 - Medusa Admin has strong credentials.
-- Cloudflare Access protects production `admin.brand.com` before production launch; QA Access is deferred until the Cloudflare API token has Zero Trust Access write permission.
+- Cloudflare Access protects production `admin.brand.com` before production launch; QA Access is Terraform-wired and must be enabled after the Cloudflare API token has Zero Trust Access write permission.
 - Cloudflare Access email OTP allowlist contains only approved admin emails before Access is enabled.
 - Cloudflare Access app/policies for admin are Terraform-managed and reviewed before Access is enabled.
 - Conservative Cloudflare WAF/security baseline is enabled for proxied API/admin records.

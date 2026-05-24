@@ -12,6 +12,7 @@ import {
   type CheckoutAddressInput,
   checkoutAddressSchema,
 } from "@/features/checkout/schema";
+import { grantOrderAccess } from "@/features/orders/order-access";
 import {
   clearCurrentCart,
   getCurrentCart,
@@ -171,6 +172,7 @@ export async function verifyAndCompleteRazorpayPaymentAction(
     await verifyRazorpayPayment(payload);
     const orderId = await completeCartPayment(cart.id);
 
+    await grantOrderAccess(orderId);
     await clearRazorpayCheckoutSession();
     await clearCurrentCart();
     revalidateCheckoutViews();

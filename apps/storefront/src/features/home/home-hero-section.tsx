@@ -65,7 +65,7 @@ export function HeroSection({
                 {content.hero.description}
               </p>
 
-              <div className="mt-7 grid grid-cols-2 gap-3 sm:flex sm:flex-row">
+              <div className="mt-7 flex">
                 <Link
                   href="/shop"
                   prefetch={false}
@@ -75,16 +75,6 @@ export function HeroSection({
                   )}
                 >
                   {content.hero.primaryAction}
-                </Link>
-                <Link
-                  href="/size-guide"
-                  prefetch={false}
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "lg" }),
-                    "h-11 rounded-none px-4 sm:px-6",
-                  )}
-                >
-                  {content.hero.secondaryAction}
                 </Link>
               </div>
 

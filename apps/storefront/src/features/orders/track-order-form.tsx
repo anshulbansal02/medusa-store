@@ -9,33 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { siteContent } from "@/content/site-content";
+import { verifyOrderLookupAction } from "@/features/orders/actions";
 import {
   type OrderLookupInput,
   orderLookupSchema,
 } from "@/features/orders/schema";
-
-function getOrderIdFromReference(reference: string) {
-  const trimmedReference = reference.trim();
-
-  if (trimmedReference.startsWith("order_")) {
-    return trimmedReference;
-  }
-
-  try {
-    const url = new URL(trimmedReference);
-    const orderConfirmationIndex = url.pathname
-      .split("/")
-      .indexOf("order-confirmation");
-    const orderId =
-      orderConfirmationIndex >= 0
-        ? url.pathname.split("/")[orderConfirmationIndex + 1]
-        : "";
-
-    return orderId?.startsWith("order_") ? orderId : "";
-  } catch {
-    return "";
-  }
-}
 
 export function TrackOrderForm() {
   const content = siteContent.trackOrder.form;
@@ -51,6 +29,7 @@ export function TrackOrderForm() {
   } = useForm<OrderLookupInput>({
     defaultValues: {
       orderReference: "",
+      email: "",
     },
   });
 
@@ -61,25 +40,36 @@ export function TrackOrderForm() {
 
     if (!result.success) {
       const issue = result.error.issues[0];
+      const field = issue?.path[0] === "email" ? "email" : "orderReference";
 
-      setError("orderReference", {
+      setError(field, {
         message: issue?.message ?? content.invalidInput,
-      });
-      return;
-    }
-
-    const orderId = getOrderIdFromReference(result.data.orderReference);
-
-    if (!orderId) {
-      setError("orderReference", {
-        message: content.invalidReference,
       });
       return;
     }
 
     startTransition(() => {
       setMessage(content.pendingMessage);
-      router.push(`/order-confirmation/${encodeURIComponent(orderId)}`);
+      verifyOrderLookupAction(result.data)
+        .then((lookupResult) => {
+          if (!lookupResult.ok) {
+            setMessage("");
+            setError(lookupResult.field, {
+              message: lookupResult.message,
+            });
+            return;
+          }
+
+          router.push(
+            `/order-confirmation/${encodeURIComponent(lookupResult.orderId)}`,
+          );
+        })
+        .catch(() => {
+          setMessage("");
+          setError("orderReference", {
+            message: content.notFound,
+          });
+        });
     });
   }
 
@@ -100,6 +90,23 @@ export function TrackOrderForm() {
           <p className="text-destructive text-sm">
             {errors.orderReference.message}
           </p>
+        ) : null}
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="orderEmail">{content.emailLabel}</Label>
+        <Input
+          id="orderEmail"
+          type="email"
+          autoComplete="email"
+          spellCheck={false}
+          aria-invalid={Boolean(errors.email)}
+          placeholder={content.emailPlaceholder}
+          className="h-12 rounded-none border-border bg-background px-3"
+          {...register("email")}
+        />
+        {errors.email ? (
+          <p className="text-destructive text-sm">{errors.email.message}</p>
         ) : null}
       </div>
 

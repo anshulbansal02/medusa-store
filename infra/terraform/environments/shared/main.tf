@@ -31,6 +31,14 @@ locals {
   storefront_image_hostnames   = join(",", [local.production_media_domain, local.qa_media_domain])
   cloudflare_r2_buckets        = var.cloudflare_r2_media_enabled ? local.r2_media_buckets : {}
   cloudflare_r2_custom_domains = var.cloudflare_r2_media_enabled ? local.r2_media_custom_domains : {}
+  cloudflare_access_applications = var.cloudflare_access_enabled ? {
+    qa_medusa_admin = {
+      name             = "QA Medusa Admin"
+      domain           = var.qa_medusa_admin_domain
+      session_duration = var.cloudflare_access_session_duration
+      allowed_emails   = var.cloudflare_access_admin_emails
+    }
+  } : {}
   cloudflare_web_analytics_sites = var.cloudflare_web_analytics_enabled ? {
     production = {
       host         = var.production_storefront_domain
@@ -43,6 +51,24 @@ locals {
   } : {}
   production_media_domain = var.production_media_domain
   qa_media_domain         = var.qa_media_domain
+  vercel_storefront_qa_secret_environment_variables = var.vercel_storefront_qa_order_access_secret == null ? {} : {
+    order_access_secret = {
+      key       = "ORDER_ACCESS_SECRET"
+      value     = var.vercel_storefront_qa_order_access_secret
+      target    = ["production"]
+      sensitive = true
+      comment   = "Server-only signing secret for short-lived order detail access grants."
+    }
+  }
+  vercel_storefront_prod_secret_environment_variables = var.vercel_storefront_prod_order_access_secret == null ? {} : {
+    order_access_secret = {
+      key       = "ORDER_ACCESS_SECRET"
+      value     = var.vercel_storefront_prod_order_access_secret
+      target    = ["production"]
+      sensitive = true
+      comment   = "Server-only signing secret for short-lived order detail access grants."
+    }
+  }
   tags = {
     Project     = var.project
     ManagedBy   = "terraform"
@@ -92,36 +118,38 @@ module "vercel_storefront_qa" {
       domain = var.qa_storefront_domain
     }
   }
-  environment_variables = merge({
-    site_url = {
-      key       = "NEXT_PUBLIC_SITE_URL"
-      value     = "https://${var.qa_storefront_domain}"
-      target    = ["production"]
-      sensitive = false
-      comment   = "Canonical QA storefront URL for metadata and absolute links."
-    }
-    qa_medusa_backend_url = {
-      key       = "MEDUSA_BACKEND_URL"
-      value     = "https://${var.qa_medusa_api_domain}"
-      target    = ["production"]
-      sensitive = false
-      comment   = "QA Medusa backend URL for manually dispatched QA deployments."
-    }
-    qa_medusa_publishable_key = {
-      key       = "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY"
-      value     = var.vercel_storefront_qa_medusa_publishable_key
-      target    = ["production"]
-      sensitive = false
-      comment   = "QA Medusa publishable API key for storefront deployments."
-    }
-    image_hostnames = {
-      key       = "NEXT_PUBLIC_IMAGE_HOSTNAMES"
-      value     = local.storefront_image_hostnames
-      target    = ["production"]
-      sensitive = false
-      comment   = "Allowed image hostnames for QA storefront deployments."
-    }
+  environment_variables = merge(
+    {
+      site_url = {
+        key       = "NEXT_PUBLIC_SITE_URL"
+        value     = "https://${var.qa_storefront_domain}"
+        target    = ["production"]
+        sensitive = false
+        comment   = "Canonical QA storefront URL for metadata and absolute links."
+      }
+      qa_medusa_backend_url = {
+        key       = "MEDUSA_BACKEND_URL"
+        value     = "https://${var.qa_medusa_api_domain}"
+        target    = ["production"]
+        sensitive = false
+        comment   = "QA Medusa backend URL for manually dispatched QA deployments."
+      }
+      qa_medusa_publishable_key = {
+        key       = "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY"
+        value     = var.vercel_storefront_qa_medusa_publishable_key
+        target    = ["production"]
+        sensitive = false
+        comment   = "QA Medusa publishable API key for storefront deployments."
+      }
+      image_hostnames = {
+        key       = "NEXT_PUBLIC_IMAGE_HOSTNAMES"
+        value     = local.storefront_image_hostnames
+        target    = ["production"]
+        sensitive = false
+        comment   = "Allowed image hostnames for QA storefront deployments."
+      }
     },
+    local.vercel_storefront_qa_secret_environment_variables,
     var.cloudflare_site_enabled && var.cloudflare_web_analytics_enabled ? {
       cloudflare_web_analytics_token = {
         key       = "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN"
@@ -149,22 +177,24 @@ module "vercel_storefront_prod" {
       domain = var.production_storefront_domain
     }
   }
-  environment_variables = merge({
-    site_url = {
-      key       = "NEXT_PUBLIC_SITE_URL"
-      value     = "https://${var.production_storefront_domain}"
-      target    = ["production"]
-      sensitive = false
-      comment   = "Canonical production storefront URL for metadata and absolute links."
-    }
-    image_hostnames = {
-      key       = "NEXT_PUBLIC_IMAGE_HOSTNAMES"
-      value     = local.storefront_image_hostnames
-      target    = ["production"]
-      sensitive = false
-      comment   = "Allowed image hostnames for production storefront deployments."
-    }
+  environment_variables = merge(
+    {
+      site_url = {
+        key       = "NEXT_PUBLIC_SITE_URL"
+        value     = "https://${var.production_storefront_domain}"
+        target    = ["production"]
+        sensitive = false
+        comment   = "Canonical production storefront URL for metadata and absolute links."
+      }
+      image_hostnames = {
+        key       = "NEXT_PUBLIC_IMAGE_HOSTNAMES"
+        value     = local.storefront_image_hostnames
+        target    = ["production"]
+        sensitive = false
+        comment   = "Allowed image hostnames for production storefront deployments."
+      }
     },
+    local.vercel_storefront_prod_secret_environment_variables,
     var.cloudflare_site_enabled && var.cloudflare_web_analytics_enabled ? {
       cloudflare_web_analytics_token = {
         key       = "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN"
@@ -232,6 +262,7 @@ module "cloudflare_site" {
   }
   r2_buckets          = local.cloudflare_r2_buckets
   r2_custom_domains   = local.cloudflare_r2_custom_domains
+  access_applications = local.cloudflare_access_applications
   web_analytics_sites = local.cloudflare_web_analytics_sites
 }
 

@@ -12,7 +12,6 @@ export const homeContent = {
     description:
       "Limited-run western occasion pieces for dinners, wedding functions, launches, and dressed-up weekends.",
     primaryAction: "Shop new arrivals",
-    secondaryAction: "Find your size",
     emptyTitle: "The first edit is being prepared.",
     emptyDescription:
       "The launch collection will appear here as soon as the first pieces are available.",
@@ -51,8 +50,7 @@ export const homeContent = {
     title: "Dressy should still feel easy.",
     description:
       "Measurements, fabric, care, and fit notes stay close to the add-to-bag flow, so customers can decide with confidence.",
-    primaryAction: "Size guide",
-    secondaryAction: "Shop new arrivals",
+    primaryAction: "Shop new arrivals",
   },
   trustItems: [
     {
@@ -68,7 +66,7 @@ export const homeContent = {
     {
       icon: "ruler",
       title: "Size support",
-      text: "Fit notes and a clear size chart on every product.",
+      text: "Fit notes and product-level size details where available.",
     },
   ],
 } as const;

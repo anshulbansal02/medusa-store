@@ -46,7 +46,7 @@ export function FitSupportSection({
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
-              href="/size-guide"
+              href="/shop"
               prefetch={false}
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
@@ -54,16 +54,6 @@ export function FitSupportSection({
               )}
             >
               {content.fitSupport.primaryAction}
-            </Link>
-            <Link
-              href="/shop"
-              prefetch={false}
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "lg" }),
-                "h-11 rounded-none px-6",
-              )}
-            >
-              {content.fitSupport.secondaryAction}
             </Link>
           </div>
         </div>

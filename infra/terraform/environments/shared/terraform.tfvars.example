@@ -12,6 +12,10 @@ vercel_storefront_prod_project_name = "your-storefront-prod-project"
 vercel_storefront_function_regions  = ["sin1"]
 
 vercel_storefront_qa_medusa_publishable_key = "pk_qa_publishable_key"
+# Prefer TF_VAR_vercel_storefront_qa_order_access_secret and
+# TF_VAR_vercel_storefront_prod_order_access_secret instead of committing them.
+# vercel_storefront_qa_order_access_secret = "32-plus-random-bytes"
+# vercel_storefront_prod_order_access_secret = "32-plus-random-bytes"
 
 production_apex_domain        = "example.com"
 production_storefront_domain  = "www.example.com"
@@ -27,6 +31,11 @@ qa_medusa_static_ip           = "203.0.113.10"
 # Prefer CLOUDFLARE_API_TOKEN in the shell instead of committing it.
 cloudflare_site_enabled     = true
 cloudflare_r2_media_enabled = true
+cloudflare_access_enabled   = false
+cloudflare_access_admin_emails = [
+  "admin@example.com",
+]
+cloudflare_access_session_duration = "12h"
 # Enable only after the Cloudflare API token has Web Analytics/RUM write permission.
 cloudflare_web_analytics_enabled = false
 cloudflare_account_id       = "cloudflare-account-id"

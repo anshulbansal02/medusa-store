@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
 import { siteContent } from "@/content/site-content";
+import { hasOrderAccess } from "@/features/orders/order-access";
 import { getOrderById } from "@/lib/medusa/orders";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,12 @@ export default async function OrderConfirmationPage({
   params,
 }: OrderConfirmationPageProps) {
   const { id } = await params;
+  const canViewOrder = await hasOrderAccess(id);
+
+  if (!canViewOrder) {
+    notFound();
+  }
+
   const order = await getOrderById(id);
 
   if (!order) {

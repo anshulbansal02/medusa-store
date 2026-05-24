@@ -39,7 +39,7 @@ Scrub and rotation plan:
 
 ### QA Medusa Is Exposed Over Plain HTTP
 
-Remediation status: committed deploy/config defaults require HTTPS Medusa hostnames and no longer include raw public/private IP CORS origins. Cloudflare Access for the admin hostname remains deferred and is still required before real operator/customer data is used through QA Admin.
+Remediation status: committed deploy/config defaults require HTTPS Medusa hostnames and no longer include raw public/private IP CORS origins. Cloudflare Access for the QA admin hostname is now wired as an opt-in Terraform setting, but the live Cloudflare token still needs Zero Trust Access write permission before it can be enabled.
 
 The deploy script configures Caddy to proxy public port 80 directly to Medusa. QA Terraform defaults also include raw HTTP origins for Medusa backend, admin, and auth CORS.
 
@@ -54,10 +54,11 @@ Completed changes:
 - Put QA API/admin behind HTTPS hostnames, for example `qa-api` and `qa-admin`.
 - Remove raw IP and private network origins from committed defaults and from live CORS once domain setup is complete.
 - Keep Store API and Admin on separate hostnames so CORS and access policies stay clean.
+- Wire Cloudflare Access for QA Medusa Admin through `infra/terraform/environments/shared` with an explicit admin email allowlist.
 
 Remaining fix:
 
-- Protect the admin hostname with Cloudflare Access before using it for real operator login.
+- Enable Cloudflare Access after updating the Cloudflare API token permissions, then apply shared Terraform before using QA Admin for real operator/customer data.
 
 Rotation plan:
 
@@ -65,6 +66,8 @@ Rotation plan:
 - Update SSM values for `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, and `MEDUSA_BACKEND_URL` after HTTPS domain setup.
 
 ### Order Confirmation Page Exposes PII With Only An Order ID
+
+Remediation status: fixed in the storefront. Order detail pages now require a short-lived, signed, HttpOnly order-access cookie before fetching or rendering the order. Verified checkout grants the cookie after payment completion; manual track-order lookup requires the order reference plus matching checkout email before the server grants access.
 
 The storefront order confirmation route fetches an order by id and renders customer email, order contents, totals, delivery name, delivery address, and phone number. The track-order flow accepts only an order reference and then routes to the same page.
 
@@ -74,11 +77,11 @@ Evidence:
 - `apps/storefront/src/app/order-confirmation/[id]/page.tsx`
 - `apps/storefront/src/features/orders/track-order-form.tsx`
 
-Fix plan:
+Completed changes:
 
 - Require a second verifier for order lookup, such as email, phone, or postal code.
 - Verify that pair server-side before rendering customer/order PII.
-- For post-checkout confirmation, issue a short-lived signed confirmation token and require verified lookup after it expires.
+- For post-checkout confirmation, issue a short-lived signed confirmation grant and require verified lookup after it expires.
 - Avoid showing full delivery address and phone on unauthenticated pages.
 
 Rotation plan:
@@ -87,6 +90,8 @@ Rotation plan:
 - Treat existing order confirmation URLs as bearer links and avoid sharing them publicly.
 
 ### Production Dependency Audit Fails
+
+Remediation status: fixed. Medusa packages were updated to `2.15.3` and patched transitive dependency versions are enforced through root `pnpm-workspace.yaml` overrides. `pnpm audit --prod` now reports no known vulnerabilities.
 
 `pnpm audit --prod` reports production vulnerabilities in the current dependency graph. The high-severity findings are in Medusa transitive dependencies. The storefront also reports a moderate PostCSS advisory through Next.
 
@@ -97,12 +102,12 @@ Verified high-severity packages reported by audit:
 - `@opentelemetry/sdk-node`
 - `@opentelemetry/exporter-prometheus`
 
-Fix plan:
+Completed changes:
 
 - Upgrade Medusa packages and Next/PostCSS to versions whose transitive dependency graph satisfies the advisories.
 - Regenerate lockfiles.
 - Rerun `pnpm audit --prod` at the root and for both apps.
-- If upstream Medusa has not released patched transitive ranges yet, track the advisories as a launch blocker or explicitly accept QA-only risk until patched.
+- Use narrow root overrides for patched transitive packages where upstream Medusa/Next ranges have not yet moved.
 
 Rotation plan:
 

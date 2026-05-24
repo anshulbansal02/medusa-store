@@ -115,7 +115,6 @@ Current storefront routes:
 /order-confirmation/[id]
 /about
 /contact
-/size-guide
 /shipping
 /returns
 /refund-cancellation
@@ -266,7 +265,7 @@ Layout direction:
 - Large image gallery.
 - Sticky product info and add-to-bag on desktop.
 - Mobile image carousel first, then name/price/size/add-to-bag.
-- Size guide near size selector.
+- PDP-level size chart or fit notes near size selector when product data supports it.
 - Fit/fabric/care details below or in compact sections.
 - Related products from same category/edit.
 
@@ -370,21 +369,19 @@ Layout direction:
 - Footer link is acceptable.
 - Do not make wishlist a primary nav item unless analytics later proves usage.
 
-### 11. Size Guide
+### 11. Size Guidance
 
-Keep.
+Do not keep a standalone Size Guide page for v1.
 
 Purpose:
 
-- Reduce apparel fit anxiety.
-- Support premium price trust.
-- Help reduce returns and support questions.
+- Avoid a generic support page that does not add enough customer value.
+- Keep fit help close to the product decision where it matters.
 
 Layout direction:
 
-- Standalone page plus PDP-level size chart access.
-- Clear measurement instructions.
-- Link from PDP size selector, footer, mobile support menu.
+- Use PDP-level size charts or fit notes when product data supports them.
+- Do not link a standalone `/size-guide` route from footer, mobile menu, or PDPs.
 
 ### 12. Shipping, Returns, Refund/Cancellation
 
@@ -409,7 +406,7 @@ Do not:
 
 ### 13. FAQ
 
-Keep only if the content is real and non-duplicative.
+Keep the route only if needed, but remove it from prominent navigation for v1.
 
 Purpose:
 
@@ -419,6 +416,10 @@ Decision rule:
 
 - If FAQ mostly repeats shipping, returns, size, and contact pages, remove it from prominent navigation or defer it.
 - If it covers real concerns like sizing help, order changes, exchange workflow, fabric care, or payment, keep it.
+
+Current decision:
+
+- The current FAQ mostly repeats other support pages, so it is not linked from footer or mobile support navigation.
 
 ### 14. Track Order
 
@@ -493,7 +494,6 @@ Dresses
 Sets
 Tops
 Occasion Edit
-Size Guide
 Shipping
 Returns
 Track Order, only if reliable
@@ -516,10 +516,8 @@ Shop:
 
 Help:
   Contact
-  Size Guide
   Shipping
   Returns
-  FAQ, only if useful
   Track Order, only if reliable
 
 Legal:
@@ -575,7 +573,6 @@ Use for:
 
 - Contact.
 - Track order.
-- Size guide if it needs richer tools later.
 
 Core parts:
 
@@ -699,4 +696,3 @@ The highest-impact layout improvement is not making a new page. It is turning `/
 - Same shell reused for category PLPs.
 
 Once that is working, align `/search` and clean up support/legal layouts. This will make the storefront feel simpler to customers while keeping the route structure needed for commerce, trust, and SEO.
-

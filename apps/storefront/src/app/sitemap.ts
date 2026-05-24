@@ -22,11 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: absoluteUrl("/size-guide"),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
       url: absoluteUrl("/shipping"),
       changeFrequency: "monthly",
       priority: 0.5,
@@ -60,11 +55,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: absoluteUrl("/privacy"),
       changeFrequency: "monthly",
       priority: 0.3,
-    },
-    {
-      url: absoluteUrl("/faq"),
-      changeFrequency: "monthly",
-      priority: 0.4,
     },
     {
       url: absoluteUrl("/track-order"),

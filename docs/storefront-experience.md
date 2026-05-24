@@ -111,7 +111,6 @@ Support/trust pages:
 
 - About.
 - Contact.
-- Size guide.
 - Shipping policy.
 - Returns/exchanges policy.
 - FAQ, optional.
@@ -150,7 +149,6 @@ Tops
 Occasion Edit
 Bestsellers
 Search
-Size Guide
 Shipping & Returns
 Contact
 ```
@@ -162,7 +160,7 @@ Shop:
   New Arrivals, Dresses, Sets, Tops, Occasion Edit
 
 Help:
-  Contact, Size Guide, Shipping, Returns, FAQ, Track Order if enabled
+  Contact, Shipping, Returns, FAQ, Track Order if enabled
 
 Legal:
   Terms, Privacy, Refund/Cancellation
@@ -214,7 +212,7 @@ Must include:
 - Short description.
 - Color selector.
 - Size selector.
-- Size chart/size guide.
+- Product-specific size chart where available.
 - Stock/unavailable variant state.
 - Add to bag.
 - Mobile sticky add-to-bag.
