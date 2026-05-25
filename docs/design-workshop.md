@@ -8,6 +8,7 @@ This document is the compact workshop summary. Canonical implementation details 
 - [README](README.md)
 - [Architecture](architecture.md)
 - [Storefront Experience](storefront-experience.md)
+- [Storefront Motion And Loading Plan](storefront-motion-loading-plan.md)
 - [Engineering Standards](engineering-standards.md)
 - [Implementation Plan](implementation-plan.md)
 - [Launch Checklist](launch-checklist.md)
@@ -57,6 +58,7 @@ Use this file for future high-level design discussions. When a decision becomes 
 - Checkout: guest-first sectioned single-page checkout.
 - Wishlist/recently viewed/buy now: allowed only if simple.
 - Reviews: no fake reviews; real reviews/testimonials later.
+- Loading and motion: use Next.js prefetching/streaming first, quiet final-layout loading states, CSS-first opacity/transform motion, no production View Transitions, no full-page route animation, and no smooth-scroll hijacking.
 
 ## Operational Summary
 

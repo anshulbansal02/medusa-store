@@ -45,7 +45,6 @@ export default async function BagPage() {
                   >
                     <Link
                       href={item.href}
-                      prefetch={false}
                       className="relative aspect-[4/5] overflow-hidden bg-muted"
                     >
                       {item.image ? (
@@ -64,7 +63,6 @@ export default async function BagPage() {
                       <div>
                         <Link
                           href={item.href}
-                          prefetch={false}
                           className="font-medium hover:underline hover:underline-offset-4"
                         >
                           {item.name}
@@ -114,7 +112,6 @@ export default async function BagPage() {
                 </div>
                 <Link
                   href="/checkout"
-                  prefetch={false}
                   className={cn(
                     buttonVariants({ size: "lg" }),
                     "mt-6 h-12 w-full rounded-none",

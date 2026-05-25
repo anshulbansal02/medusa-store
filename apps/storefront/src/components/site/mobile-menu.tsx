@@ -74,7 +74,6 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
         <div className="flex-1 overflow-y-auto px-5 py-5">
           <Link
             href="/search"
-            prefetch={false}
             onClick={closeMenu}
             className="flex min-h-12 items-center gap-3 border-border border-b text-sm font-medium transition hover:text-primary"
           >
@@ -88,7 +87,6 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    prefetch={false}
                     onClick={closeMenu}
                     className="block py-3 font-heading text-4xl leading-none transition hover:text-primary"
                   >

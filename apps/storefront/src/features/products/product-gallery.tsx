@@ -26,9 +26,14 @@ import { cn } from "@/lib/utils";
 type ProductGalleryProps = {
   images: string[];
   productName: string;
+  prioritizeFirstImage?: boolean;
 };
 
-export function ProductGallery({ images, productName }: ProductGalleryProps) {
+export function ProductGallery({
+  images,
+  productName,
+  prioritizeFirstImage = false,
+}: ProductGalleryProps) {
   const content = siteContent.product.gallery;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
@@ -94,7 +99,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 src={image}
                 alt=""
                 fill
-                loading={index === 0 ? "eager" : "lazy"}
+                loading="lazy"
                 sizes="88px"
                 className="object-cover"
               />
@@ -122,9 +127,9 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             alt={`${productName} ${content.imageAltSuffix} ${activeIndex + 1}`}
             fill
             loading="eager"
-            fetchPriority="high"
-            sizes="(min-width: 1024px) 52vw, 100vw"
-            className="object-cover transition duration-300 ease-out group-hover:scale-[1.015]"
+            fetchPriority={prioritizeFirstImage ? "high" : "auto"}
+            sizes="(min-width: 1280px) 50vw, (min-width: 1024px) 52vw, 100vw"
+            className="object-cover transition duration-300 ease-out group-hover:scale-[1.01] motion-reduce:transition-none"
           />
           <span className="absolute top-3 right-3 grid size-10 place-items-center bg-background/90 text-foreground shadow-sm backdrop-blur-sm transition group-hover:bg-background">
             <Expand className="size-4 stroke-icon" aria-hidden="true" />

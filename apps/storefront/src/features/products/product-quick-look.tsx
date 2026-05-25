@@ -85,7 +85,6 @@ export function ProductQuickLook({
             ) : null}
             <Link
               href={product.href}
-              prefetch={false}
               onClick={() => onOpenChange(false)}
               className="mt-5 inline-flex h-11 items-center justify-center gap-2 border border-border px-4 text-sm font-medium transition hover:border-foreground"
             >

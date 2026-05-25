@@ -14,7 +14,6 @@ export function WishlistLink() {
   return (
     <Link
       href="/wishlist"
-      prefetch={false}
       aria-label={content.openLabel}
       className="relative grid size-9 cursor-pointer place-items-center transition hover:bg-muted"
     >

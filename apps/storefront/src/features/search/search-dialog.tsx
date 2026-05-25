@@ -3,7 +3,7 @@
 import { ArrowRight, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useDeferredValue, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -66,7 +66,9 @@ function getCategoryResults(
 export function SearchDialog({ products, categories }: SearchDialogProps) {
   const content = siteContent.search;
   const [query, setQuery] = useState("");
-  const normalizedQuery = normalizeQuery(query);
+  const deferredQuery = useDeferredValue(query);
+  const normalizedQuery = normalizeQuery(deferredQuery);
+  const isUpdating = query !== deferredQuery;
   const productResults = getProductResults(products, normalizedQuery);
   const categoryResults = getCategoryResults(categories, normalizedQuery);
 
@@ -124,7 +126,6 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
                 {normalizedQuery ? (
                   <Link
                     href={`/search?q=${encodeURIComponent(query.trim())}`}
-                    prefetch={false}
                     className="inline-flex items-center gap-2 text-sm underline-offset-4 hover:underline"
                   >
                     {content.viewAllAction}
@@ -135,6 +136,7 @@ export function SearchDialog({ products, categories }: SearchDialogProps) {
 
               <SearchProductResults
                 content={content}
+                isUpdating={isUpdating}
                 products={productResults}
               />
             </div>
@@ -201,7 +203,6 @@ function SearchCategoryLinks({
           <Link
             key={category.id}
             href={`/shop/${category.handle}`}
-            prefetch={false}
             className="shrink-0 border border-border px-3 py-2 text-sm transition hover:border-foreground"
           >
             {category.name}
@@ -214,9 +215,11 @@ function SearchCategoryLinks({
 
 function SearchProductResults({
   content,
+  isUpdating,
   products,
 }: {
   content: SearchContent;
+  isUpdating: boolean;
   products: StorefrontProduct[];
 }) {
   if (products.length === 0) {
@@ -224,7 +227,10 @@ function SearchProductResults({
   }
 
   return (
-    <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-3">
+    <div
+      aria-busy={isUpdating}
+      className="mt-4 grid grid-cols-2 gap-x-3 gap-y-6 transition-opacity duration-150 ease-out aria-busy:opacity-65 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-3"
+    >
       {products.map((product, index) => (
         <SearchProductResult
           key={product.id}
@@ -246,11 +252,7 @@ function SearchProductResult({
   const content = siteContent.search;
 
   return (
-    <Link
-      href={product.href}
-      prefetch={false}
-      className="group block min-w-0 transition"
-    >
+    <Link href={product.href} className="group block min-w-0 transition">
       <div className="relative aspect-[4/5] overflow-hidden bg-muted">
         <Image
           src={product.image}
@@ -259,7 +261,7 @@ function SearchProductResult({
           loading={eager ? "eager" : "lazy"}
           fetchPriority={eager ? "high" : "auto"}
           sizes="(min-width: 1024px) 260px, (min-width: 640px) 30vw, 45vw"
-          className="object-cover transition duration-300 ease-out group-hover:scale-[1.03]"
+          className="object-cover transition duration-300 ease-out group-hover:scale-[1.02] motion-reduce:transition-none"
         />
       </div>
       <div className="mt-2 min-w-0">
@@ -281,7 +283,6 @@ function SearchEmptyState({ content }: { content: SearchContent }) {
       </p>
       <Link
         href="/shop"
-        prefetch={false}
         className="mt-4 inline-flex text-sm underline-offset-4 hover:underline"
       >
         {content.browseAction}

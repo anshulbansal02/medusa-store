@@ -21,11 +21,7 @@ export function HeroSection({
       <div className="mx-auto max-w-[1440px]">
         {primaryProduct ? (
           <div className="grid gap-5 lg:grid-cols-[1.12fr_0.88fr] lg:items-end">
-            <Link
-              href={primaryProduct.href}
-              prefetch={false}
-              className="group block"
-            >
+            <Link href={primaryProduct.href} className="group block">
               <article>
                 <div className="relative aspect-[4/5] overflow-hidden bg-muted lg:aspect-[16/18] lg:min-h-[720px]">
                   <Image
@@ -35,7 +31,7 @@ export function HeroSection({
                     loading="eager"
                     fetchPriority="high"
                     sizes="(min-width: 1024px) 54vw, 100vw"
-                    className="object-cover transition duration-500 ease-out group-hover:scale-[1.025]"
+                    className="object-cover transition duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none"
                   />
                   <div className="absolute inset-x-0 bottom-0 p-4 text-background sm:p-6">
                     <p className="text-micro uppercase tracking-label-wider">
@@ -54,7 +50,7 @@ export function HeroSection({
               </article>
             </Link>
 
-            <div>
+            <div className="nf-reveal-soft nf-delay-1">
               <p className="text-sm font-medium text-muted-foreground">
                 {content.hero.eyebrow}
               </p>
@@ -68,7 +64,6 @@ export function HeroSection({
               <div className="mt-7 flex">
                 <Link
                   href="/shop"
-                  prefetch={false}
                   className={cn(
                     buttonVariants({ size: "lg" }),
                     "h-11 rounded-none px-4 sm:px-6",
@@ -84,8 +79,7 @@ export function HeroSection({
                     <Link
                       key={product.id}
                       href={product.href}
-                      prefetch={false}
-                      className="group block"
+                      className="group block nf-reveal-soft"
                     >
                       <article>
                         <div className="relative aspect-[4/5] overflow-hidden bg-muted">
@@ -95,7 +89,7 @@ export function HeroSection({
                             fill
                             loading={index === 0 ? "eager" : "lazy"}
                             sizes="(min-width: 1024px) 22vw, 50vw"
-                            className="object-cover transition duration-500 ease-out group-hover:scale-[1.03]"
+                            className="object-cover transition duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none"
                           />
                         </div>
                         <div className="mt-2 flex items-start justify-between gap-3 text-sm">

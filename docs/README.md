@@ -9,6 +9,7 @@ This folder contains the canonical planning and implementation context for the f
 - [Storefront Experience](storefront-experience.md): UX, design direction, page behavior, content standards.
 - [Storefront Design Rules](storefront-design-rules.md): distilled visual and UX guardrails from research.
 - [Storefront Layout And Page Planning](storefront-layout-planning.md): page architecture, PLP/category/search layout recommendations, and route cleanup plan.
+- [Storefront Motion And Loading Plan](storefront-motion-loading-plan.md): loading states, transitions, animation, image-loading, and perceived-performance standards.
 - [Engineering Standards](engineering-standards.md): code organization, tooling, state, forms, security, accessibility, performance.
 - [Code Quality Checklist](code-quality-checklist.md): concrete review rules for storefront, backend, Tailwind tokens, components, and verification.
 - [Secrets And Config](secrets-and-config.md): environment variable layout, secret handling, rotation, and hosted config rules.

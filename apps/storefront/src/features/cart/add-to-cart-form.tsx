@@ -93,7 +93,12 @@ export function AddToCartForm({
 
   return (
     <>
-      <form id={formId} onSubmit={handleSubmit} className="py-7">
+      <form
+        id={formId}
+        onSubmit={handleSubmit}
+        aria-busy={isPending}
+        className="py-7"
+      >
         <input
           type="hidden"
           name="variant_title"
@@ -134,11 +139,13 @@ export function AddToCartForm({
             type="submit"
             disabled={!canSubmit}
             size="lg"
-            className="h-12 min-w-0 flex-1 rounded-none px-6 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
+            className="h-12 min-w-0 flex-1 rounded-none px-6 transition-[background-color,opacity,transform] duration-150 ease-out hover:bg-primary/90 active:translate-y-px disabled:bg-muted disabled:text-muted-foreground motion-reduce:transition-none"
           >
             {isPending ? content.pendingLabel : content.submitLabel}
           </Button>
-          {submitSideAction}
+          {submitSideAction ? (
+            <div className="shrink-0">{submitSideAction}</div>
+          ) : null}
         </div>
       </form>
 
@@ -302,7 +309,7 @@ function StickyAddToBagBar({
           form={formId}
           disabled={!canSubmit}
           size="lg"
-          className="h-11 rounded-none px-5 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
+          className="h-11 rounded-none px-5 transition-[background-color,opacity,transform] duration-150 ease-out hover:bg-primary/90 active:translate-y-px disabled:bg-muted disabled:text-muted-foreground motion-reduce:transition-none"
         >
           {isPending ? content.stickyPendingLabel : content.stickySubmitLabel}
         </Button>

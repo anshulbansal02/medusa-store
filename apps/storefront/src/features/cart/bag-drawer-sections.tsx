@@ -109,7 +109,6 @@ function BagDrawerLineItem({
     <article className="grid min-w-0 grid-cols-[104px_minmax(0,1fr)] gap-4 border-border border-b pb-4 last:border-b-0 sm:grid-cols-[112px_minmax(0,1fr)]">
       <Link
         href={item.href}
-        prefetch={false}
         onClick={closeBag}
         className="relative aspect-[4/5] overflow-hidden bg-muted"
       >
@@ -129,7 +128,6 @@ function BagDrawerLineItem({
           <div className="min-w-0">
             <Link
               href={item.href}
-              prefetch={false}
               onClick={closeBag}
               className="line-clamp-2 text-sm font-medium leading-snug hover:underline hover:underline-offset-4"
             >
@@ -238,7 +236,6 @@ export function BagDrawerFooter({
       ) : null}
       <Link
         href="/checkout"
-        prefetch={false}
         onClick={closeBag}
         className={cn(
           buttonVariants({ size: "lg" }),
@@ -249,7 +246,6 @@ export function BagDrawerFooter({
       </Link>
       <Link
         href="/bag"
-        prefetch={false}
         onClick={closeBag}
         className={cn(
           buttonVariants({ variant: "outline" }),
@@ -274,7 +270,6 @@ export function EmptyBagDrawer({ closeBag }: EmptyBagDrawerProps) {
         </p>
         <Link
           href="/shop"
-          prefetch={false}
           onClick={closeBag}
           className={cn(
             buttonVariants({ size: "lg" }),

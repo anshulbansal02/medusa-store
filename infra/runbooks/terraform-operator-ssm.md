@@ -92,6 +92,17 @@ export TF_VAR_neon_org_id="$(ssm_value /ecom/shared/operator/neon/org_id)"
 export TF_VAR_upstash_email="$(ssm_value /ecom/shared/operator/upstash/email)"
 export TF_VAR_upstash_api_key="$(ssm_value /ecom/shared/operator/upstash/api_key)"
 export TF_VAR_cloudflare_r2_account_id="$(ssm_value /ecom/shared/operator/cloudflare/account_id)"
+export TF_VAR_qa_storefront_domain="$(ssm_value /ecom/shared/operator/domain/qa_storefront)"
+export TF_VAR_qa_medusa_api_domain="$(ssm_value /ecom/shared/operator/domain/qa_medusa_api)"
+export TF_VAR_qa_medusa_admin_domain="$(ssm_value /ecom/shared/operator/domain/qa_medusa_admin)"
+export TF_VAR_qa_media_domain="$(ssm_value /ecom/shared/operator/domain/qa_media)"
+export TF_VAR_qa_media_bucket_name="$(ssm_value /ecom/shared/operator/cloudflare/r2/qa_media_bucket_name)"
+export TF_VAR_resend_from_email="$(ssm_value /ecom/qa/medusa/RESEND_FROM_EMAIL)"
+export TF_VAR_admin_invite_from_email="$(ssm_value /ecom/qa/medusa/ADMIN_INVITE_FROM_EMAIL)"
+export TF_VAR_order_from_email="$(ssm_value /ecom/qa/medusa/ORDER_FROM_EMAIL)"
+export TF_VAR_owner_order_from_email="$(ssm_value /ecom/qa/medusa/OWNER_ORDER_FROM_EMAIL)"
+export TF_VAR_transactional_reply_to_email="$(ssm_value /ecom/qa/medusa/TRANSACTIONAL_REPLY_TO_EMAIL)"
+export TF_VAR_resend_api_key="$(ssm_value /ecom/qa/medusa/RESEND_API_KEY)"
 export AWS_PROFILE=personal
 ```
 
@@ -102,6 +113,10 @@ mise exec terraform@1.15.4 -- terraform -chdir=infra/terraform/environments/qa p
   -var='aws_profile=personal' \
   -var='lightsail_ssh_public_key_path=~/.ssh/id_ed25519_ecom_lightsail.pub'
 ```
+
+Do not run QA plan/apply with only provider credentials. The QA root also needs
+the real domain, media, and currently managed email inputs above; otherwise
+Terraform will compare against public placeholder defaults.
 
 ## After Manual Token Updates
 

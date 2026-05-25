@@ -8,7 +8,7 @@ export function NewArrivalsSection({ content, products }: ProductSectionProps) {
   return (
     <section className="px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
       <div className="mx-auto max-w-[1440px]">
-        <div className="mb-8 flex flex-col justify-between gap-5 border-border border-b pb-6 md:flex-row md:items-end">
+        <div className="nf-reveal mb-8 flex flex-col justify-between gap-5 border-border border-b pb-6 md:flex-row md:items-end">
           <div>
             <h2 className="font-heading text-5xl leading-none sm:text-6xl">
               {content.newArrivals.title}
@@ -19,7 +19,6 @@ export function NewArrivalsSection({ content, products }: ProductSectionProps) {
           </div>
           <Link
             href="/shop"
-            prefetch={false}
             className="text-sm font-medium underline-offset-4 hover:underline"
           >
             {content.newArrivals.action}
@@ -54,7 +53,7 @@ export function OccasionEditSection({
   return (
     <section className="border-border border-y px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
       <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-        <div>
+        <div className="nf-reveal">
           <h2 className="font-heading text-5xl leading-none sm:text-7xl">
             {content.occasionEdit.title}
           </h2>
@@ -63,14 +62,13 @@ export function OccasionEditSection({
           </p>
           <Link
             href="/shop/occasion-edit"
-            prefetch={false}
             className="mt-7 inline-flex text-sm font-medium underline-offset-4 hover:underline"
           >
             {content.occasionEdit.action}
           </Link>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="nf-reveal-soft nf-delay-1 grid gap-4 sm:grid-cols-3">
           {products.slice(0, 3).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

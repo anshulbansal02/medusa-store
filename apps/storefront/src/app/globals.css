@@ -111,6 +111,10 @@
   --swatch-wine: #6f1f33;
   --swatch-default: #ded8cf;
   --radius: 0.5rem;
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 260ms;
+  --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.18 0.015 30);
   --sidebar-primary: oklch(0.51 0.19 25);
@@ -139,4 +143,50 @@
 
 @utility stroke-icon-strong {
   stroke-width: 1.7;
+}
+
+@keyframes nf-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nf-reveal-soft {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility nf-reveal {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: nf-reveal var(--motion-base) var(--motion-ease-out) both;
+  }
+}
+
+@utility nf-reveal-soft {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: nf-reveal-soft var(--motion-fast) var(--motion-ease-out) both;
+  }
+}
+
+@utility nf-delay-1 {
+  @media (prefers-reduced-motion: no-preference) {
+    animation-delay: 60ms;
+  }
+}
+
+@utility nf-delay-2 {
+  @media (prefers-reduced-motion: no-preference) {
+    animation-delay: 120ms;
+  }
 }

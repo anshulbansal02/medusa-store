@@ -42,7 +42,6 @@ export function EmptyAction({
       <p className="mt-5 max-w-xl text-muted-foreground">{description}</p>
       <Link
         href={actionHref}
-        prefetch={false}
         className={cn(
           buttonVariants({ size: "lg" }),
           "mt-7 h-11 rounded-none px-6",

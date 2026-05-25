@@ -44,7 +44,6 @@ export function BagToast() {
       <div className="grid grid-cols-[46px_1fr_auto] items-center gap-3">
         <Link
           href={addedItem.href}
-          prefetch={false}
           onClick={dismissAddedItem}
           className="relative aspect-[4/5] overflow-hidden bg-muted"
         >

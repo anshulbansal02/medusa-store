@@ -199,6 +199,7 @@ function ProductRouteContent({
             <ProductGallery
               images={product.images}
               productName={product.name}
+              prioritizeFirstImage
             />
           </div>
 
@@ -207,11 +208,7 @@ function ProductRouteContent({
               aria-label={content.breadcrumbLabel}
               className="mb-6 flex min-w-0 flex-wrap items-center gap-2 text-muted-foreground text-sm"
             >
-              <Link
-                href="/shop"
-                prefetch={false}
-                className="hover:text-foreground"
-              >
+              <Link href="/shop" className="hover:text-foreground">
                 {content.shopBreadcrumbLabel}
               </Link>
               <span aria-hidden="true">/</span>
@@ -272,7 +269,7 @@ function ProductRouteContent({
             <ProductAssuranceSection content={content} />
 
             {product.detailSections.length > 0 ? (
-              <div className="grid gap-5 border-border border-t py-6 text-sm">
+              <div className="nf-reveal grid gap-5 border-border border-t py-6 text-sm">
                 {product.detailSections.map((section) => (
                   <section key={section.key} className="flex gap-3">
                     <ProductDetailIcon sectionKey={section.key} />
@@ -294,7 +291,7 @@ function ProductRouteContent({
 
       {relatedProducts.length > 0 ? (
         <section className="px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
-          <div className="mx-auto max-w-[1440px] border-border border-t pt-9">
+          <div className="nf-reveal mx-auto max-w-[1440px] border-border border-t pt-9">
             <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
                 <p className="text-muted-foreground text-sm">
@@ -307,7 +304,6 @@ function ProductRouteContent({
               {primaryCategory ? (
                 <Link
                   href={`/shop/${primaryCategory.handle}`}
-                  prefetch={false}
                   className="text-sm font-medium underline-offset-4 hover:underline"
                 >
                   {content.relatedAction}

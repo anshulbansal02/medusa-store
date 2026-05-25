@@ -28,7 +28,6 @@ export function ProductCard({
       <div className="relative">
         <Link
           href={product.href}
-          prefetch={false}
           className="block"
           aria-label={`${content.viewAriaLabelPrefix} ${product.name}`}
         >
@@ -41,7 +40,7 @@ export function ProductCard({
               fetchPriority={eager ? "high" : "auto"}
               sizes="(min-width: 1024px) 25vw, 50vw"
               className={cn(
-                "object-cover transition duration-700 ease-out group-hover:scale-[1.03] motion-reduce:transition-none",
+                "object-cover transition duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none",
                 hoverImage ? "group-hover:opacity-0" : "",
               )}
             />
@@ -52,7 +51,7 @@ export function ProductCard({
                 fill
                 loading="lazy"
                 sizes="(min-width: 1024px) 25vw, 50vw"
-                className="object-cover opacity-0 transition duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100 motion-reduce:transition-none"
+                className="object-cover opacity-0 transition duration-500 ease-out group-hover:scale-[1.02] group-hover:opacity-100 motion-reduce:transition-none"
               />
             ) : null}
             {product.tags.length > 0 ? (
@@ -87,7 +86,7 @@ export function ProductCard({
       </div>
 
       <div className="mt-2 flex flex-col gap-1 sm:mt-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-        <Link href={product.href} prefetch={false} className="block min-w-0">
+        <Link href={product.href} className="block min-w-0">
           <div>
             {categoryName ? (
               <p className="mb-1 text-micro uppercase tracking-label-wide text-muted-foreground">

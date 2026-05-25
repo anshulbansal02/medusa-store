@@ -51,7 +51,6 @@ export function WishlistPageContent({ products }: WishlistPageContentProps) {
         </p>
         <Link
           href="/shop"
-          prefetch={false}
           className={cn(
             buttonVariants({ size: "lg" }),
             "mt-6 h-11 rounded-none px-6",

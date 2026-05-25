@@ -2,7 +2,6 @@ import { X } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { LinkPendingIndicator } from "@/components/site/link-pending-indicator";
 import { siteContent } from "@/content/site-content";
 import { ProductGrid } from "@/features/products/product-grid";
 import { ProductListingFilters } from "@/features/products/product-listing-filters";
@@ -203,7 +202,6 @@ export function ProductListing({
                   <Link
                     key={item.href}
                     href={item.href}
-                    prefetch={false}
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "inline-flex shrink-0 items-center gap-2 border px-4 py-2 text-sm transition",
@@ -213,7 +211,6 @@ export function ProductListing({
                     )}
                   >
                     <span>{item.label}</span>
-                    <LinkPendingIndicator />
                   </Link>
                 );
               })}
@@ -235,12 +232,10 @@ export function ProductListing({
               {activeCategoryFilter ? (
                 <Link
                   href={activeCategoryFilter.href}
-                  prefetch={false}
-                  className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
+                  className="nf-reveal-soft inline-flex items-center gap-2 border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
                 >
                   <span>{activeCategoryFilter.label}</span>
                   <X className="size-3 stroke-icon" aria-hidden="true" />
-                  <LinkPendingIndicator />
                 </Link>
               ) : null}
               {appliedFilters.map((filter) => (
@@ -249,20 +244,17 @@ export function ProductListing({
                   href={buildProductListingHref(actionPath, searchParams, {
                     [filter.key]: null,
                   })}
-                  prefetch={false}
-                  className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
+                  className="nf-reveal-soft inline-flex items-center gap-2 border border-border px-3 py-1.5 text-muted-foreground transition hover:border-foreground hover:text-foreground"
                 >
                   <span>
                     {getAppliedFilterLabel(filter.key)}:{" "}
                     {getAppliedFilterValue(filter.key, filter.value)}
                   </span>
                   <X className="size-3 stroke-icon" aria-hidden="true" />
-                  <LinkPendingIndicator />
                 </Link>
               ))}
               <Link
                 href={clearFiltersHref}
-                prefetch={false}
                 className="px-2 py-1.5 underline-offset-4 hover:underline"
               >
                 {content.clearFiltersLabel}
@@ -311,7 +303,6 @@ export function ProductListing({
                 {emptyActionHref && emptyActionLabel ? (
                   <Link
                     href={emptyActionHref}
-                    prefetch={false}
                     className="mt-5 inline-flex text-sm underline-offset-4 hover:underline"
                   >
                     {emptyActionLabel}

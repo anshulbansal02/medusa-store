@@ -58,7 +58,7 @@ export function ProductListingLayout({
 
       <div
         className={cn(
-          "grid min-w-0 gap-0 transition-[grid-template-columns] duration-300 ease-out",
+          "grid min-w-0 gap-0",
           desktopFiltersOpen
             ? "lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-6"
             : "lg:grid-cols-[0_minmax(0,1fr)]",
@@ -67,10 +67,10 @@ export function ProductListingLayout({
         <aside
           aria-hidden={!desktopFiltersOpen}
           className={cn(
-            "hidden min-w-0 overflow-hidden transition-opacity duration-200 lg:sticky lg:top-28 lg:block lg:h-[calc(100svh-8rem)] lg:self-start",
+            "hidden min-w-0 overflow-hidden transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none lg:sticky lg:top-28 lg:block lg:h-[calc(100svh-8rem)] lg:self-start",
             desktopFiltersOpen
-              ? "pointer-events-auto opacity-100"
-              : "pointer-events-none opacity-0",
+              ? "pointer-events-auto translate-x-0 opacity-100"
+              : "pointer-events-none -translate-x-3 opacity-0",
           )}
         >
           <FilterPanelFrame onClose={() => setDesktopFiltersOpen(false)}>

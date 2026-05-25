@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { LinkPendingIndicator } from "@/components/site/link-pending-indicator";
 import { MobileMenu } from "@/components/site/mobile-menu";
 import { siteContent } from "@/content/site-content";
 import { BagDrawer } from "@/features/cart/bag-drawer";
@@ -29,7 +28,6 @@ export async function SiteHeader() {
           <div className="bg-announcement px-4 py-2 text-center text-micro font-medium uppercase tracking-label text-announcement-foreground sm:px-6 sm:tracking-label-wide lg:px-8">
             <Link
               href={announcement.href}
-              prefetch={false}
               className="mx-auto flex max-w-[1440px] items-center justify-center gap-2 whitespace-nowrap"
             >
               <span>{announcement.label}</span>
@@ -58,7 +56,6 @@ export async function SiteHeader() {
                 className="inline-flex items-center gap-2 transition hover:text-foreground"
               >
                 <span>{item.label}</span>
-                <LinkPendingIndicator />
               </Link>
             ))}
           </nav>
