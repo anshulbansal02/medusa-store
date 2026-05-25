@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { Suspense } from "react";
 
 import { AnalyticsEventOnMount } from "@/components/analytics/ecommerce-events";
 import { EmptyAction } from "@/components/content/empty-action";
@@ -16,14 +17,24 @@ import {
   type StorefrontCart,
 } from "@/lib/medusa/cart";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: siteContent.checkout.metadata.title,
   description: siteContent.checkout.metadata.description,
 };
 
-export default async function CheckoutPage() {
+export default function CheckoutPage() {
+  return (
+    <main className="min-h-screen">
+      <SiteHeader />
+      <Suspense fallback={<CheckoutContentFallback />}>
+        <CheckoutContent />
+      </Suspense>
+      <SiteFooter />
+    </main>
+  );
+}
+
+async function CheckoutContent() {
   const cart = await getCurrentCart();
   const content = siteContent.checkout;
   const shippingOptions = cart?.shippingAddress
@@ -32,26 +43,22 @@ export default async function CheckoutPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <main className="min-h-screen">
-        <SiteHeader />
-        <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 lg:px-8">
-          <EmptyAction
-            eyebrow={content.eyebrow}
-            title={content.emptyTitle}
-            description={content.emptyDescription}
-            actionHref="/shop"
-            actionLabel={content.emptyAction}
-            className="mx-auto max-w-[900px] border-border border-b pb-10"
-            titleAs="h1"
-          />
-        </section>
-        <SiteFooter />
-      </main>
+      <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 lg:px-8">
+        <EmptyAction
+          eyebrow={content.eyebrow}
+          title={content.emptyTitle}
+          description={content.emptyDescription}
+          actionHref="/shop"
+          actionLabel={content.emptyAction}
+          className="mx-auto max-w-[900px] border-border border-b pb-10"
+          titleAs="h1"
+        />
+      </section>
     );
   }
 
   return (
-    <main className="min-h-screen">
+    <>
       <AnalyticsEventOnMount
         event="checkout_viewed"
         data={{
@@ -60,7 +67,6 @@ export default async function CheckoutPage() {
           has_shipping_method: Boolean(cart.selectedShippingOptionId),
         }}
       />
-      <SiteHeader />
 
       <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
         <div className="mx-auto max-w-[1200px]">
@@ -188,9 +194,55 @@ export default async function CheckoutPage() {
           </div>
         </div>
       </section>
+    </>
+  );
+}
 
-      <SiteFooter />
-    </main>
+function CheckoutContentFallback() {
+  return (
+    <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
+      <div className="mx-auto max-w-[1200px]">
+        <div className="border-border border-b pb-7">
+          <div className="h-3 w-20 bg-muted" />
+          <div className="mt-4 h-16 w-60 bg-muted sm:h-24 sm:w-80" />
+        </div>
+        <div className="grid gap-10 py-8 lg:grid-cols-[1fr_360px] lg:items-start">
+          <div className="grid gap-10">
+            {[0, 1].map((section) => (
+              <div
+                key={section}
+                className={section === 1 ? "border-border border-t pt-8" : ""}
+              >
+                <div className="h-5 w-36 bg-muted" />
+                <div className="mt-3 h-3 w-72 max-w-full bg-muted" />
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <div className="h-12 bg-muted" />
+                  <div className="h-12 bg-muted" />
+                  <div className="h-12 bg-muted sm:col-span-2" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="border border-border p-5 sm:p-6">
+            <div className="h-4 w-28 bg-muted" />
+            <div className="mt-5 grid gap-4 border-border border-b pb-5">
+              {[0, 1].map((item) => (
+                <div key={item} className="grid grid-cols-[56px_1fr] gap-3">
+                  <div className="aspect-[4/5] bg-muted" />
+                  <div>
+                    <div className="h-3 w-full bg-muted" />
+                    <div className="mt-3 h-3 w-2/3 bg-muted" />
+                    <div className="mt-4 h-3 w-20 bg-muted" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 h-4 w-full bg-muted" />
+            <div className="mt-6 h-12 w-full bg-muted" />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 

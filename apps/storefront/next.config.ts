@@ -13,6 +13,7 @@ const extraImageHostnames = new Set(
 );
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
   images: {
     remotePatterns: [
       {

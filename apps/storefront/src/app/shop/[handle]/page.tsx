@@ -10,6 +10,7 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { AnalyticsEventOnMount } from "@/components/analytics/ecommerce-events";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -91,6 +92,18 @@ export default async function ProductPage({
   params,
   searchParams,
 }: ProductPageProps) {
+  return (
+    <main className="min-h-screen">
+      <SiteHeader />
+      <Suspense fallback={<ProductRouteFallback />}>
+        <ProductRoute params={params} searchParams={searchParams} />
+      </Suspense>
+      <SiteFooter />
+    </main>
+  );
+}
+
+async function ProductRoute({ params, searchParams }: ProductPageProps) {
   const { handle } = await params;
   const product = await getProductByHandle(handle);
 
@@ -129,7 +142,7 @@ async function CollectionRoute({
   const content = siteContent.collection;
 
   return (
-    <main className="min-h-screen">
+    <>
       <AnalyticsEventOnMount
         event="collection_viewed"
         data={{
@@ -138,7 +151,6 @@ async function CollectionRoute({
           product_count: products.length,
         }}
       />
-      <SiteHeader />
 
       <ProductListing
         actionPath={`/shop/${category.handle}`}
@@ -154,9 +166,7 @@ async function CollectionRoute({
         searchParams={params}
         title={category.name}
       />
-
-      <SiteFooter />
-    </main>
+    </>
   );
 }
 
@@ -172,7 +182,7 @@ function ProductRouteContent({
   const content = siteContent.product;
 
   return (
-    <main className="min-h-screen">
+    <>
       <AnalyticsEventOnMount
         event="product_viewed"
         data={{
@@ -191,7 +201,6 @@ function ProductRouteContent({
           __html: serializeJsonLd(productJsonLd),
         }}
       />
-      <SiteHeader />
 
       <section className="px-4 pt-24 pb-28 sm:px-6 sm:pt-28 sm:pb-20 lg:px-8">
         <div className="mx-auto grid max-w-[1440px] min-w-0 gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] xl:gap-14">
@@ -318,9 +327,82 @@ function ProductRouteContent({
           </div>
         </section>
       ) : null}
+    </>
+  );
+}
 
-      <SiteFooter />
-    </main>
+function ProductRouteFallback() {
+  return (
+    <>
+      <section className="px-4 pt-24 pb-28 sm:px-6 sm:pt-28 sm:pb-20 lg:px-8">
+        <div className="mx-auto grid max-w-[1440px] min-w-0 gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] xl:gap-14">
+          <div className="min-w-0">
+            <div className="aspect-[4/5] bg-muted" />
+            <div className="mt-3 hidden grid-cols-4 gap-3 sm:grid">
+              {[0, 1, 2, 3].map((item) => (
+                <div key={item} className="aspect-[4/5] bg-muted" />
+              ))}
+            </div>
+          </div>
+
+          <div className="min-w-0">
+            <div className="mb-6 h-4 w-48 bg-muted" />
+            <div className="border-border border-b pb-7">
+              <div className="h-3 w-24 bg-muted" />
+              <div className="mt-4 h-16 w-full max-w-lg bg-muted sm:h-20" />
+              <div className="mt-4 h-7 w-28 bg-muted" />
+              <div className="mt-5 h-4 w-full max-w-xl bg-muted" />
+              <div className="mt-3 h-4 w-9/12 max-w-lg bg-muted" />
+            </div>
+
+            <div className="grid gap-6 border-border border-b py-6">
+              <div>
+                <div className="h-4 w-16 bg-muted" />
+                <div className="mt-3 h-4 w-28 bg-muted" />
+              </div>
+              <div>
+                <div className="h-4 w-14 bg-muted" />
+                <div className="mt-4 grid grid-cols-5 gap-3">
+                  {[0, 1, 2, 3, 4].map((item) => (
+                    <div key={item} className="h-12 bg-muted" />
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <div className="h-12 flex-1 bg-muted" />
+                <div className="h-12 w-12 bg-muted" />
+              </div>
+            </div>
+
+            <div className="grid gap-4 py-6 text-sm sm:grid-cols-3">
+              {[0, 1, 2].map((item) => (
+                <div key={item} className="flex gap-3">
+                  <div className="size-5 bg-muted" />
+                  <div className="flex-1">
+                    <div className="h-3 w-20 bg-muted" />
+                    <div className="mt-2 h-3 w-full bg-muted" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+        <div className="mx-auto max-w-[1440px] border-border border-t pt-9">
+          <div className="h-12 w-72 max-w-full bg-muted" />
+          <div className="mt-7 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            {[0, 1, 2, 3].map((item) => (
+              <div key={item}>
+                <div className="aspect-[4/5] bg-muted" />
+                <div className="mt-4 h-4 w-3/4 bg-muted" />
+                <div className="mt-3 h-3 w-1/3 bg-muted" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
 

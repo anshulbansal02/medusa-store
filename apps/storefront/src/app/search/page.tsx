@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { AnalyticsEventOnMount } from "@/components/analytics/ecommerce-events";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -23,6 +24,18 @@ type SearchPageProps = {
 };
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
+  return (
+    <main className="min-h-screen">
+      <SiteHeader />
+      <Suspense fallback={<SearchContentFallback />}>
+        <SearchContent searchParams={searchParams} />
+      </Suspense>
+      <SiteFooter />
+    </main>
+  );
+}
+
+async function SearchContent({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params?.q?.trim() ?? "";
   const [products, categories] = await Promise.all([
@@ -56,7 +69,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     : content.latestLabel;
 
   return (
-    <main className="min-h-screen">
+    <>
       {query ? (
         <AnalyticsEventOnMount
           event="search_submitted"
@@ -67,7 +80,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           }}
         />
       ) : null}
-      <SiteHeader />
 
       <ProductListing
         actionPath="/search"
@@ -99,8 +111,47 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         searchParams={params}
         title={content.title}
       />
+    </>
+  );
+}
 
-      <SiteFooter />
-    </main>
+function SearchContentFallback() {
+  const content = siteContent.search;
+
+  return (
+    <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
+      <div className="mx-auto max-w-[1440px]">
+        <div className="grid gap-6 border-border border-b pb-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div>
+            <p className="text-muted-foreground text-sm">{content.eyebrow}</p>
+            <h1 className="mt-3 font-heading text-6xl leading-none sm:text-8xl">
+              {content.title}
+            </h1>
+            <div className="mt-5 h-4 w-72 max-w-full bg-muted" />
+          </div>
+          <form action="/search" className="flex max-w-2xl gap-3">
+            <Input
+              type="search"
+              name="q"
+              placeholder={content.placeholder}
+              className="h-12 min-w-0 flex-1 rounded-none border-border bg-background px-4"
+            />
+            <Button type="submit" size="lg" className="h-12 rounded-none px-6">
+              {content.action}
+            </Button>
+          </form>
+        </div>
+
+        <div className="grid gap-4 pt-8 sm:grid-cols-2 lg:grid-cols-4">
+          {[0, 1, 2, 3].map((item) => (
+            <div key={item}>
+              <div className="aspect-[4/5] bg-muted" />
+              <div className="mt-4 h-4 w-3/4 bg-muted" />
+              <div className="mt-3 h-3 w-1/3 bg-muted" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

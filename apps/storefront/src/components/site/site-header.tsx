@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { MobileMenu } from "@/components/site/mobile-menu";
 import { siteContent } from "@/content/site-content";
@@ -11,13 +12,7 @@ import { getCurrentCart } from "@/lib/medusa/cart";
 import { getProductCategories } from "@/lib/medusa/categories";
 import { getProducts } from "@/lib/medusa/products";
 
-export async function SiteHeader() {
-  const [cart, categories, searchProducts] = await Promise.all([
-    getCurrentCart(),
-    getProductCategories(5),
-    getProducts({ limit: 12 }),
-  ]);
-  const cartItemCount = cart?.itemCount ?? 0;
+export function SiteHeader() {
   const navItems = siteContent.header.primaryNavigationItems;
   const announcement = siteContent.header.announcement;
 
@@ -67,15 +62,48 @@ export async function SiteHeader() {
             {siteContent.brand.name}
           </Link>
 
-          <div className="flex items-center justify-end gap-1.5">
-            <SearchDialog products={searchProducts} categories={categories} />
-            <WishlistLink />
-            <BagDrawer initialCart={cart} initialItemCount={cartItemCount} />
-          </div>
+          <Suspense fallback={<HeaderActionsFallback />}>
+            <HeaderActions />
+          </Suspense>
         </div>
       </header>
-      <BagHydrator cart={cart} />
+      <Suspense fallback={null}>
+        <HeaderHydration />
+      </Suspense>
       <BagToast />
     </>
+  );
+}
+
+async function HeaderActions() {
+  const [cart, categories, searchProducts] = await Promise.all([
+    getCurrentCart(),
+    getProductCategories(5),
+    getProducts({ limit: 12 }),
+  ]);
+  const cartItemCount = cart?.itemCount ?? 0;
+
+  return (
+    <div className="flex items-center justify-end gap-1.5">
+      <SearchDialog products={searchProducts} categories={categories} />
+      <WishlistLink />
+      <BagDrawer initialCart={cart} initialItemCount={cartItemCount} />
+    </div>
+  );
+}
+
+async function HeaderHydration() {
+  const cart = await getCurrentCart();
+
+  return <BagHydrator cart={cart} />;
+}
+
+function HeaderActionsFallback() {
+  return (
+    <div className="flex items-center justify-end gap-1.5">
+      <SearchDialog products={[]} categories={[]} />
+      <WishlistLink />
+      <BagDrawer initialCart={null} initialItemCount={0} />
+    </div>
   );
 }

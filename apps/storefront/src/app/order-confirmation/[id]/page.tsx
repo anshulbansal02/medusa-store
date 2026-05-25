@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { AnalyticsEventOnMount } from "@/components/analytics/ecommerce-events";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -11,8 +12,6 @@ import { siteContent } from "@/content/site-content";
 import { hasOrderAccess } from "@/features/orders/order-access";
 import { getOrderById } from "@/lib/medusa/orders";
 import { cn } from "@/lib/utils";
-
-export const dynamic = "force-dynamic";
 
 type OrderConfirmationPageProps = {
   params: Promise<{
@@ -38,6 +37,20 @@ export async function generateMetadata({
 export default async function OrderConfirmationPage({
   params,
 }: OrderConfirmationPageProps) {
+  return (
+    <main className="min-h-screen">
+      <SiteHeader />
+      <Suspense fallback={<OrderConfirmationFallback />}>
+        <OrderConfirmationContent params={params} />
+      </Suspense>
+      <SiteFooter />
+    </main>
+  );
+}
+
+async function OrderConfirmationContent({
+  params,
+}: OrderConfirmationPageProps) {
   const { id } = await params;
   const canViewOrder = await hasOrderAccess(id);
 
@@ -54,7 +67,7 @@ export default async function OrderConfirmationPage({
   const content = siteContent.orderConfirmation;
 
   return (
-    <main className="min-h-screen">
+    <>
       <AnalyticsEventOnMount
         event="order_completed"
         data={{
@@ -67,7 +80,6 @@ export default async function OrderConfirmationPage({
           has_shipping_address: Boolean(order.shippingAddress),
         }}
       />
-      <SiteHeader />
 
       <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
         <div className="mx-auto max-w-[1200px]">
@@ -217,8 +229,60 @@ export default async function OrderConfirmationPage({
           </div>
         </div>
       </section>
+    </>
+  );
+}
 
-      <SiteFooter />
-    </main>
+function OrderConfirmationFallback() {
+  return (
+    <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">
+      <div className="mx-auto max-w-[1200px]">
+        <div className="grid gap-8 border-border border-b pb-8 lg:grid-cols-[0.74fr_1.26fr] lg:items-end">
+          <div>
+            <div className="h-3 w-24 bg-muted" />
+            <div className="mt-4 h-16 w-72 bg-muted sm:h-24 sm:w-96" />
+          </div>
+          <div>
+            <div className="h-4 max-w-xl bg-muted" />
+            <div className="mt-5 flex gap-3">
+              <div className="h-9 w-24 bg-muted" />
+              <div className="h-9 w-32 bg-muted" />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-10 py-8 lg:grid-cols-[1fr_360px] lg:items-start">
+          <div>
+            <div className="h-5 w-24 bg-muted" />
+            <div className="mt-5 divide-y divide-border border-y border-border">
+              {[0, 1].map((item) => (
+                <div
+                  key={item}
+                  className="grid grid-cols-[76px_1fr] gap-4 py-4"
+                >
+                  <div className="aspect-[4/5] bg-muted" />
+                  <div>
+                    <div className="h-3 w-44 bg-muted" />
+                    <div className="mt-3 h-3 w-32 bg-muted" />
+                    <div className="mt-4 h-3 w-24 bg-muted" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="border border-border p-5 sm:p-6">
+            <div className="h-4 w-28 bg-muted" />
+            <div className="mt-5 grid gap-3 border-border border-b pb-5">
+              <div className="h-3 w-full bg-muted" />
+              <div className="h-3 w-10/12 bg-muted" />
+              <div className="h-3 w-11/12 bg-muted" />
+            </div>
+            <div className="mt-5 h-4 w-full bg-muted" />
+            <div className="mt-6 h-12 w-full bg-muted" />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

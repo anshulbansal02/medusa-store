@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { EmptyAction } from "@/components/content/empty-action";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -10,17 +11,13 @@ import { siteContent } from "@/content/site-content";
 import { getCurrentCart } from "@/lib/medusa/cart";
 import { cn } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: siteContent.bag.metadata.title,
   description: siteContent.bag.metadata.description,
 };
 
-export default async function BagPage() {
-  const cart = await getCurrentCart();
+export default function BagPage() {
   const content = siteContent.bag;
-  const hasItems = Boolean(cart?.items.length);
 
   return (
     <main className="min-h-screen">
@@ -35,108 +32,150 @@ export default async function BagPage() {
             </h1>
           </div>
 
-          {hasItems && cart ? (
-            <div className="grid gap-10 py-8 lg:grid-cols-[1fr_360px] lg:items-start">
-              <div className="grid gap-6">
-                {cart.items.map((item, index) => (
-                  <article
-                    key={item.id}
-                    className="grid grid-cols-[96px_1fr] gap-4 border-border border-b pb-6 sm:grid-cols-[132px_1fr]"
-                  >
-                    <Link
-                      href={item.href}
-                      className="relative aspect-[4/5] overflow-hidden bg-muted"
-                    >
-                      {item.image ? (
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          loading={index === 0 ? "eager" : "lazy"}
-                          sizes="132px"
-                          className="object-cover"
-                        />
-                      ) : null}
-                    </Link>
-
-                    <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
-                      <div>
-                        <Link
-                          href={item.href}
-                          className="font-medium hover:underline hover:underline-offset-4"
-                        >
-                          {item.name}
-                        </Link>
-                        {item.variant ? (
-                          <p className="mt-1 text-muted-foreground text-sm">
-                            {item.variant}
-                          </p>
-                        ) : null}
-                        <p className="mt-3 text-sm">
-                          {content.quantityPrefix} {item.quantity} ·{" "}
-                          {item.unitPrice}
-                        </p>
-                      </div>
-                      <p className="font-medium sm:text-right">{item.total}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-
-              <aside className="border border-border p-5 sm:p-6 lg:sticky lg:top-24">
-                <h2 className="font-medium">{content.summaryTitle}</h2>
-                <div className="mt-5 grid gap-3 border-border border-b pb-5 text-sm">
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">
-                      {content.subtotalLabel} · {cart.itemCount}{" "}
-                      {cart.itemCount === 1
-                        ? content.itemSingular
-                        : content.itemPlural}
-                    </span>
-                    <span>{cart.subtotal}</span>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">
-                      {content.shippingLabel}
-                    </span>
-                    <span>
-                      {cart.selectedShippingOptionId
-                        ? cart.shippingTotal
-                        : content.shippingPendingLabel}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-5 flex justify-between gap-4 font-medium">
-                  <span>{content.totalLabel}</span>
-                  <span>{cart.total}</span>
-                </div>
-                <Link
-                  href="/checkout"
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "mt-6 h-12 w-full rounded-none",
-                  )}
-                >
-                  {content.checkoutFullAction}
-                </Link>
-                <p className="mt-4 text-muted-foreground text-sm">
-                  {content.summaryNote}
-                </p>
-              </aside>
-            </div>
-          ) : (
-            <EmptyAction
-              title={content.emptyTitle}
-              description={content.emptyPageDescription}
-              actionHref="/shop"
-              actionLabel={content.emptyAction}
-              titleClassName="mt-0 font-sans text-xl leading-snug sm:text-xl"
-            />
-          )}
+          <Suspense fallback={<BagContentFallback />}>
+            <BagContent />
+          </Suspense>
         </div>
       </section>
 
       <SiteFooter />
     </main>
+  );
+}
+
+async function BagContent() {
+  const cart = await getCurrentCart();
+  const content = siteContent.bag;
+  const hasItems = Boolean(cart?.items.length);
+
+  if (!hasItems || !cart) {
+    return (
+      <EmptyAction
+        title={content.emptyTitle}
+        description={content.emptyPageDescription}
+        actionHref="/shop"
+        actionLabel={content.emptyAction}
+        titleClassName="mt-0 font-sans text-xl leading-snug sm:text-xl"
+      />
+    );
+  }
+
+  return (
+    <div className="grid gap-10 py-8 lg:grid-cols-[1fr_360px] lg:items-start">
+      <div className="grid gap-6">
+        {cart.items.map((item, index) => (
+          <article
+            key={item.id}
+            className="grid grid-cols-[96px_1fr] gap-4 border-border border-b pb-6 sm:grid-cols-[132px_1fr]"
+          >
+            <Link
+              href={item.href}
+              className="relative aspect-[4/5] overflow-hidden bg-muted"
+            >
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  loading={index === 0 ? "eager" : "lazy"}
+                  sizes="132px"
+                  className="object-cover"
+                />
+              ) : null}
+            </Link>
+
+            <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+              <div>
+                <Link
+                  href={item.href}
+                  className="font-medium hover:underline hover:underline-offset-4"
+                >
+                  {item.name}
+                </Link>
+                {item.variant ? (
+                  <p className="mt-1 text-muted-foreground text-sm">
+                    {item.variant}
+                  </p>
+                ) : null}
+                <p className="mt-3 text-sm">
+                  {content.quantityPrefix} {item.quantity} · {item.unitPrice}
+                </p>
+              </div>
+              <p className="font-medium sm:text-right">{item.total}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <aside className="border border-border p-5 sm:p-6 lg:sticky lg:top-24">
+        <h2 className="font-medium">{content.summaryTitle}</h2>
+        <div className="mt-5 grid gap-3 border-border border-b pb-5 text-sm">
+          <div className="flex justify-between gap-4">
+            <span className="text-muted-foreground">
+              {content.subtotalLabel} · {cart.itemCount}{" "}
+              {cart.itemCount === 1 ? content.itemSingular : content.itemPlural}
+            </span>
+            <span>{cart.subtotal}</span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span className="text-muted-foreground">
+              {content.shippingLabel}
+            </span>
+            <span>
+              {cart.selectedShippingOptionId
+                ? cart.shippingTotal
+                : content.shippingPendingLabel}
+            </span>
+          </div>
+        </div>
+        <div className="mt-5 flex justify-between gap-4 font-medium">
+          <span>{content.totalLabel}</span>
+          <span>{cart.total}</span>
+        </div>
+        <Link
+          href="/checkout"
+          className={cn(
+            buttonVariants({ size: "lg" }),
+            "mt-6 h-12 w-full rounded-none",
+          )}
+        >
+          {content.checkoutFullAction}
+        </Link>
+        <p className="mt-4 text-muted-foreground text-sm">
+          {content.summaryNote}
+        </p>
+      </aside>
+    </div>
+  );
+}
+
+function BagContentFallback() {
+  return (
+    <div className="grid gap-10 py-8 lg:grid-cols-[1fr_360px] lg:items-start">
+      <div className="grid gap-6">
+        {[0, 1].map((item) => (
+          <div
+            key={item}
+            className="grid grid-cols-[96px_1fr] gap-4 border-border border-b pb-6 sm:grid-cols-[132px_1fr]"
+          >
+            <div className="aspect-[4/5] bg-muted" />
+            <div className="pt-1">
+              <div className="h-4 w-44 bg-muted" />
+              <div className="mt-3 h-3 w-28 bg-muted" />
+              <div className="mt-5 h-3 w-36 bg-muted" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="border border-border p-5 sm:p-6">
+        <div className="h-4 w-28 bg-muted" />
+        <div className="mt-5 grid gap-3 border-border border-b pb-5">
+          <div className="h-3 w-full bg-muted" />
+          <div className="h-3 w-10/12 bg-muted" />
+        </div>
+        <div className="mt-5 h-4 w-full bg-muted" />
+        <div className="mt-6 h-12 w-full bg-muted" />
+      </div>
+    </div>
   );
 }
