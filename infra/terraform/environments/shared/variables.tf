@@ -254,7 +254,7 @@ variable "cloudflare_access_session_duration" {
 }
 
 variable "cloudflare_web_analytics_enabled" {
-  description = "Whether to create Cloudflare Web Analytics sites for storefront hostnames."
+  description = "Whether to create the Cloudflare Web Analytics site for the QA storefront hostname."
   type        = bool
   default     = false
 

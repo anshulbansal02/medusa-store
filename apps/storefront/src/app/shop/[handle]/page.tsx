@@ -11,6 +11,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AnalyticsEventOnMount } from "@/components/analytics/ecommerce-events";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { siteContent } from "@/content/site-content";
@@ -129,6 +130,14 @@ async function CollectionRoute({
 
   return (
     <main className="min-h-screen">
+      <AnalyticsEventOnMount
+        event="collection_viewed"
+        data={{
+          collection_handle: category.handle,
+          collection_name: category.name,
+          product_count: products.length,
+        }}
+      />
       <SiteHeader />
 
       <ProductListing
@@ -164,6 +173,17 @@ function ProductRouteContent({
 
   return (
     <main className="min-h-screen">
+      <AnalyticsEventOnMount
+        event="product_viewed"
+        data={{
+          product_id: product.id,
+          product_handle: product.handle,
+          product_name: product.name,
+          categories: product.categories.map((category) => category.name),
+          price_amount: product.priceAmount,
+          currency: product.currencyCode,
+        }}
+      />
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD is generated server-side and serialized with "<" escaped.
@@ -233,6 +253,7 @@ function ProductRouteContent({
 
             <AddToCartForm
               key={product.id}
+              productId={product.id}
               productName={product.name}
               productPrice={product.price}
               color={product.color}

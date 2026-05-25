@@ -4,6 +4,7 @@ import { Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useWishlistStore } from "@/features/wishlist/wishlist-store";
+import { trackAnalyticsEvent } from "@/lib/analytics/events";
 import { cn } from "@/lib/utils";
 
 type WishlistButtonProps = {
@@ -23,6 +24,16 @@ export function WishlistButton({
   const hasHydrated = useWishlistStore((state) => state.hasHydrated);
   const toggleProduct = useWishlistStore((state) => state.toggleProduct);
   const isSaved = hasHydrated && productIds.includes(productId);
+  function handleClick() {
+    toggleProduct(productId);
+    trackAnalyticsEvent(
+      isSaved ? "wishlist_item_removed" : "wishlist_item_added",
+      {
+        product_id: productId,
+        product_name: productName,
+      },
+    );
+  }
 
   return (
     <Button
@@ -42,7 +53,7 @@ export function WishlistButton({
           : "size-8 rounded-full border border-background/85 bg-background/88 text-foreground shadow-md backdrop-blur-sm transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-150 ease-out hover:-translate-y-0.5 hover:border-background hover:bg-background hover:text-primary hover:shadow-lg active:translate-y-0 active:scale-95 data-[saved=true]:border-background data-[saved=true]:bg-background data-[saved=true]:text-primary motion-reduce:transition-none sm:size-10 sm:shadow-lg sm:hover:shadow-xl",
         className,
       )}
-      onClick={() => toggleProduct(productId)}
+      onClick={handleClick}
     >
       <Heart
         className={cn(

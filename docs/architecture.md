@@ -285,17 +285,26 @@ Implementation:
 
 ## Analytics
 
-Use Cloudflare Web Analytics for v1 basic website visibility.
+Use Cloudflare Web Analytics for v1 basic website visibility. Use the existing
+Better Stack browser tag for lightweight QA funnel events so the storefront does
+not need another analytics vendor for v1.
 
 Rules:
 
 - Track basic page/performance/referrer/device visibility.
+- Track only privacy-safe storefront events such as product views, collection
+  views, cart additions, checkout start/payment status, wishlist toggles, and
+  order completion counts.
 - Do not use Google Analytics.
 - Do not use Meta/ads pixels.
-- Do not track customer/payment/order data.
+- Do not track customer PII, addresses, phone numbers, payment IDs, raw search
+  terms, or order IDs.
 - Keep commerce visibility in Medusa Admin, Razorpay, Resend, Better Stack, and logs.
 
-If custom events or lightweight funnel visibility becomes necessary later, evaluate Umami Cloud before heavier product analytics tools.
+If Better Stack browser events are not sufficient after QA, evaluate PostHog for
+product analytics before adding another lightweight pageview tool. Umami is a
+reasonable web analytics tool, but it overlaps more with Cloudflare Web
+Analytics and Better Stack than it improves ecommerce event analysis.
 
 ## Search Infrastructure
 

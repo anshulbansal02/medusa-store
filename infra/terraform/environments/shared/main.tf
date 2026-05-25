@@ -40,10 +40,6 @@ locals {
     }
   } : {}
   cloudflare_web_analytics_sites = var.cloudflare_web_analytics_enabled ? {
-    production = {
-      host         = var.production_storefront_domain
-      auto_install = false
-    }
     qa = {
       host         = var.qa_storefront_domain
       auto_install = false
@@ -225,16 +221,7 @@ module "vercel_storefront_prod" {
         comment   = "Allowed image hostnames for production storefront deployments."
       }
     },
-    local.vercel_storefront_prod_secret_environment_variables,
-    var.cloudflare_site_enabled && var.cloudflare_web_analytics_enabled ? {
-      cloudflare_web_analytics_token = {
-        key       = "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN"
-        value     = module.cloudflare_site[0].web_analytics_site_tokens["production"]
-        target    = ["production"]
-        sensitive = false
-        comment   = "Cloudflare Web Analytics token for the production storefront."
-      }
-    } : {}
+    local.vercel_storefront_prod_secret_environment_variables
   )
 }
 

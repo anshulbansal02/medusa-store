@@ -444,9 +444,12 @@ Current status:
 - Terraform manages QA Medusa non-secret R2 runtime SSM parameters for `S3_FILE_URL`, `S3_BUCKET`, `S3_ENDPOINT`, and `S3_REGION`.
 - QA R2 S3 credentials are stored in SSM `SecureString` and Medusa upload/read has been smoke tested.
 - Shared operator/provider credentials and setup config are stored in SSM under `/ecom/shared/operator/*` so local `.env` files are not the long-term source of truth.
-- Production `api`, production `admin`, production R2 S3 credentials, production Cloudflare Access, WAF/ruleset baseline, Turnstile, and Web Analytics activation remain pending.
+- Production `api`, production `admin`, production R2 S3 credentials, production Cloudflare Access, WAF/ruleset baseline, Turnstile, and production Web Analytics activation remain pending.
 - `qa-api.example.com` and `qa-admin.example.com` route to the QA Lightsail Medusa service; `qa-admin.example.com` is proxied through Cloudflare, and QA Access is Terraform-wired as an opt-in setting.
-- Web Analytics Terraform wiring exists but is disabled until the Cloudflare API token has Web Analytics/RUM write permission.
+- Web Analytics Terraform wiring is active for QA only. The Cloudflare API token
+  must include account-level `Account Settings: Write` to create/update Web
+  Analytics sites and `Account Settings: Read` so future Terraform plans can
+  refresh Web Analytics state.
 - QA Cloudflare Access Terraform wiring exists but is disabled until the Cloudflare API token has Zero Trust Access write permission and the admin email allowlist is confirmed.
 
 Rules:

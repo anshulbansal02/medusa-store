@@ -68,6 +68,7 @@ export function ProductQuickLook({
           <section className="border border-border p-4 lg:sticky lg:top-24 lg:self-start lg:p-5">
             <AddToCartForm
               key={product.id}
+              productId={product.id}
               productName={product.name}
               productPrice={product.price}
               color={product.color}

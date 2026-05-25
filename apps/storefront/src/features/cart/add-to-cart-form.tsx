@@ -14,6 +14,7 @@ import {
   useBagStore,
 } from "@/features/cart/bag-store";
 import { ProductSizeFinder } from "@/features/products/product-size-finder";
+import { trackAnalyticsEvent } from "@/lib/analytics/events";
 import type {
   ProductDetailVariant,
   ProductSizeChart,
@@ -21,6 +22,7 @@ import type {
 import { cn } from "@/lib/utils";
 
 type AddToCartFormProps = {
+  productId: string;
   productName: string;
   productPrice: string;
   color: string;
@@ -35,6 +37,7 @@ type AddToCartFormProps = {
 type AddToBagContent = typeof siteContent.addToBag;
 
 export function AddToCartForm({
+  productId,
   productName,
   productPrice,
   showStickyBar = true,
@@ -72,6 +75,14 @@ export function AddToCartForm({
         setMessage("");
         setCart(result.cart);
         showAddedItem(result.addedItem, toastPlacement);
+        trackAnalyticsEvent("cart_item_added", {
+          product_id: productId,
+          product_name: productName,
+          quantity,
+          variant_id: selectedVariant?.id,
+          variant_title: selectedVariant?.title,
+          size: selectedVariant?.size,
+        });
         router.refresh();
         return;
       }

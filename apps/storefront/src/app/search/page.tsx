@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { AnalyticsEventOnMount } from "@/components/analytics/ecommerce-events";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <main className="min-h-screen">
+      {query ? (
+        <AnalyticsEventOnMount
+          event="search_submitted"
+          data={{
+            query_length: query.length,
+            result_count: results.length,
+            has_category_filter: Boolean(params?.category),
+          }}
+        />
+      ) : null}
       <SiteHeader />
 
       <ProductListing

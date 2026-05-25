@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
+import { AnalyticsEventOnMount } from "@/components/analytics/ecommerce-events";
 import { EmptyAction } from "@/components/content/empty-action";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -51,6 +52,14 @@ export default async function CheckoutPage() {
 
   return (
     <main className="min-h-screen">
+      <AnalyticsEventOnMount
+        event="checkout_viewed"
+        data={{
+          item_count: cart.itemCount,
+          has_shipping_address: Boolean(cart.shippingAddress),
+          has_shipping_method: Boolean(cart.selectedShippingOptionId),
+        }}
+      />
       <SiteHeader />
 
       <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">

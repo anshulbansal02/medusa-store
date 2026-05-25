@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AnalyticsEventOnMount } from "@/components/analytics/ecommerce-events";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonVariants } from "@/components/ui/button";
@@ -54,6 +55,18 @@ export default async function OrderConfirmationPage({
 
   return (
     <main className="min-h-screen">
+      <AnalyticsEventOnMount
+        event="order_completed"
+        data={{
+          item_count: order.items.reduce(
+            (total, item) => total + item.quantity,
+            0,
+          ),
+          order_status: order.status,
+          discount_applied: order.discountAmount > 0,
+          has_shipping_address: Boolean(order.shippingAddress),
+        }}
+      />
       <SiteHeader />
 
       <section className="px-4 pt-28 pb-14 sm:px-6 sm:pt-32 sm:pb-20 lg:px-8">

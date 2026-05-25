@@ -10,6 +10,7 @@ import {
   startRazorpayPaymentAction,
   verifyAndCompleteRazorpayPaymentAction,
 } from "@/features/checkout/actions";
+import { trackAnalyticsEvent } from "@/lib/analytics/events";
 
 type RazorpayCheckoutResponse = {
   razorpay_order_id: string;
@@ -116,6 +117,11 @@ export function RazorpayPaymentButton({
         return;
       }
 
+      trackAnalyticsEvent("checkout_payment_started", {
+        amount_minor: result.payment.amount,
+        currency: result.payment.currency,
+      });
+
       const checkoutOptions: RazorpayConstructorOptions = {
         key: publicKey,
         amount: result.payment.amount,
@@ -140,11 +146,15 @@ export function RazorpayPaymentButton({
               return;
             }
 
+            trackAnalyticsEvent("checkout_payment_completed");
             router.push(`/order-confirmation/${completion.orderId}`);
           });
         },
         modal: {
-          ondismiss: () => setMessage(content.dismissed),
+          ondismiss: () => {
+            trackAnalyticsEvent("checkout_payment_dismissed");
+            setMessage(content.dismissed);
+          },
         },
       };
       const checkout = new RazorpayCheckout(checkoutOptions);
